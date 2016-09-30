@@ -29,20 +29,18 @@ package org.hl7.fhir.dstu3.model;
   
 */
 
-// Generated on Sat, Jul 2, 2016 11:26-0400 for FHIR v1.4.0
+// Generated on Thu, Aug 25, 2016 23:04-0400 for FHIR v1.6.0
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
-import java.util.*;
-
+import org.hl7.fhir.exceptions.FHIRException;
+import org.hl7.fhir.dstu3.model.Enumerations.DocumentReferenceStatus;
+import org.hl7.fhir.dstu3.model.Enumerations.DocumentReferenceStatusEnumFactory;
+import org.hl7.fhir.instance.model.api.IBaseBackboneElement;
 import org.hl7.fhir.utilities.Utilities;
-import org.hl7.fhir.dstu3.model.Enumerations.*;
-import ca.uhn.fhir.model.api.annotation.ResourceDef;
-import ca.uhn.fhir.model.api.annotation.SearchParamDefinition;
-import ca.uhn.fhir.model.api.annotation.Child;
-import ca.uhn.fhir.model.api.annotation.ChildOrder;
-import ca.uhn.fhir.model.api.annotation.Description;
-import ca.uhn.fhir.model.api.annotation.Block;
-import org.hl7.fhir.instance.model.api.*;
-import org.hl7.fhir.dstu3.exceptions.FHIRException;
+
+import ca.uhn.fhir.model.api.annotation.*;
 /**
  * A manifest that defines a set of documents.
  */
@@ -54,7 +52,7 @@ public class DocumentManifest extends DomainResource {
         /**
          * The list of references to document content, or Attachment that consist of the parts of this document manifest. Usually, these would be document references, but direct references to Media or Attachments are also allowed.
          */
-        @Child(name = "p", type = {Attachment.class}, order=1, min=1, max=1, modifier=false, summary=true)
+        @Child(name = "p", type = {Attachment.class, Reference.class}, order=1, min=1, max=1, modifier=false, summary=true)
         @Description(shortDefinition="Contents of this set of documents", formalDefinition="The list of references to document content, or Attachment that consist of the parts of this document manifest. Usually, these would be document references, but direct references to Media or Attachments are also allowed." )
         protected Type p;
 
@@ -224,14 +222,14 @@ public class DocumentManifest extends DomainResource {
         protected Identifier identifier;
 
         /**
-         * Related Resource to this DocumentManifest. For example, Order, DiagnosticOrder,  Procedure, EligibilityRequest, etc.
+         * Related Resource to this DocumentManifest. For example, Order, DiagnosticRequest,  Procedure, EligibilityRequest, etc.
          */
-        @Child(name = "ref", type = {}, order=2, min=0, max=1, modifier=false, summary=true)
-        @Description(shortDefinition="Related Resource", formalDefinition="Related Resource to this DocumentManifest. For example, Order, DiagnosticOrder,  Procedure, EligibilityRequest, etc." )
+        @Child(name = "ref", type = {Reference.class}, order=2, min=0, max=1, modifier=false, summary=true)
+        @Description(shortDefinition="Related Resource", formalDefinition="Related Resource to this DocumentManifest. For example, Order, DiagnosticRequest,  Procedure, EligibilityRequest, etc." )
         protected Reference ref;
 
         /**
-         * The actual object that is the target of the reference (Related Resource to this DocumentManifest. For example, Order, DiagnosticOrder,  Procedure, EligibilityRequest, etc.)
+         * The actual object that is the target of the reference (Related Resource to this DocumentManifest. For example, Order, DiagnosticRequest,  Procedure, EligibilityRequest, etc.)
          */
         protected Resource refTarget;
 
@@ -269,7 +267,7 @@ public class DocumentManifest extends DomainResource {
         }
 
         /**
-         * @return {@link #ref} (Related Resource to this DocumentManifest. For example, Order, DiagnosticOrder,  Procedure, EligibilityRequest, etc.)
+         * @return {@link #ref} (Related Resource to this DocumentManifest. For example, Order, DiagnosticRequest,  Procedure, EligibilityRequest, etc.)
          */
         public Reference getRef() { 
           if (this.ref == null)
@@ -285,7 +283,7 @@ public class DocumentManifest extends DomainResource {
         }
 
         /**
-         * @param value {@link #ref} (Related Resource to this DocumentManifest. For example, Order, DiagnosticOrder,  Procedure, EligibilityRequest, etc.)
+         * @param value {@link #ref} (Related Resource to this DocumentManifest. For example, Order, DiagnosticRequest,  Procedure, EligibilityRequest, etc.)
          */
         public DocumentManifestRelatedComponent setRef(Reference value) { 
           this.ref = value;
@@ -293,14 +291,14 @@ public class DocumentManifest extends DomainResource {
         }
 
         /**
-         * @return {@link #ref} The actual object that is the target of the reference. The reference library doesn't populate this, but you can use it to hold the resource if you resolve it. (Related Resource to this DocumentManifest. For example, Order, DiagnosticOrder,  Procedure, EligibilityRequest, etc.)
+         * @return {@link #ref} The actual object that is the target of the reference. The reference library doesn't populate this, but you can use it to hold the resource if you resolve it. (Related Resource to this DocumentManifest. For example, Order, DiagnosticRequest,  Procedure, EligibilityRequest, etc.)
          */
         public Resource getRefTarget() { 
           return this.refTarget;
         }
 
         /**
-         * @param value {@link #ref} The actual object that is the target of the reference. The reference library doesn't use these, but you can use it to hold the resource if you resolve it. (Related Resource to this DocumentManifest. For example, Order, DiagnosticOrder,  Procedure, EligibilityRequest, etc.)
+         * @param value {@link #ref} The actual object that is the target of the reference. The reference library doesn't use these, but you can use it to hold the resource if you resolve it. (Related Resource to this DocumentManifest. For example, Order, DiagnosticRequest,  Procedure, EligibilityRequest, etc.)
          */
         public DocumentManifestRelatedComponent setRefTarget(Resource value) { 
           this.refTarget = value;
@@ -310,7 +308,7 @@ public class DocumentManifest extends DomainResource {
         protected void listChildren(List<Property> childrenList) {
           super.listChildren(childrenList);
           childrenList.add(new Property("identifier", "Identifier", "Related identifier to this DocumentManifest.  For example, Order numbers, accession numbers, XDW workflow numbers.", 0, java.lang.Integer.MAX_VALUE, identifier));
-          childrenList.add(new Property("ref", "Reference(Any)", "Related Resource to this DocumentManifest. For example, Order, DiagnosticOrder,  Procedure, EligibilityRequest, etc.", 0, java.lang.Integer.MAX_VALUE, ref));
+          childrenList.add(new Property("ref", "Reference(Any)", "Related Resource to this DocumentManifest. For example, Order, DiagnosticRequest,  Procedure, EligibilityRequest, etc.", 0, java.lang.Integer.MAX_VALUE, ref));
         }
 
       @Override

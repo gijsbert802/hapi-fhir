@@ -29,19 +29,16 @@ package org.hl7.fhir.dstu3.model;
   
 */
 
-// Generated on Fri, Jul 1, 2016 14:13-0400 for FHIR v1.4.0
+// Generated on Thu, Aug 25, 2016 23:04-0400 for FHIR v1.6.0
+import java.util.List;
 
-import java.util.*;
+import org.hl7.fhir.exceptions.FHIRException;
+import org.hl7.fhir.instance.model.api.INarrative;
 import org.hl7.fhir.utilities.xhtml.XhtmlNode;
 
-import org.hl7.fhir.utilities.Utilities;
 import ca.uhn.fhir.model.api.annotation.Child;
-import ca.uhn.fhir.model.api.annotation.ChildOrder;
-import ca.uhn.fhir.model.api.annotation.Description;
 import ca.uhn.fhir.model.api.annotation.DatatypeDef;
-import ca.uhn.fhir.model.api.annotation.Block;
-import org.hl7.fhir.instance.model.api.*;
-import org.hl7.fhir.dstu3.exceptions.FHIRException;
+import ca.uhn.fhir.model.api.annotation.Description;
 /**
  * A human-readable formatted text, including images.
  */
@@ -58,7 +55,7 @@ public class Narrative extends BaseNarrative implements INarrative {
          */
         EXTENSIONS, 
         /**
-         * The contents of the narrative contain additional information not found in the structured data
+         * The contents of the narrative may contain additional information not found in the structured data. Note that there is no computable way to determine what the extra information is, other than by human inspection
          */
         ADDITIONAL, 
         /**
@@ -107,7 +104,7 @@ public class Narrative extends BaseNarrative implements INarrative {
           switch (this) {
             case GENERATED: return "The contents of the narrative are entirely generated from the structured data in the content.";
             case EXTENSIONS: return "The contents of the narrative are entirely generated from the structured data in the content and some of the content is generated from extensions";
-            case ADDITIONAL: return "The contents of the narrative contain additional information not found in the structured data";
+            case ADDITIONAL: return "The contents of the narrative may contain additional information not found in the structured data. Note that there is no computable way to determine what the extra information is, other than by human inspection";
             case EMPTY: return "The contents of the narrative are some equivalent of \"No human-readable text provided in this case\"";
             default: return "?";
           }

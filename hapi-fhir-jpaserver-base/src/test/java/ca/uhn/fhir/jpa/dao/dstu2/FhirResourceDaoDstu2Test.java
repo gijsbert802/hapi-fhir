@@ -44,6 +44,7 @@ import ca.uhn.fhir.jpa.dao.BaseHapiFhirDao;
 import ca.uhn.fhir.jpa.dao.BaseHapiFhirResourceDao;
 import ca.uhn.fhir.jpa.dao.FhirResourceDaoDstu2;
 import ca.uhn.fhir.jpa.dao.SearchParameterMap;
+import ca.uhn.fhir.jpa.dao.dstu3.FhirResourceDaoDstu3Test;
 import ca.uhn.fhir.jpa.entity.ResourceIndexedSearchParamString;
 import ca.uhn.fhir.jpa.entity.TagTypeEnum;
 import ca.uhn.fhir.model.api.IQueryParameterType;
@@ -804,7 +805,8 @@ public class FhirResourceDaoDstu2Test extends BaseJpaDstu2Test {
 			myOrganizationDao.delete(orgId, mySrd);
 			fail();
 		} catch (ResourceVersionConflictException e) {
-			assertThat(e.getMessage(), containsString("Delete failed because of constraint"));
+			FhirResourceDaoDstu3Test.assertConflictException(e);
+
 		}
 
 		myPatientDao.delete(patId, mySrd);
@@ -878,7 +880,7 @@ public class FhirResourceDaoDstu2Test extends BaseJpaDstu2Test {
 		try {
 			myPatientDao.delete(id2, mySrd);
 			fail();
-		} catch (InvalidRequestException e) {
+		} catch (ResourceVersionConflictException e) {
 			// good
 		}
 
@@ -1635,28 +1637,29 @@ public class FhirResourceDaoDstu2Test extends BaseJpaDstu2Test {
 	public void testOrganizationName() {
 
 		//@formatter:off
-		String inputStr = "{\"resourceType\":\"Organization\",\n" + 
-				"                \"extension\":[\n" + 
-				"                    {\n" + 
-				"                        \"url\":\"http://fhir.connectinggta.ca/Profile/organization#providerIdPool\",\n" + 
-				"                        \"valueUri\":\"urn:oid:2.16.840.1.113883.3.239.23.21.1\"\n" + 
-				"                    }\n" + 
-				"                ],\n" + 
-				"                \"text\":{\n" + 
-				"                    \"status\":\"empty\",\n" + 
-				"                    \"div\":\"<div xmlns=\\\"http://www.w3.org/1999/xhtml\\\">No narrative template available for resource profile: http://fhir.connectinggta.ca/Profile/organization</div>\"\n" + 
-				"                },\n" + 
-				"                \"identifier\":[\n" + 
-				"                    {\n" + 
-				"                        \"use\":\"official\",\n" + 
-				"                        \"label\":\"HSP 2.16.840.1.113883.3.239.23.21\",\n" + 
-				"                        \"system\":\"urn:cgta:hsp_ids\",\n" + 
-				"                        \"value\":\"urn:oid:2.16.840.1.113883.3.239.23.21\"\n" + 
-				"                    }\n" + 
-				"                ],\n" + 
-				"                \"name\":\"Peterborough Regional Health Centre\"\n" + 
-				"            }\n" + 
-				"        }";
+		String inputStr = 
+				"{" +
+				"  \"resourceType\":\"Organization\",\n" + 
+				"  \"extension\":[\n" + 
+				"     {\n" + 
+				"       \"url\":\"http://fhir.connectinggta.ca/Profile/organization#providerIdPool\",\n" + 
+				"       \"valueUri\":\"urn:oid:2.16.840.1.113883.3.239.23.21.1\"\n" + 
+				"     }\n" + 
+				"  ],\n" + 
+				"  \"text\":{\n" + 
+				"     \"status\":\"empty\",\n" + 
+				"     \"div\":\"<div xmlns=\\\"http://www.w3.org/1999/xhtml\\\">No narrative template available for resource profile: http://fhir.connectinggta.ca/Profile/organization</div>\"\n" + 
+				"  },\n" + 
+				"  \"identifier\":[\n" + 
+				"     {\n" + 
+				"       \"use\":\"official\",\n" + 
+				"       \"label\":\"HSP 2.16.840.1.113883.3.239.23.21\",\n" + 
+				"       \"system\":\"urn:cgta:hsp_ids\",\n" + 
+				"       \"value\":\"urn:oid:2.16.840.1.113883.3.239.23.21\"\n" + 
+				"     }\n" + 
+				"  ],\n" + 
+				"  \"name\":\"Peterborough Regional Health Centre\"\n" + 
+				"}\n";
 		//@formatter:on
 
 		Set<Long> val = myOrganizationDao.searchForIds("name", new StringParam("P"));

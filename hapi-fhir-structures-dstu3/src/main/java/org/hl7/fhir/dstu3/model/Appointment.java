@@ -29,19 +29,16 @@ package org.hl7.fhir.dstu3.model;
   
 */
 
-// Generated on Sat, Jul 2, 2016 11:26-0400 for FHIR v1.4.0
+// Generated on Thu, Aug 25, 2016 23:04-0400 for FHIR v1.6.0
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
-import java.util.*;
-
+import org.hl7.fhir.exceptions.FHIRException;
+import org.hl7.fhir.instance.model.api.IBaseBackboneElement;
 import org.hl7.fhir.utilities.Utilities;
-import ca.uhn.fhir.model.api.annotation.ResourceDef;
-import ca.uhn.fhir.model.api.annotation.SearchParamDefinition;
-import ca.uhn.fhir.model.api.annotation.Child;
-import ca.uhn.fhir.model.api.annotation.ChildOrder;
-import ca.uhn.fhir.model.api.annotation.Description;
-import ca.uhn.fhir.model.api.annotation.Block;
-import org.hl7.fhir.instance.model.api.*;
-import org.hl7.fhir.dstu3.exceptions.FHIRException;
+
+import ca.uhn.fhir.model.api.annotation.*;
 /**
  * A booking of a healthcare event among patient(s), practitioner(s), related person(s) and/or device(s) for a specific date/time. This may result in one or more Encounter(s).
  */
@@ -78,6 +75,10 @@ public class Appointment extends DomainResource {
          */
         NOSHOW, 
         /**
+         * This instance should not have been part of this patient's medical record.
+         */
+        ENTEREDINERROR, 
+        /**
          * added to help the parsers with the generic types
          */
         NULL;
@@ -98,6 +99,8 @@ public class Appointment extends DomainResource {
           return CANCELLED;
         if ("noshow".equals(codeString))
           return NOSHOW;
+        if ("entered-in-error".equals(codeString))
+          return ENTEREDINERROR;
         if (Configuration.isAcceptInvalidEnums())
           return null;
         else
@@ -112,6 +115,7 @@ public class Appointment extends DomainResource {
             case FULFILLED: return "fulfilled";
             case CANCELLED: return "cancelled";
             case NOSHOW: return "noshow";
+            case ENTEREDINERROR: return "entered-in-error";
             default: return "?";
           }
         }
@@ -124,6 +128,7 @@ public class Appointment extends DomainResource {
             case FULFILLED: return "http://hl7.org/fhir/appointmentstatus";
             case CANCELLED: return "http://hl7.org/fhir/appointmentstatus";
             case NOSHOW: return "http://hl7.org/fhir/appointmentstatus";
+            case ENTEREDINERROR: return "http://hl7.org/fhir/appointmentstatus";
             default: return "?";
           }
         }
@@ -136,6 +141,7 @@ public class Appointment extends DomainResource {
             case FULFILLED: return "This appointment has completed and may have resulted in an encounter.";
             case CANCELLED: return "The appointment has been cancelled.";
             case NOSHOW: return "Some or all of the participant(s) have not/did not appear for the appointment (usually the patient).";
+            case ENTEREDINERROR: return "This instance should not have been part of this patient's medical record.";
             default: return "?";
           }
         }
@@ -148,6 +154,7 @@ public class Appointment extends DomainResource {
             case FULFILLED: return "Fulfilled";
             case CANCELLED: return "Cancelled";
             case NOSHOW: return "No Show";
+            case ENTEREDINERROR: return "Entered in error";
             default: return "?";
           }
         }
@@ -172,6 +179,8 @@ public class Appointment extends DomainResource {
           return AppointmentStatus.CANCELLED;
         if ("noshow".equals(codeString))
           return AppointmentStatus.NOSHOW;
+        if ("entered-in-error".equals(codeString))
+          return AppointmentStatus.ENTEREDINERROR;
         throw new IllegalArgumentException("Unknown AppointmentStatus code '"+codeString+"'");
         }
         public Enumeration<AppointmentStatus> fromType(Base code) throws FHIRException {
@@ -194,6 +203,8 @@ public class Appointment extends DomainResource {
           return new Enumeration<AppointmentStatus>(this, AppointmentStatus.CANCELLED);
         if ("noshow".equals(codeString))
           return new Enumeration<AppointmentStatus>(this, AppointmentStatus.NOSHOW);
+        if ("entered-in-error".equals(codeString))
+          return new Enumeration<AppointmentStatus>(this, AppointmentStatus.ENTEREDINERROR);
         throw new FHIRException("Unknown AppointmentStatus code '"+codeString+"'");
         }
     public String toCode(AppointmentStatus code) {
@@ -211,6 +222,8 @@ public class Appointment extends DomainResource {
         return "cancelled";
       if (code == AppointmentStatus.NOSHOW)
         return "noshow";
+      if (code == AppointmentStatus.ENTEREDINERROR)
+        return "entered-in-error";
       return "?";
       }
     public String toSystem(AppointmentStatus code) {
@@ -830,7 +843,7 @@ public class Appointment extends DomainResource {
      * The overall status of the Appointment. Each of the participants has their own participation status which indicates their involvement in the process, however this status indicates the shared status.
      */
     @Child(name = "status", type = {CodeType.class}, order=1, min=1, max=1, modifier=true, summary=true)
-    @Description(shortDefinition="proposed | pending | booked | arrived | fulfilled | cancelled | noshow", formalDefinition="The overall status of the Appointment. Each of the participants has their own participation status which indicates their involvement in the process, however this status indicates the shared status." )
+    @Description(shortDefinition="proposed | pending | booked | arrived | fulfilled | cancelled | noshow | entered-in-error", formalDefinition="The overall status of the Appointment. Each of the participants has their own participation status which indicates their involvement in the process, however this status indicates the shared status." )
     @ca.uhn.fhir.model.api.annotation.Binding(valueSet="http://hl7.org/fhir/ValueSet/appointmentstatus")
     protected Enumeration<AppointmentStatus> status;
 

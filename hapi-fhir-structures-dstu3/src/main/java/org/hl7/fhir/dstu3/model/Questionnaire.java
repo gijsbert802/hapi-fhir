@@ -29,20 +29,16 @@ package org.hl7.fhir.dstu3.model;
   
 */
 
-// Generated on Sat, Jul 2, 2016 11:26-0400 for FHIR v1.4.0
+// Generated on Thu, Aug 25, 2016 23:04-0400 for FHIR v1.6.0
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
-import java.util.*;
-
+import org.hl7.fhir.exceptions.FHIRException;
+import org.hl7.fhir.instance.model.api.IBaseBackboneElement;
 import org.hl7.fhir.utilities.Utilities;
-import org.hl7.fhir.dstu3.model.Enumerations.*;
-import ca.uhn.fhir.model.api.annotation.ResourceDef;
-import ca.uhn.fhir.model.api.annotation.SearchParamDefinition;
-import ca.uhn.fhir.model.api.annotation.Child;
-import ca.uhn.fhir.model.api.annotation.ChildOrder;
-import ca.uhn.fhir.model.api.annotation.Description;
-import ca.uhn.fhir.model.api.annotation.Block;
-import org.hl7.fhir.instance.model.api.*;
-import org.hl7.fhir.dstu3.exceptions.FHIRException;
+
+import ca.uhn.fhir.model.api.annotation.*;
 /**
  * A structured set of questions intended to guide the collection of answers. The questions are ordered and grouped into coherent subsets, corresponding to the structure of the grouping of the underlying questions.
  */
@@ -543,7 +539,7 @@ public class Questionnaire extends DomainResource {
         /**
          * If present, indicates that this item should only be enabled (displayed/allow answers to be captured) when the specified condition is true.
          */
-        @Child(name = "enableWhen", type = {}, order=6, min=0, max=Child.MAX_UNLIMITED, modifier=true, summary=false)
+        @Child(name = "enableWhen", type = {}, order=6, min=0, max=Child.MAX_UNLIMITED, modifier=true, summary=true)
         @Description(shortDefinition="Only allow data when:", formalDefinition="If present, indicates that this item should only be enabled (displayed/allow answers to be captured) when the specified condition is true." )
         protected List<QuestionnaireItemEnableWhenComponent> enableWhen;
 
@@ -597,7 +593,7 @@ public class Questionnaire extends DomainResource {
         /**
          * The value that should be pre-populated when rendering the questionnaire for user input.
          */
-        @Child(name = "initial", type = {BooleanType.class, DecimalType.class, IntegerType.class, DateType.class, DateTimeType.class, InstantType.class, TimeType.class, StringType.class, UriType.class, Attachment.class, Coding.class, Quantity.class}, order=13, min=0, max=1, modifier=false, summary=false)
+        @Child(name = "initial", type = {BooleanType.class, DecimalType.class, IntegerType.class, DateType.class, DateTimeType.class, InstantType.class, TimeType.class, StringType.class, UriType.class, Attachment.class, Coding.class, Quantity.class, Reference.class}, order=13, min=0, max=1, modifier=false, summary=false)
         @Description(shortDefinition="Initial presumed answer for question", formalDefinition="The value that should be pre-populated when rendering the questionnaire for user input." )
         protected Type initial;
 
@@ -1779,7 +1775,7 @@ public class Questionnaire extends DomainResource {
         /**
          * If present, then the answer for the referenced question must match this answer for all components present in the enableWhen.answer.
          */
-        @Child(name = "answer", type = {BooleanType.class, DecimalType.class, IntegerType.class, DateType.class, DateTimeType.class, InstantType.class, TimeType.class, StringType.class, UriType.class, Attachment.class, Coding.class, Quantity.class}, order=3, min=0, max=1, modifier=false, summary=false)
+        @Child(name = "answer", type = {BooleanType.class, DecimalType.class, IntegerType.class, DateType.class, DateTimeType.class, InstantType.class, TimeType.class, StringType.class, UriType.class, Attachment.class, Coding.class, Quantity.class, Reference.class}, order=3, min=0, max=1, modifier=false, summary=false)
         @Description(shortDefinition="Value question must have", formalDefinition="If present, then the answer for the referenced question must match this answer for all components present in the enableWhen.answer." )
         protected Type answer;
 

@@ -29,19 +29,17 @@ package org.hl7.fhir.dstu3.model;
   
 */
 
-// Generated on Fri, Jul 1, 2016 14:13-0400 for FHIR v1.4.0
+// Generated on Thu, Aug 25, 2016 23:04-0400 for FHIR v1.6.0
+import java.util.Date;
+import java.util.List;
 
-import java.util.*;
-
+import org.hl7.fhir.exceptions.FHIRException;
+import org.hl7.fhir.instance.model.api.ICompositeType;
 import org.hl7.fhir.utilities.Utilities;
-import org.hl7.fhir.dstu3.model.Enumerations.*;
+
 import ca.uhn.fhir.model.api.annotation.Child;
-import ca.uhn.fhir.model.api.annotation.ChildOrder;
-import ca.uhn.fhir.model.api.annotation.Description;
 import ca.uhn.fhir.model.api.annotation.DatatypeDef;
-import ca.uhn.fhir.model.api.annotation.Block;
-import org.hl7.fhir.instance.model.api.*;
-import org.hl7.fhir.dstu3.exceptions.FHIRException;
+import ca.uhn.fhir.model.api.annotation.Description;
 /**
  * For referring to data content defined in other formats.
  */
@@ -60,6 +58,7 @@ public class Attachment extends Type implements ICompositeType {
      */
     @Child(name = "language", type = {CodeType.class}, order=1, min=0, max=1, modifier=false, summary=true)
     @Description(shortDefinition="Human language of the content (BCP-47)", formalDefinition="The human language of the content. The value can be any valid value according to BCP 47." )
+    @ca.uhn.fhir.model.api.annotation.Binding(valueSet="http://hl7.org/fhir/ValueSet/languages")
     protected CodeType language;
 
     /**

@@ -6,12 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.Validate;
-import org.hl7.fhir.dstu3.elementmodel.Element.SpecialElement;
-import org.hl7.fhir.dstu3.exceptions.FHIRException;
 import org.hl7.fhir.dstu3.model.Base;
 import org.hl7.fhir.dstu3.model.ElementDefinition;
 import org.hl7.fhir.dstu3.model.StructureDefinition;
-import org.hl7.fhir.dstu3.model.StructureDefinition.StructureDefinitionKind;
+import org.hl7.fhir.exceptions.FHIRException;
 import org.hl7.fhir.utilities.Utilities;
 import org.hl7.fhir.utilities.xhtml.XhtmlNode;
 
@@ -28,13 +26,15 @@ import org.hl7.fhir.utilities.xhtml.XhtmlNode;
 public class Element extends Base {
 
 	public enum SpecialElement {
-		CONTAINED, BUNDLE_ENTRY, PARAMETER;
+		CONTAINED, BUNDLE_ENTRY, BUNDLE_OUTCOME, PARAMETER;
 
     public static SpecialElement fromProperty(Property property) {
       if (property.getStructure().getIdElement().getIdPart().equals("Parameters"))
         return PARAMETER;
-      if (property.getStructure().getIdElement().getIdPart().equals("Bundle"))
+      if (property.getStructure().getIdElement().getIdPart().equals("Bundle") && property.getName().equals("resource"))
         return BUNDLE_ENTRY;
+      if (property.getStructure().getIdElement().getIdPart().equals("Bundle") && property.getName().equals("outcome"))
+        return BUNDLE_OUTCOME;
       if (property.getName().equals("contained")) 
         return CONTAINED;
       throw new Error("Unknown resource containing a native resource: "+property.getDefinition().getId());
@@ -218,11 +218,13 @@ public class Element extends Base {
   	}
   		
   	List<Base> result = new ArrayList<Base>();
+  	if (children != null) {
   	for (Element child : children) {
   		if (child.getName().equals(name))
   			result.add(child);
   		if (child.getName().startsWith(name) && child.getProperty().isChoice() && child.getProperty().getName().equals(name+"[x]"))
   			result.add(child);
+  	}
   	}
   	if (result.isEmpty() && checkValid) {
 //  		throw new FHIRException("not determined yet");
@@ -231,10 +233,19 @@ public class Element extends Base {
 	}
 
 	@Override
-	protected void listChildren(
-	    List<org.hl7.fhir.dstu3.model.Property> result) {
-	// TODO Auto-generated method stub
+	protected void listChildren(List<org.hl7.fhir.dstu3.model.Property> childProps) {
+	  if (children != null) {
+	  for (Element c : children) {
+	    childProps.add(new org.hl7.fhir.dstu3.model.Property(c.getName(), c.fhirType(), c.getProperty().getDefinition().getDefinition(), c.getProperty().getDefinition().getMin(), maxToInt(c.getProperty().getDefinition().getMax()), c));
+	  }
+  }
+  }
 	
+	private int maxToInt(String max) {
+    if (max.equals("*"))
+      return Integer.MAX_VALUE;
+    else
+      return Integer.parseInt(max);
 	}
 
 	@Override
@@ -242,6 +253,11 @@ public class Element extends Base {
 		return type != null ? property.isPrimitive(type) : property.isPrimitive(property.getType(name));
 	}
 	
+  @Override
+  public boolean isResource() {
+    return property.isResource();
+  }
+  
 
 	@Override
 	public boolean hasPrimitiveValue() {
@@ -352,6 +368,28 @@ public class Element extends Base {
   public boolean hasElementProperty() {
     return elementProperty != null;
   }
+
+  public boolean hasChild(String name) {
+    return getNamedChild(name) != null;
+  }
+
+  @Override
+  public String toString() {
+    return name+"="+fhirType() + "["+(children == null || hasValue() ? value : Integer.toString(children.size())+" children")+"]";
+  }
+
+//  @Override
+//  public boolean equalsDeep(Base other) {
+//    if (!super.equalsDeep(other))
+//      return false;
+//    
+//  }
+//
+//  @Override
+//  public boolean equalsShallow(Base other) {
+//    if (!super.equalsShallow(other))
+//      return false;
+//  }
 
 
 }

@@ -29,20 +29,17 @@ package org.hl7.fhir.dstu3.model;
   
 */
 
-// Generated on Sat, Jul 2, 2016 11:26-0400 for FHIR v1.4.0
+// Generated on Thu, Aug 25, 2016 23:04-0400 for FHIR v1.6.0
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
-import java.util.*;
+import org.hl7.fhir.exceptions.FHIRException;
+import org.hl7.fhir.dstu3.model.Enumerations.AdministrativeGender;
+import org.hl7.fhir.dstu3.model.Enumerations.AdministrativeGenderEnumFactory;
+import org.hl7.fhir.instance.model.api.IBaseBackboneElement;
 
-import org.hl7.fhir.utilities.Utilities;
-import org.hl7.fhir.dstu3.model.Enumerations.*;
-import ca.uhn.fhir.model.api.annotation.ResourceDef;
-import ca.uhn.fhir.model.api.annotation.SearchParamDefinition;
-import ca.uhn.fhir.model.api.annotation.Child;
-import ca.uhn.fhir.model.api.annotation.ChildOrder;
-import ca.uhn.fhir.model.api.annotation.Description;
-import ca.uhn.fhir.model.api.annotation.Block;
-import org.hl7.fhir.instance.model.api.*;
-import org.hl7.fhir.dstu3.exceptions.FHIRException;
+import ca.uhn.fhir.model.api.annotation.*;
 /**
  * Demographics and administrative information about a person independent of a specific health-related context.
  */
@@ -1215,17 +1212,17 @@ public class Person extends DomainResource {
  /**
    * Search parameter: <b>address</b>
    * <p>
-   * Description: <b>An address in any kind of address/part</b><br>
+   * Description: <b>A server defined search that may match any of the string fields in the Address, including line, city, state, country, postalCode, and/or text</b><br>
    * Type: <b>string</b><br>
    * Path: <b>Person.address</b><br>
    * </p>
    */
-  @SearchParamDefinition(name="address", path="Person.address", description="An address in any kind of address/part", type="string" )
+  @SearchParamDefinition(name="address", path="Person.address", description="A server defined search that may match any of the string fields in the Address, including line, city, state, country, postalCode, and/or text", type="string" )
   public static final String SP_ADDRESS = "address";
  /**
    * <b>Fluent Client</b> search parameter constant for <b>address</b>
    * <p>
-   * Description: <b>An address in any kind of address/part</b><br>
+   * Description: <b>A server defined search that may match any of the string fields in the Address, including line, city, state, country, postalCode, and/or text</b><br>
    * Type: <b>string</b><br>
    * Path: <b>Person.address</b><br>
    * </p>
@@ -1505,17 +1502,17 @@ public class Person extends DomainResource {
  /**
    * Search parameter: <b>name</b>
    * <p>
-   * Description: <b>A portion of name in any name part</b><br>
+   * Description: <b>A server defined search that may match any of the string fields in the HumanName, including family, give, prefix, suffix, suffix, and/or text</b><br>
    * Type: <b>string</b><br>
    * Path: <b>Person.name</b><br>
    * </p>
    */
-  @SearchParamDefinition(name="name", path="Person.name", description="A portion of name in any name part", type="string" )
+  @SearchParamDefinition(name="name", path="Person.name", description="A server defined search that may match any of the string fields in the HumanName, including family, give, prefix, suffix, suffix, and/or text", type="string" )
   public static final String SP_NAME = "name";
  /**
    * <b>Fluent Client</b> search parameter constant for <b>name</b>
    * <p>
-   * Description: <b>A portion of name in any name part</b><br>
+   * Description: <b>A server defined search that may match any of the string fields in the HumanName, including family, give, prefix, suffix, suffix, and/or text</b><br>
    * Type: <b>string</b><br>
    * Path: <b>Person.name</b><br>
    * </p>

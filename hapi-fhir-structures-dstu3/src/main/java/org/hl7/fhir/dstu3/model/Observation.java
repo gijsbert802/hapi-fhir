@@ -29,19 +29,16 @@ package org.hl7.fhir.dstu3.model;
   
 */
 
-// Generated on Sat, Jul 2, 2016 11:26-0400 for FHIR v1.4.0
+// Generated on Thu, Aug 25, 2016 23:04-0400 for FHIR v1.6.0
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
-import java.util.*;
-
+import org.hl7.fhir.exceptions.FHIRException;
+import org.hl7.fhir.instance.model.api.IBaseBackboneElement;
 import org.hl7.fhir.utilities.Utilities;
-import ca.uhn.fhir.model.api.annotation.ResourceDef;
-import ca.uhn.fhir.model.api.annotation.SearchParamDefinition;
-import ca.uhn.fhir.model.api.annotation.Child;
-import ca.uhn.fhir.model.api.annotation.ChildOrder;
-import ca.uhn.fhir.model.api.annotation.Description;
-import ca.uhn.fhir.model.api.annotation.Block;
-import org.hl7.fhir.instance.model.api.*;
-import org.hl7.fhir.dstu3.exceptions.FHIRException;
+
+import ca.uhn.fhir.model.api.annotation.*;
 /**
  * Measurements and simple assertions made about a patient, device or other subject.
  */
@@ -752,7 +749,7 @@ public class Observation extends DomainResource {
         /**
          * A reference to the observation or [[[QuestionnaireResponse]]] resource that is related to this observation.
          */
-        @Child(name = "target", type = {Observation.class, QuestionnaireResponse.class}, order=2, min=1, max=1, modifier=false, summary=false)
+        @Child(name = "target", type = {Observation.class, QuestionnaireResponse.class, Sequence.class}, order=2, min=1, max=1, modifier=false, summary=false)
         @Description(shortDefinition="Resource that is related to this one", formalDefinition="A reference to the observation or [[[QuestionnaireResponse]]] resource that is related to this observation." )
         protected Reference target;
 
@@ -869,7 +866,7 @@ public class Observation extends DomainResource {
         protected void listChildren(List<Property> childrenList) {
           super.listChildren(childrenList);
           childrenList.add(new Property("type", "code", "A code specifying the kind of relationship that exists with the target resource.", 0, java.lang.Integer.MAX_VALUE, type));
-          childrenList.add(new Property("target", "Reference(Observation|QuestionnaireResponse)", "A reference to the observation or [[[QuestionnaireResponse]]] resource that is related to this observation.", 0, java.lang.Integer.MAX_VALUE, target));
+          childrenList.add(new Property("target", "Reference(Observation|QuestionnaireResponse|Sequence)", "A reference to the observation or [[[QuestionnaireResponse]]] resource that is related to this observation.", 0, java.lang.Integer.MAX_VALUE, target));
         }
 
       @Override
@@ -1642,10 +1639,10 @@ public class Observation extends DomainResource {
     protected List<ObservationReferenceRangeComponent> referenceRange;
 
     /**
-     * A  reference to another resource (usually another Observation but could  also be a QuestionnaireAnswer) whose relationship is defined by the relationship type code.
+     * A  reference to another resource (usually another Observation) whose relationship is defined by the relationship type code.
      */
     @Child(name = "related", type = {}, order=18, min=0, max=Child.MAX_UNLIMITED, modifier=false, summary=true)
-    @Description(shortDefinition="Resource related to this observation", formalDefinition="A  reference to another resource (usually another Observation but could  also be a QuestionnaireAnswer) whose relationship is defined by the relationship type code." )
+    @Description(shortDefinition="Resource related to this observation", formalDefinition="A  reference to another resource (usually another Observation) whose relationship is defined by the relationship type code." )
     protected List<ObservationRelatedComponent> related;
 
     /**
@@ -2519,7 +2516,7 @@ public class Observation extends DomainResource {
     }
 
     /**
-     * @return {@link #related} (A  reference to another resource (usually another Observation but could  also be a QuestionnaireAnswer) whose relationship is defined by the relationship type code.)
+     * @return {@link #related} (A  reference to another resource (usually another Observation) whose relationship is defined by the relationship type code.)
      */
     public List<ObservationRelatedComponent> getRelated() { 
       if (this.related == null)
@@ -2644,7 +2641,7 @@ public class Observation extends DomainResource {
         childrenList.add(new Property("specimen", "Reference(Specimen)", "The specimen that was used when this observation was made.", 0, java.lang.Integer.MAX_VALUE, specimen));
         childrenList.add(new Property("device", "Reference(Device|DeviceMetric)", "The device used to generate the observation data.", 0, java.lang.Integer.MAX_VALUE, device));
         childrenList.add(new Property("referenceRange", "", "Guidance on how to interpret the value by comparison to a normal or recommended range.", 0, java.lang.Integer.MAX_VALUE, referenceRange));
-        childrenList.add(new Property("related", "", "A  reference to another resource (usually another Observation but could  also be a QuestionnaireAnswer) whose relationship is defined by the relationship type code.", 0, java.lang.Integer.MAX_VALUE, related));
+        childrenList.add(new Property("related", "", "A  reference to another resource (usually another Observation) whose relationship is defined by the relationship type code.", 0, java.lang.Integer.MAX_VALUE, related));
         childrenList.add(new Property("component", "", "Some observations have multiple component observations.  These component observations are expressed as separate code value pairs that share the same attributes.  Examples include systolic and diastolic component observations for blood pressure measurement and multiple component observations for genetics observations.", 0, java.lang.Integer.MAX_VALUE, component));
       }
 
@@ -3380,7 +3377,7 @@ public class Observation extends DomainResource {
    * Path: <b>Observation.related.target</b><br>
    * </p>
    */
-  @SearchParamDefinition(name="related-target", path="Observation.related.target", description="Resource that is related to this one", type="reference", target={Observation.class, QuestionnaireResponse.class } )
+  @SearchParamDefinition(name="related-target", path="Observation.related.target", description="Resource that is related to this one", type="reference", target={Observation.class, QuestionnaireResponse.class, Sequence.class } )
   public static final String SP_RELATED_TARGET = "related-target";
  /**
    * <b>Fluent Client</b> search parameter constant for <b>related-target</b>

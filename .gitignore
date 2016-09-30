@@ -1,3 +1,4 @@
+.attach*
 /bin
 /target
 target/
@@ -123,6 +124,7 @@ tmp/
 *~.nib
 local.properties
 .loadpath
+*.hprof
 
 # External tool builders
 .externalToolBuilders/

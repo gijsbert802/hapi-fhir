@@ -259,6 +259,30 @@ public class FhirResourceDaoDstu3TerminologyTest extends BaseJpaDstu3Test {
 	}
 
 	@Test
+	public void testReindex() {
+		createLocalCsAndVs();
+
+		ValueSet vs = new ValueSet();
+		ConceptSetComponent include = vs.getCompose().addInclude();
+		include.setSystem(URL_MY_CODE_SYSTEM);
+		include.addConcept().setCode("ZZZZ");
+
+		mySystemDao.markAllResourcesForReindexing();
+		mySystemDao.performReindexingPass(null);
+		myTermSvc.saveDeferred();
+		mySystemDao.performReindexingPass(null);
+		myTermSvc.saveDeferred();
+		
+		// Again
+		mySystemDao.markAllResourcesForReindexing();
+		mySystemDao.performReindexingPass(null);
+		myTermSvc.saveDeferred();
+		mySystemDao.performReindexingPass(null);
+		myTermSvc.saveDeferred();
+
+	}
+
+	@Test
 	public void testExpandWithNoResultsInLocalValueSet2() {
 		createLocalCsAndVs();
 
@@ -555,7 +579,7 @@ public class FhirResourceDaoDstu3TerminologyTest extends BaseJpaDstu3Test {
 		String id1 = myAllergyIntoleranceDao.create(ai1, mySrd).getId().toUnqualifiedVersionless().getValue();
 
 		AllergyIntolerance ai2 = new AllergyIntolerance();
-		ai2.setStatus(AllergyIntoleranceStatus.CONFIRMED);
+		ai2.setStatus(AllergyIntoleranceStatus.ACTIVECONFIRMED);
 		String id2 = myAllergyIntoleranceDao.create(ai2, mySrd).getId().toUnqualifiedVersionless().getValue();
 
 		AllergyIntolerance ai3 = new AllergyIntolerance();
@@ -595,7 +619,7 @@ public class FhirResourceDaoDstu3TerminologyTest extends BaseJpaDstu3Test {
 		String id1 = myAllergyIntoleranceDao.create(ai1, mySrd).getId().toUnqualifiedVersionless().getValue();
 
 		AllergyIntolerance ai2 = new AllergyIntolerance();
-		ai2.setStatus(AllergyIntoleranceStatus.CONFIRMED);
+		ai2.setStatus(AllergyIntoleranceStatus.ACTIVECONFIRMED);
 		String id2 = myAllergyIntoleranceDao.create(ai2, mySrd).getId().toUnqualifiedVersionless().getValue();
 
 		AllergyIntolerance ai3 = new AllergyIntolerance();
@@ -630,7 +654,7 @@ public class FhirResourceDaoDstu3TerminologyTest extends BaseJpaDstu3Test {
 		String id1 = myAllergyIntoleranceDao.create(ai1, mySrd).getId().toUnqualifiedVersionless().getValue();
 
 		AllergyIntolerance ai2 = new AllergyIntolerance();
-		ai2.setStatus(AllergyIntoleranceStatus.CONFIRMED);
+		ai2.setStatus(AllergyIntoleranceStatus.ACTIVECONFIRMED);
 		String id2 = myAllergyIntoleranceDao.create(ai2, mySrd).getId().toUnqualifiedVersionless().getValue();
 
 		AllergyIntolerance ai3 = new AllergyIntolerance();
@@ -647,11 +671,11 @@ public class FhirResourceDaoDstu3TerminologyTest extends BaseJpaDstu3Test {
 		assertThat(toUnqualifiedVersionlessIdValues(myAllergyIntoleranceDao.search(params)), containsInAnyOrder(id1, id2));
 
 		params = new SearchParameterMap();
-		params.add(AllergyIntolerance.SP_STATUS, new TokenParam("http://hl7.org/fhir/allergy-intolerance-status", AllergyIntoleranceStatus.CONFIRMED.toCode()).setModifier(TokenParamModifier.BELOW));
+		params.add(AllergyIntolerance.SP_STATUS, new TokenParam("http://hl7.org/fhir/allergy-intolerance-status", AllergyIntoleranceStatus.ACTIVECONFIRMED.toCode()).setModifier(TokenParamModifier.BELOW));
 		assertThat(toUnqualifiedVersionlessIdValues(myAllergyIntoleranceDao.search(params)), containsInAnyOrder(id2));
 
 		params = new SearchParameterMap();
-		params.add(AllergyIntolerance.SP_STATUS, new TokenParam("http://hl7.org/fhir/allergy-intolerance-status", AllergyIntoleranceStatus.CONFIRMED.toCode()));
+		params.add(AllergyIntolerance.SP_STATUS, new TokenParam("http://hl7.org/fhir/allergy-intolerance-status", AllergyIntoleranceStatus.ACTIVECONFIRMED.toCode()));
 		assertThat(toUnqualifiedVersionlessIdValues(myAllergyIntoleranceDao.search(params)), containsInAnyOrder(id2));
 
 		params = new SearchParameterMap();
@@ -677,7 +701,7 @@ public class FhirResourceDaoDstu3TerminologyTest extends BaseJpaDstu3Test {
 		String id1 = myAllergyIntoleranceDao.create(ai1, mySrd).getId().toUnqualifiedVersionless().getValue();
 
 		AllergyIntolerance ai2 = new AllergyIntolerance();
-		ai2.setStatus(AllergyIntoleranceStatus.CONFIRMED);
+		ai2.setStatus(AllergyIntoleranceStatus.ACTIVECONFIRMED);
 		String id2 = myAllergyIntoleranceDao.create(ai2, mySrd).getId().toUnqualifiedVersionless().getValue();
 
 		AllergyIntolerance ai3 = new AllergyIntolerance();
@@ -694,11 +718,11 @@ public class FhirResourceDaoDstu3TerminologyTest extends BaseJpaDstu3Test {
 		assertThat(toUnqualifiedVersionlessIdValues(myAllergyIntoleranceDao.search(params)), containsInAnyOrder(id1, id2));
 
 		params = new SearchParameterMap();
-		params.add(AllergyIntolerance.SP_STATUS, new TokenParam(null, AllergyIntoleranceStatus.CONFIRMED.toCode()).setModifier(TokenParamModifier.BELOW));
+		params.add(AllergyIntolerance.SP_STATUS, new TokenParam(null, AllergyIntoleranceStatus.ACTIVECONFIRMED.toCode()).setModifier(TokenParamModifier.BELOW));
 		assertThat(toUnqualifiedVersionlessIdValues(myAllergyIntoleranceDao.search(params)), containsInAnyOrder(id2));
 
 		params = new SearchParameterMap();
-		params.add(AllergyIntolerance.SP_STATUS, new TokenParam(null, AllergyIntoleranceStatus.CONFIRMED.toCode()));
+		params.add(AllergyIntolerance.SP_STATUS, new TokenParam(null, AllergyIntoleranceStatus.ACTIVECONFIRMED.toCode()));
 		assertThat(toUnqualifiedVersionlessIdValues(myAllergyIntoleranceDao.search(params)), containsInAnyOrder(id2));
 
 		params = new SearchParameterMap();
@@ -747,7 +771,7 @@ public class FhirResourceDaoDstu3TerminologyTest extends BaseJpaDstu3Test {
 		try {
 			myObservationDao.search(params);
 		} catch(InvalidRequestException e) {
-			assertEquals("Unable to expand imported value set \"http://example.com/my_value_set\" - Error was: Unable to find imported value set http://non_existant_VS", e.getMessage());
+			assertEquals("Unable to expand imported value set: Unable to find imported value set http://non_existant_VS", e.getMessage());
 		}
 
 		// Now let's update 

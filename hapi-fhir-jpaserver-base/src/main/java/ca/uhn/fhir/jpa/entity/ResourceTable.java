@@ -77,7 +77,7 @@ import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
 	@Index(name = "IDX_RES_DATE", columnList="RES_UPDATED"), 
 	@Index(name = "IDX_RES_LANG", columnList="RES_TYPE,RES_LANGUAGE"), 
 	@Index(name = "IDX_RES_PROFILE", columnList="RES_PROFILE"),
-	@Index(name = "IDX_INDEXSTATUS", columnList="SP_INDEX_STATUS") 
+	@Index(name = "IDX_INDEXSTATUS", columnList="SP_INDEX_STATUS")
 })
 @AnalyzerDefs({
 	@AnalyzerDef(name = "autocompleteEdgeAnalyzer",
@@ -174,7 +174,12 @@ public class ResourceTable extends BaseHasResource implements Serializable {
 	 * Holds the narrative text only - Used for Fulltext searching but not directly stored in the DB
 	 */
 	@Transient()
-	@Field()
+	@Fields({
+		@Field(name = "myNarrativeText", index = org.hibernate.search.annotations.Index.YES, store = Store.YES, analyze = Analyze.YES, analyzer = @Analyzer(definition = "standardAnalyzer")),
+		@Field(name = "myNarrativeTextEdgeNGram", index = org.hibernate.search.annotations.Index.YES, store = Store.NO, analyze = Analyze.YES, analyzer = @Analyzer(definition = "autocompleteEdgeAnalyzer")),
+		@Field(name = "myNarrativeTextNGram", index = org.hibernate.search.annotations.Index.YES, store = Store.NO, analyze = Analyze.YES, analyzer = @Analyzer(definition = "autocompleteNGramAnalyzer")),
+		@Field(name = "myNarrativeTextPhonetic", index = org.hibernate.search.annotations.Index.YES, store = Store.NO, analyze = Analyze.YES, analyzer = @Analyzer(definition = "autocompletePhoneticAnalyzer"))
+	})
 	private String myNarrativeText;
 
 	@OneToMany(mappedBy = "myResource", cascade = {}, fetch = FetchType.LAZY, orphanRemoval = false)

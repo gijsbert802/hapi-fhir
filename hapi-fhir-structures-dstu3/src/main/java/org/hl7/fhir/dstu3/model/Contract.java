@@ -1,5 +1,7 @@
 package org.hl7.fhir.dstu3.model;
 
+import java.math.BigDecimal;
+
 /*
   Copyright (c) 2011+, HL7, Inc.
   All rights reserved.
@@ -29,20 +31,16 @@ package org.hl7.fhir.dstu3.model;
   
 */
 
-// Generated on Sat, Jul 2, 2016 11:26-0400 for FHIR v1.4.0
+// Generated on Thu, Aug 25, 2016 23:04-0400 for FHIR v1.6.0
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
-import java.util.*;
-
-import java.math.*;
+import org.hl7.fhir.exceptions.FHIRException;
+import org.hl7.fhir.instance.model.api.IBaseBackboneElement;
 import org.hl7.fhir.utilities.Utilities;
-import ca.uhn.fhir.model.api.annotation.ResourceDef;
-import ca.uhn.fhir.model.api.annotation.SearchParamDefinition;
-import ca.uhn.fhir.model.api.annotation.Child;
-import ca.uhn.fhir.model.api.annotation.ChildOrder;
-import ca.uhn.fhir.model.api.annotation.Description;
-import ca.uhn.fhir.model.api.annotation.Block;
-import org.hl7.fhir.instance.model.api.*;
-import org.hl7.fhir.dstu3.exceptions.FHIRException;
+
+import ca.uhn.fhir.model.api.annotation.*;
 /**
  * A formal agreement between parties regarding the conduct of business, exchange of information or other matters.
  */
@@ -574,7 +572,7 @@ public class Contract extends DomainResource {
         /**
          * Specific type of Contract Valued Item that may be priced.
          */
-        @Child(name = "entity", type = {CodeableConcept.class}, order=1, min=0, max=1, modifier=false, summary=false)
+        @Child(name = "entity", type = {CodeableConcept.class, Reference.class}, order=1, min=0, max=1, modifier=false, summary=false)
         @Description(shortDefinition="Contract Valued Item Type", formalDefinition="Specific type of Contract Valued Item that may be priced." )
         protected Type entity;
 
@@ -1188,7 +1186,7 @@ public class Contract extends DomainResource {
         /**
          * The matter of concern in the context of this provision of the agrement.
          */
-        @Child(name = "topic", type = {}, order=6, min=0, max=Child.MAX_UNLIMITED, modifier=false, summary=true)
+        @Child(name = "topic", type = {Reference.class}, order=6, min=0, max=Child.MAX_UNLIMITED, modifier=false, summary=true)
         @Description(shortDefinition="Context of the Contract term", formalDefinition="The matter of concern in the context of this provision of the agrement." )
         protected List<Reference> topic;
         /**
@@ -2269,7 +2267,7 @@ public class Contract extends DomainResource {
         /**
          * Specific type of Contract Provision Valued Item that may be priced.
          */
-        @Child(name = "entity", type = {CodeableConcept.class}, order=1, min=0, max=1, modifier=false, summary=false)
+        @Child(name = "entity", type = {CodeableConcept.class, Reference.class}, order=1, min=0, max=1, modifier=false, summary=false)
         @Description(shortDefinition="Contract Term Valued Item Type", formalDefinition="Specific type of Contract Provision Valued Item that may be priced." )
         protected Type entity;
 
@@ -3360,7 +3358,7 @@ public class Contract extends DomainResource {
     /**
      * The target entity impacted by or of interest to parties to the agreement.
      */
-    @Child(name = "subject", type = {}, order=3, min=0, max=Child.MAX_UNLIMITED, modifier=false, summary=true)
+    @Child(name = "subject", type = {Reference.class}, order=3, min=0, max=Child.MAX_UNLIMITED, modifier=false, summary=true)
     @Description(shortDefinition="Contract Target Entity", formalDefinition="The target entity impacted by or of interest to parties to the agreement." )
     protected List<Reference> subject;
     /**
@@ -3372,7 +3370,7 @@ public class Contract extends DomainResource {
     /**
      * The matter of concern in the context of this agreement.
      */
-    @Child(name = "topic", type = {}, order=4, min=0, max=Child.MAX_UNLIMITED, modifier=false, summary=true)
+    @Child(name = "topic", type = {Reference.class}, order=4, min=0, max=Child.MAX_UNLIMITED, modifier=false, summary=true)
     @Description(shortDefinition="Context of the Contract", formalDefinition="The matter of concern in the context of this agreement." )
     protected List<Reference> topic;
     /**

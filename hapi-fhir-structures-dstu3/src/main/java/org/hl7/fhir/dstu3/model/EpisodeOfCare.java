@@ -29,19 +29,14 @@ package org.hl7.fhir.dstu3.model;
   
 */
 
-// Generated on Sat, Jul 2, 2016 11:26-0400 for FHIR v1.4.0
+// Generated on Thu, Aug 25, 2016 23:04-0400 for FHIR v1.6.0
+import java.util.ArrayList;
+import java.util.List;
 
-import java.util.*;
+import org.hl7.fhir.exceptions.FHIRException;
+import org.hl7.fhir.instance.model.api.IBaseBackboneElement;
 
-import org.hl7.fhir.utilities.Utilities;
-import ca.uhn.fhir.model.api.annotation.ResourceDef;
-import ca.uhn.fhir.model.api.annotation.SearchParamDefinition;
-import ca.uhn.fhir.model.api.annotation.Child;
-import ca.uhn.fhir.model.api.annotation.ChildOrder;
-import ca.uhn.fhir.model.api.annotation.Description;
-import ca.uhn.fhir.model.api.annotation.Block;
-import org.hl7.fhir.instance.model.api.*;
-import org.hl7.fhir.dstu3.exceptions.FHIRException;
+import ca.uhn.fhir.model.api.annotation.*;
 /**
  * An association between a patient and an organization / healthcare provider(s) during which time encounters may occur. The managing organization assumes a level of responsibility for the patient during this time.
  */
@@ -74,6 +69,10 @@ public class EpisodeOfCare extends DomainResource {
          */
         CANCELLED, 
         /**
+         * This instance should not have been part of this patient's medical record.
+         */
+        ENTEREDINERROR, 
+        /**
          * added to help the parsers with the generic types
          */
         NULL;
@@ -92,6 +91,8 @@ public class EpisodeOfCare extends DomainResource {
           return FINISHED;
         if ("cancelled".equals(codeString))
           return CANCELLED;
+        if ("entered-in-error".equals(codeString))
+          return ENTEREDINERROR;
         if (Configuration.isAcceptInvalidEnums())
           return null;
         else
@@ -105,6 +106,7 @@ public class EpisodeOfCare extends DomainResource {
             case ONHOLD: return "onhold";
             case FINISHED: return "finished";
             case CANCELLED: return "cancelled";
+            case ENTEREDINERROR: return "entered-in-error";
             default: return "?";
           }
         }
@@ -116,6 +118,7 @@ public class EpisodeOfCare extends DomainResource {
             case ONHOLD: return "http://hl7.org/fhir/episode-of-care-status";
             case FINISHED: return "http://hl7.org/fhir/episode-of-care-status";
             case CANCELLED: return "http://hl7.org/fhir/episode-of-care-status";
+            case ENTEREDINERROR: return "http://hl7.org/fhir/episode-of-care-status";
             default: return "?";
           }
         }
@@ -127,6 +130,7 @@ public class EpisodeOfCare extends DomainResource {
             case ONHOLD: return "This episode of care is on hold, the organization has limited responsibility for the patient (such as while on respite).";
             case FINISHED: return "This episode of care is finished at the organization is not expecting to be providing care to the patient. Can also be known as \"closed\", \"completed\" or other similar terms.";
             case CANCELLED: return "The episode of care was cancelled, or withdrawn from service, often selected during the planned stage as the patient may have gone elsewhere, or the circumstances have changed and the organization is unable to provide the care. It indicates that services terminated outside the planned/expected workflow.";
+            case ENTEREDINERROR: return "This instance should not have been part of this patient's medical record.";
             default: return "?";
           }
         }
@@ -138,6 +142,7 @@ public class EpisodeOfCare extends DomainResource {
             case ONHOLD: return "On Hold";
             case FINISHED: return "Finished";
             case CANCELLED: return "Cancelled";
+            case ENTEREDINERROR: return "Entered in Error";
             default: return "?";
           }
         }
@@ -160,6 +165,8 @@ public class EpisodeOfCare extends DomainResource {
           return EpisodeOfCareStatus.FINISHED;
         if ("cancelled".equals(codeString))
           return EpisodeOfCareStatus.CANCELLED;
+        if ("entered-in-error".equals(codeString))
+          return EpisodeOfCareStatus.ENTEREDINERROR;
         throw new IllegalArgumentException("Unknown EpisodeOfCareStatus code '"+codeString+"'");
         }
         public Enumeration<EpisodeOfCareStatus> fromType(Base code) throws FHIRException {
@@ -180,6 +187,8 @@ public class EpisodeOfCare extends DomainResource {
           return new Enumeration<EpisodeOfCareStatus>(this, EpisodeOfCareStatus.FINISHED);
         if ("cancelled".equals(codeString))
           return new Enumeration<EpisodeOfCareStatus>(this, EpisodeOfCareStatus.CANCELLED);
+        if ("entered-in-error".equals(codeString))
+          return new Enumeration<EpisodeOfCareStatus>(this, EpisodeOfCareStatus.ENTEREDINERROR);
         throw new FHIRException("Unknown EpisodeOfCareStatus code '"+codeString+"'");
         }
     public String toCode(EpisodeOfCareStatus code) {
@@ -195,6 +204,8 @@ public class EpisodeOfCare extends DomainResource {
         return "finished";
       if (code == EpisodeOfCareStatus.CANCELLED)
         return "cancelled";
+      if (code == EpisodeOfCareStatus.ENTEREDINERROR)
+        return "entered-in-error";
       return "?";
       }
     public String toSystem(EpisodeOfCareStatus code) {
@@ -208,7 +219,7 @@ public class EpisodeOfCare extends DomainResource {
          * planned | waitlist | active | onhold | finished | cancelled.
          */
         @Child(name = "status", type = {CodeType.class}, order=1, min=1, max=1, modifier=false, summary=false)
-        @Description(shortDefinition="planned | waitlist | active | onhold | finished | cancelled", formalDefinition="planned | waitlist | active | onhold | finished | cancelled." )
+        @Description(shortDefinition="planned | waitlist | active | onhold | finished | cancelled | entered-in-error", formalDefinition="planned | waitlist | active | onhold | finished | cancelled." )
         @ca.uhn.fhir.model.api.annotation.Binding(valueSet="http://hl7.org/fhir/ValueSet/episode-of-care-status")
         protected Enumeration<EpisodeOfCareStatus> status;
 
@@ -419,7 +430,7 @@ public class EpisodeOfCare extends DomainResource {
      * planned | waitlist | active | onhold | finished | cancelled.
      */
     @Child(name = "status", type = {CodeType.class}, order=1, min=1, max=1, modifier=true, summary=true)
-    @Description(shortDefinition="planned | waitlist | active | onhold | finished | cancelled", formalDefinition="planned | waitlist | active | onhold | finished | cancelled." )
+    @Description(shortDefinition="planned | waitlist | active | onhold | finished | cancelled | entered-in-error", formalDefinition="planned | waitlist | active | onhold | finished | cancelled." )
     @ca.uhn.fhir.model.api.annotation.Binding(valueSet="http://hl7.org/fhir/ValueSet/episode-of-care-status")
     protected Enumeration<EpisodeOfCareStatus> status;
 
@@ -516,7 +527,19 @@ public class EpisodeOfCare extends DomainResource {
     protected List<CareTeam> teamTarget;
 
 
-    private static final long serialVersionUID = 922419354L;
+    /**
+     * The set of accounts that may be used for billing for this EpisodeOfCare.
+     */
+    @Child(name = "account", type = {Account.class}, order=11, min=0, max=Child.MAX_UNLIMITED, modifier=false, summary=false)
+    @Description(shortDefinition="The set of accounts that may be used for billing for this EpisodeOfCare", formalDefinition="The set of accounts that may be used for billing for this EpisodeOfCare." )
+    protected List<Reference> account;
+    /**
+     * The actual objects that are the target of the reference (The set of accounts that may be used for billing for this EpisodeOfCare.)
+     */
+    protected List<Account> accountTarget;
+
+
+    private static final long serialVersionUID = -1726118845L;
 
   /**
    * Constructor
@@ -1119,6 +1142,81 @@ public class EpisodeOfCare extends DomainResource {
       return r;
     }
 
+    /**
+     * @return {@link #account} (The set of accounts that may be used for billing for this EpisodeOfCare.)
+     */
+    public List<Reference> getAccount() { 
+      if (this.account == null)
+        this.account = new ArrayList<Reference>();
+      return this.account;
+    }
+
+    /**
+     * @return Returns a reference to <code>this</code> for easy method chaining
+     */
+    public EpisodeOfCare setAccount(List<Reference> theAccount) { 
+      this.account = theAccount;
+      return this;
+    }
+
+    public boolean hasAccount() { 
+      if (this.account == null)
+        return false;
+      for (Reference item : this.account)
+        if (!item.isEmpty())
+          return true;
+      return false;
+    }
+
+    public Reference addAccount() { //3
+      Reference t = new Reference();
+      if (this.account == null)
+        this.account = new ArrayList<Reference>();
+      this.account.add(t);
+      return t;
+    }
+
+    public EpisodeOfCare addAccount(Reference t) { //3
+      if (t == null)
+        return this;
+      if (this.account == null)
+        this.account = new ArrayList<Reference>();
+      this.account.add(t);
+      return this;
+    }
+
+    /**
+     * @return The first repetition of repeating field {@link #account}, creating it if it does not already exist
+     */
+    public Reference getAccountFirstRep() { 
+      if (getAccount().isEmpty()) {
+        addAccount();
+      }
+      return getAccount().get(0);
+    }
+
+    /**
+     * @deprecated Use Reference#setResource(IBaseResource) instead
+     */
+    @Deprecated
+    public List<Account> getAccountTarget() { 
+      if (this.accountTarget == null)
+        this.accountTarget = new ArrayList<Account>();
+      return this.accountTarget;
+    }
+
+    /**
+     * @deprecated Use Reference#setResource(IBaseResource) instead
+     */
+    @Deprecated
+    public Account addAccountTarget() { 
+      Account r = new Account();
+      if (this.accountTarget == null)
+        this.accountTarget = new ArrayList<Account>();
+      this.accountTarget.add(r);
+      return r;
+    }
+
       protected void listChildren(List<Property> childrenList) {
         super.listChildren(childrenList);
         childrenList.add(new Property("identifier", "Identifier", "Identifier(s) by which this EpisodeOfCare is known.", 0, java.lang.Integer.MAX_VALUE, identifier));
@@ -1132,6 +1230,7 @@ public class EpisodeOfCare extends DomainResource {
         childrenList.add(new Property("referralRequest", "Reference(ReferralRequest)", "Referral Request(s) that are fulfilled by this EpisodeOfCare, incoming referrals.", 0, java.lang.Integer.MAX_VALUE, referralRequest));
         childrenList.add(new Property("careManager", "Reference(Practitioner)", "The practitioner that is the care manager/care co-ordinator for this patient.", 0, java.lang.Integer.MAX_VALUE, careManager));
         childrenList.add(new Property("team", "Reference(CareTeam)", "The list of practitioners that may be facilitating this episode of care for specific purposes.", 0, java.lang.Integer.MAX_VALUE, team));
+        childrenList.add(new Property("account", "Reference(Account)", "The set of accounts that may be used for billing for this EpisodeOfCare.", 0, java.lang.Integer.MAX_VALUE, account));
       }
 
       @Override
@@ -1148,6 +1247,7 @@ public class EpisodeOfCare extends DomainResource {
         case -310299598: /*referralRequest*/ return this.referralRequest == null ? new Base[0] : this.referralRequest.toArray(new Base[this.referralRequest.size()]); // Reference
         case -1147746468: /*careManager*/ return this.careManager == null ? new Base[0] : new Base[] {this.careManager}; // Reference
         case 3555933: /*team*/ return this.team == null ? new Base[0] : this.team.toArray(new Base[this.team.size()]); // Reference
+        case -1177318867: /*account*/ return this.account == null ? new Base[0] : this.account.toArray(new Base[this.account.size()]); // Reference
         default: return super.getProperty(hash, name, checkValid);
         }
 
@@ -1189,6 +1289,9 @@ public class EpisodeOfCare extends DomainResource {
         case 3555933: // team
           this.getTeam().add(castToReference(value)); // Reference
           break;
+        case -1177318867: // account
+          this.getAccount().add(castToReference(value)); // Reference
+          break;
         default: super.setProperty(hash, name, value);
         }
 
@@ -1218,6 +1321,8 @@ public class EpisodeOfCare extends DomainResource {
           this.careManager = castToReference(value); // Reference
         else if (name.equals("team"))
           this.getTeam().add(castToReference(value));
+        else if (name.equals("account"))
+          this.getAccount().add(castToReference(value));
         else
           super.setProperty(name, value);
       }
@@ -1236,6 +1341,7 @@ public class EpisodeOfCare extends DomainResource {
         case -310299598:  return addReferralRequest(); // Reference
         case -1147746468:  return getCareManager(); // Reference
         case 3555933:  return addTeam(); // Reference
+        case -1177318867:  return addAccount(); // Reference
         default: return super.makeProperty(hash, name);
         }
 
@@ -1279,6 +1385,9 @@ public class EpisodeOfCare extends DomainResource {
         }
         else if (name.equals("team")) {
           return addTeam();
+        }
+        else if (name.equals("account")) {
+          return addAccount();
         }
         else
           return super.addChild(name);
@@ -1327,6 +1436,11 @@ public class EpisodeOfCare extends DomainResource {
           for (Reference i : team)
             dst.team.add(i.copy());
         };
+        if (account != null) {
+          dst.account = new ArrayList<Reference>();
+          for (Reference i : account)
+            dst.account.add(i.copy());
+        };
         return dst;
       }
 
@@ -1345,7 +1459,7 @@ public class EpisodeOfCare extends DomainResource {
            && compareDeep(type, o.type, true) && compareDeep(condition, o.condition, true) && compareDeep(patient, o.patient, true)
            && compareDeep(managingOrganization, o.managingOrganization, true) && compareDeep(period, o.period, true)
            && compareDeep(referralRequest, o.referralRequest, true) && compareDeep(careManager, o.careManager, true)
-           && compareDeep(team, o.team, true);
+           && compareDeep(team, o.team, true) && compareDeep(account, o.account, true);
       }
 
       @Override
@@ -1361,7 +1475,7 @@ public class EpisodeOfCare extends DomainResource {
       public boolean isEmpty() {
         return super.isEmpty() && ca.uhn.fhir.util.ElementUtil.isEmpty(identifier, status, statusHistory
           , type, condition, patient, managingOrganization, period, referralRequest, careManager
-          , team);
+          , team, account);
       }
 
   @Override

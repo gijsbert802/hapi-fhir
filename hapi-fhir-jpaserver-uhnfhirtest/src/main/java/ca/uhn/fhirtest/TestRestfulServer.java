@@ -25,6 +25,7 @@ import ca.uhn.fhir.jpa.provider.JpaSystemProviderDstu2;
 import ca.uhn.fhir.jpa.provider.dstu3.JpaConformanceProviderDstu3;
 import ca.uhn.fhir.jpa.provider.dstu3.JpaSystemProviderDstu3;
 import ca.uhn.fhir.jpa.provider.dstu3.TerminologyUploaderProviderDstu3;
+import ca.uhn.fhir.jpa.search.DatabaseBackedPagingProvider;
 import ca.uhn.fhir.narrative.DefaultThymeleafNarrativeGenerator;
 import ca.uhn.fhir.rest.server.ETagSupportEnum;
 import ca.uhn.fhir.rest.server.EncodingEnum;
@@ -32,6 +33,7 @@ import ca.uhn.fhir.rest.server.FifoMemoryPagingProvider;
 import ca.uhn.fhir.rest.server.HardcodedServerAddressStrategy;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.RestfulServer;
+import ca.uhn.fhir.rest.server.interceptor.BanUnsupportedHttpMethodsInterceptor;
 import ca.uhn.fhir.rest.server.interceptor.IServerInterceptor;
 import ca.uhn.fhir.rest.server.interceptor.ResponseHighlighterInterceptor;
 import ca.uhn.fhirtest.config.TestDstu3Config;
@@ -175,6 +177,7 @@ public class TestRestfulServer extends RestfulServer {
 		 * makes things a little easier for testers.
 		 */
 		registerInterceptor(new ResponseHighlighterInterceptor());
+		registerInterceptor(new BanUnsupportedHttpMethodsInterceptor());
 		
 		/*
 		 * Default to JSON with pretty printing
@@ -198,11 +201,10 @@ public class TestRestfulServer extends RestfulServer {
 		setServerAddressStrategy(new MyHardcodedServerAddressStrategy(baseUrl));
 		
 		/*
-		 * This is a simple paging strategy that keeps the last 10 
-		 * searches in memory
+		 * Spool results to the database 
 		 */
-		setPagingProvider(new FifoMemoryPagingProvider(10).setMaximumPageSize(500));
-
+		setPagingProvider(myAppCtx.getBean(DatabaseBackedPagingProvider.class));
+		
 		/*
 		 * Load interceptors for the server from Spring
 		 */

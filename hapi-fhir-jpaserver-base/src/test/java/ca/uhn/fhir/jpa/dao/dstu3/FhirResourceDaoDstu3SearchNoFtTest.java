@@ -13,85 +13,39 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 
+import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.hl7.fhir.dstu3.model.Appointment;
-import org.hl7.fhir.dstu3.model.CodeType;
-import org.hl7.fhir.dstu3.model.CodeableConcept;
-import org.hl7.fhir.dstu3.model.Coding;
+import org.hl7.fhir.dstu3.model.*;
 import org.hl7.fhir.dstu3.model.ContactPoint.ContactPointSystem;
-import org.hl7.fhir.dstu3.model.DateTimeType;
-import org.hl7.fhir.dstu3.model.DateType;
-import org.hl7.fhir.dstu3.model.Device;
-import org.hl7.fhir.dstu3.model.DiagnosticOrder;
-import org.hl7.fhir.dstu3.model.DiagnosticReport;
-import org.hl7.fhir.dstu3.model.Encounter;
 import org.hl7.fhir.dstu3.model.Enumerations.AdministrativeGender;
-import org.hl7.fhir.dstu3.model.IdType;
-import org.hl7.fhir.dstu3.model.Immunization;
-import org.hl7.fhir.dstu3.model.Location;
-import org.hl7.fhir.dstu3.model.Medication;
-import org.hl7.fhir.dstu3.model.MedicationOrder;
-import org.hl7.fhir.dstu3.model.Observation;
-import org.hl7.fhir.dstu3.model.Organization;
-import org.hl7.fhir.dstu3.model.Patient;
-import org.hl7.fhir.dstu3.model.Period;
-import org.hl7.fhir.dstu3.model.Practitioner;
-import org.hl7.fhir.dstu3.model.Quantity;
-import org.hl7.fhir.dstu3.model.Reference;
-import org.hl7.fhir.dstu3.model.StringType;
-import org.hl7.fhir.dstu3.model.Subscription;
 import org.hl7.fhir.dstu3.model.Subscription.SubscriptionChannelType;
 import org.hl7.fhir.dstu3.model.Subscription.SubscriptionStatus;
-import org.hl7.fhir.dstu3.model.Substance;
-import org.hl7.fhir.dstu3.model.TemporalPrecisionEnum;
-import org.hl7.fhir.dstu3.model.ValueSet;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.junit.AfterClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import ca.uhn.fhir.jpa.dao.BaseHapiFhirDao;
 import ca.uhn.fhir.jpa.dao.SearchParameterMap;
-import ca.uhn.fhir.jpa.entity.ResourceIndexedSearchParamDate;
-import ca.uhn.fhir.jpa.entity.ResourceIndexedSearchParamNumber;
-import ca.uhn.fhir.jpa.entity.ResourceIndexedSearchParamQuantity;
-import ca.uhn.fhir.jpa.entity.ResourceIndexedSearchParamString;
-import ca.uhn.fhir.jpa.entity.ResourceIndexedSearchParamToken;
-import ca.uhn.fhir.jpa.entity.ResourceIndexedSearchParamUri;
-import ca.uhn.fhir.jpa.entity.ResourceLink;
+import ca.uhn.fhir.jpa.entity.*;
 import ca.uhn.fhir.model.api.IQueryParameterType;
 import ca.uhn.fhir.model.api.Include;
 import ca.uhn.fhir.model.dstu.valueset.QuantityCompararatorEnum;
 import ca.uhn.fhir.rest.api.SortOrderEnum;
 import ca.uhn.fhir.rest.api.SortSpec;
-import ca.uhn.fhir.rest.param.CompositeParam;
-import ca.uhn.fhir.rest.param.DateParam;
-import ca.uhn.fhir.rest.param.DateRangeParam;
-import ca.uhn.fhir.rest.param.HasParam;
-import ca.uhn.fhir.rest.param.NumberParam;
-import ca.uhn.fhir.rest.param.ParamPrefixEnum;
-import ca.uhn.fhir.rest.param.QuantityParam;
-import ca.uhn.fhir.rest.param.ReferenceParam;
-import ca.uhn.fhir.rest.param.StringAndListParam;
-import ca.uhn.fhir.rest.param.StringOrListParam;
-import ca.uhn.fhir.rest.param.StringParam;
-import ca.uhn.fhir.rest.param.TokenAndListParam;
-import ca.uhn.fhir.rest.param.TokenOrListParam;
-import ca.uhn.fhir.rest.param.TokenParam;
-import ca.uhn.fhir.rest.param.TokenParamModifier;
-import ca.uhn.fhir.rest.param.UriParam;
-import ca.uhn.fhir.rest.param.UriParamQualifierEnum;
+import ca.uhn.fhir.rest.param.*;
 import ca.uhn.fhir.rest.server.Constants;
 import ca.uhn.fhir.rest.server.IBundleProvider;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
@@ -101,6 +55,48 @@ import ca.uhn.fhir.util.TestUtil;
 public class FhirResourceDaoDstu3SearchNoFtTest extends BaseJpaDstu3Test {
 	private static final org.slf4j.Logger ourLog = org.slf4j.LoggerFactory.getLogger(FhirResourceDaoDstu3SearchNoFtTest.class);
 
+	@Test
+	public void testSearchWithRevIncludes() {
+		final String methodName = "testSearchWithRevIncludes";
+		TransactionTemplate txTemplate = new TransactionTemplate(myTransactionMgr);
+		txTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_REQUIRES_NEW);
+		IIdType pid = txTemplate.execute(new TransactionCallback<IIdType>() {
+
+			@Override
+			public IIdType doInTransaction(TransactionStatus theStatus) {
+				org.hl7.fhir.dstu3.model.Patient p = new org.hl7.fhir.dstu3.model.Patient();
+				p.addName().addFamily(methodName);
+				IIdType pid = myPatientDao.create(p).getId().toUnqualifiedVersionless();
+				
+				org.hl7.fhir.dstu3.model.Condition c = new org.hl7.fhir.dstu3.model.Condition();
+				c.getSubject().setReferenceElement(pid);
+				myConditionDao.create(c);
+				
+				return pid;
+			}
+		});
+		
+		SearchParameterMap map = new SearchParameterMap();
+		map.add(Patient.SP_RES_ID, new StringParam(pid.getIdPart()));
+		map.addRevInclude(Condition.INCLUDE_PATIENT);
+		IBundleProvider results = myPatientDao.search(map);
+		List<IBaseResource> foundResources = results.getResources(0, results.size());
+		assertEquals(Patient.class, foundResources.get(0).getClass());
+		assertEquals(Condition.class, foundResources.get(1).getClass());
+	}
+
+	/**
+	 * #454
+	 */
+	@Test
+	public void testIndexWithUtf8Chars() throws IOException {
+		String input = IOUtils.toString(getClass().getResourceAsStream("/bug454_utf8.json"), StandardCharsets.UTF_8);
+		
+		CodeSystem cs = (CodeSystem) myFhirCtx.newJsonParser().parseResource(input);
+		myCodeSystemDao.create(cs);
+	}
+	
+	
 	@Test
 	public void testCodeSearch() {
 		Subscription subs = new Subscription();
@@ -154,17 +150,17 @@ public class FhirResourceDaoDstu3SearchNoFtTest extends BaseJpaDstu3Test {
 
 	@Test
 	public void testIndexNoDuplicatesDate() {
-		DiagnosticOrder order = new DiagnosticOrder();
-		order.addItem().addEvent().setDateTimeElement(new DateTimeType("2011-12-11T11:12:12Z"));
-		order.addItem().addEvent().setDateTimeElement(new DateTimeType("2011-12-11T11:12:12Z"));
-		order.addItem().addEvent().setDateTimeElement(new DateTimeType("2011-12-11T11:12:12Z"));
-		order.addItem().addEvent().setDateTimeElement(new DateTimeType("2011-12-12T11:12:12Z"));
-		order.addItem().addEvent().setDateTimeElement(new DateTimeType("2011-12-12T11:12:12Z"));
-		order.addItem().addEvent().setDateTimeElement(new DateTimeType("2011-12-12T11:12:12Z"));
+		Encounter order = new Encounter();
+		order.addLocation().getPeriod().setStartElement(new DateTimeType("2011-12-12T11:12:12Z")).setEndElement(new DateTimeType("2011-12-12T11:12:12Z"));
+		order.addLocation().getPeriod().setStartElement(new DateTimeType("2011-12-12T11:12:12Z")).setEndElement(new DateTimeType("2011-12-12T11:12:12Z"));
+		order.addLocation().getPeriod().setStartElement(new DateTimeType("2011-12-12T11:12:12Z")).setEndElement(new DateTimeType("2011-12-12T11:12:12Z"));
+		order.addLocation().getPeriod().setStartElement(new DateTimeType("2011-12-11T11:12:12Z")).setEndElement(new DateTimeType("2011-12-11T11:12:12Z"));
+		order.addLocation().getPeriod().setStartElement(new DateTimeType("2011-12-11T11:12:12Z")).setEndElement(new DateTimeType("2011-12-11T11:12:12Z"));
+		order.addLocation().getPeriod().setStartElement(new DateTimeType("2011-12-11T11:12:12Z")).setEndElement(new DateTimeType("2011-12-11T11:12:12Z"));
 		
-		IIdType id = myDiagnosticOrderDao.create(order, mySrd).getId().toUnqualifiedVersionless();
+		IIdType id = myEncounterDao.create(order, mySrd).getId().toUnqualifiedVersionless();
 		
-		List<IIdType> actual = toUnqualifiedVersionlessIds(myDiagnosticOrderDao.search(DiagnosticOrder.SP_ITEM_DATE, new DateParam("2011-12-12T11:12:12Z")));
+		List<IIdType> actual = toUnqualifiedVersionlessIds(myEncounterDao.search(Encounter.SP_LOCATION_PERIOD, new DateParam("2011-12-12T11:12:12Z")));
 		assertThat(actual, contains(id));
 		
 		Class<ResourceIndexedSearchParamDate> type = ResourceIndexedSearchParamDate.class;
@@ -224,20 +220,20 @@ public class FhirResourceDaoDstu3SearchNoFtTest extends BaseJpaDstu3Test {
 		pract2.addName().addFamily("SOME PRACT2");
 		myPractitionerDao.update(pract2, mySrd);
 		
-		DiagnosticOrder res = new DiagnosticOrder();
-		res.addEvent().setActor(new Reference("Practitioner/somepract"));
-		res.addEvent().setActor(new Reference("Practitioner/somepract"));
-		res.addEvent().setActor(new Reference("Practitioner/somepract2"));
-		res.addEvent().setActor(new Reference("Practitioner/somepract2"));
+		DiagnosticRequest res = new DiagnosticRequest();
+		res.addReplaces(new Reference("Practitioner/somepract"));
+		res.addReplaces(new Reference("Practitioner/somepract"));
+		res.addReplaces(new Reference("Practitioner/somepract2"));
+		res.addReplaces(new Reference("Practitioner/somepract2"));
 		
-		IIdType id = myDiagnosticOrderDao.create(res, mySrd).getId().toUnqualifiedVersionless();
+		IIdType id = myDiagnosticRequestDao.create(res, mySrd).getId().toUnqualifiedVersionless();
 		
 		Class<ResourceLink> type = ResourceLink.class;
 		List<?> results = myEntityManager.createQuery("SELECT i FROM " + type.getSimpleName() + " i", type).getResultList();
 		ourLog.info(toStringMultiline(results));
 		assertEquals(2, results.size());
 		
-		List<IIdType> actual = toUnqualifiedVersionlessIds(myDiagnosticOrderDao.search(DiagnosticOrder.SP_ACTOR, new ReferenceParam("Practitioner/somepract")));
+		List<IIdType> actual = toUnqualifiedVersionlessIds(myDiagnosticRequestDao.search(DiagnosticRequest.SP_REPLACES, new ReferenceParam("Practitioner/somepract")));
 		assertThat(actual, contains(id));
 	}
 	
@@ -328,7 +324,7 @@ public class FhirResourceDaoDstu3SearchNoFtTest extends BaseJpaDstu3Test {
 
 	@Test
 	public void testHasParameter() {
-		IIdType pid0, pid1;
+		IIdType pid0;
 		{
 			Patient patient = new Patient();
 			patient.addIdentifier().setSystem("urn:system").setValue("001");
@@ -339,7 +335,7 @@ public class FhirResourceDaoDstu3SearchNoFtTest extends BaseJpaDstu3Test {
 			Patient patient = new Patient();
 			patient.addIdentifier().setSystem("urn:system").setValue("001");
 			patient.addName().addFamily("Tester").addGiven("Joe");
-			pid1 = myPatientDao.create(patient, mySrd).getId().toUnqualifiedVersionless();
+			myPatientDao.create(patient, mySrd).getId().toUnqualifiedVersionless();
 		}
 		{
 			Observation obs = new Observation();
@@ -959,6 +955,7 @@ public class FhirResourceDaoDstu3SearchNoFtTest extends BaseJpaDstu3Test {
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Test
 	public void testSearchLastUpdatedParamWithComparator() throws InterruptedException {
 		IIdType id0;
@@ -2391,7 +2388,7 @@ public class FhirResourceDaoDstu3SearchNoFtTest extends BaseJpaDstu3Test {
 
 		ValueSet vs2 = new ValueSet();
 		vs2.setUrl("http://hl7.org/foo/bar");
-		IIdType id2 = myValueSetDao.create(vs2, mySrd).getId().toUnqualifiedVersionless();
+		myValueSetDao.create(vs2, mySrd).getId().toUnqualifiedVersionless();
 		
 		IBundleProvider result;
 		result = myValueSetDao.search(ValueSet.SP_URL, new UriParam("http://hl7.org/fhir/ValueSet/basic-resource-type"));

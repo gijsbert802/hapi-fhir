@@ -33,8 +33,6 @@ import ca.uhn.fhir.util.TestUtil;
 
 public class AuthorizationInterceptorResourceProviderDstu3Test extends BaseResourceProviderDstu3Test {
 
-	private static final org.slf4j.Logger ourLog = org.slf4j.LoggerFactory.getLogger(AuthorizationInterceptorResourceProviderDstu3Test.class);
-
 	@AfterClass
 	public static void afterClassClearContext() {
 		TestUtil.clearAllStaticFieldsForUnitTest();
@@ -72,6 +70,7 @@ public class AuthorizationInterceptorResourceProviderDstu3Test extends BaseResou
 				//@formatter:off
 				return new RuleBuilder()
 					.allow("Rule 2").write().allResources().inCompartment("Patient", new IdDt("Patient/" + output1.getId().getIdPart())).andThen()
+					.allow().updateConditional().allResources()
 					.build();
 				//@formatter:on
 			}
@@ -122,7 +121,7 @@ public class AuthorizationInterceptorResourceProviderDstu3Test extends BaseResou
 		final IdType id;
 		try {
 			assertEquals(201, response.getStatusLine().getStatusCode());
-			String newIdString = response.getFirstHeader(Constants.HEADER_LOCATION_LC).getValue();
+			String newIdString = response.getFirstHeader(Constants.HEADER_CONTENT_LOCATION_LC).getValue();
 			assertThat(newIdString, startsWith(ourServerBase + "/Patient/"));
 			id = new IdType(newIdString);
 		} finally {
@@ -139,7 +138,7 @@ public class AuthorizationInterceptorResourceProviderDstu3Test extends BaseResou
 		final IdType id2;
 		try {
 			assertEquals(201, response.getStatusLine().getStatusCode());
-			String newIdString = response.getFirstHeader(Constants.HEADER_LOCATION_LC).getValue();
+			String newIdString = response.getFirstHeader(Constants.HEADER_CONTENT_LOCATION_LC).getValue();
 			assertThat(newIdString, startsWith(ourServerBase + "/Patient/"));
 			id2 = new IdType(newIdString);
 		} finally {
@@ -160,7 +159,7 @@ public class AuthorizationInterceptorResourceProviderDstu3Test extends BaseResou
 		HttpDelete delete = new HttpDelete(ourServerBase + "/Patient?name=" + methodName);
 		response = ourHttpClient.execute(delete);
 		try {
-			assertEquals(204, response.getStatusLine().getStatusCode());
+			assertEquals(200, response.getStatusLine().getStatusCode());
 		} finally {
 			response.close();
 		}

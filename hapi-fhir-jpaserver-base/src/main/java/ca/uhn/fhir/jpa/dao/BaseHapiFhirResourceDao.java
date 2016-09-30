@@ -22,28 +22,15 @@ package ca.uhn.fhir.jpa.dao;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
 import org.hl7.fhir.dstu3.model.IdType;
-import org.hl7.fhir.instance.model.api.IAnyResource;
-import org.hl7.fhir.instance.model.api.IBaseCoding;
-import org.hl7.fhir.instance.model.api.IBaseMetaType;
-import org.hl7.fhir.instance.model.api.IBaseOperationOutcome;
-import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.instance.model.api.IIdType;
-import org.hl7.fhir.instance.model.api.IPrimitiveType;
+import org.hl7.fhir.instance.model.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -57,37 +44,26 @@ import ca.uhn.fhir.context.RuntimeSearchParam;
 import ca.uhn.fhir.jpa.dao.data.IResourceHistoryTableDao;
 import ca.uhn.fhir.jpa.dao.data.IResourceIndexedSearchParamUriDao;
 import ca.uhn.fhir.jpa.dao.data.ISearchResultDao;
-import ca.uhn.fhir.jpa.entity.BaseHasResource;
-import ca.uhn.fhir.jpa.entity.BaseTag;
-import ca.uhn.fhir.jpa.entity.ResourceHistoryTable;
-import ca.uhn.fhir.jpa.entity.ResourceLink;
-import ca.uhn.fhir.jpa.entity.ResourceTable;
-import ca.uhn.fhir.jpa.entity.TagDefinition;
-import ca.uhn.fhir.jpa.entity.TagTypeEnum;
+import ca.uhn.fhir.jpa.entity.*;
 import ca.uhn.fhir.jpa.interceptor.IJpaServerInterceptor;
 import ca.uhn.fhir.jpa.term.IHapiTerminologySvc;
 import ca.uhn.fhir.jpa.util.DeleteConflict;
 import ca.uhn.fhir.jpa.util.StopWatch;
-import ca.uhn.fhir.model.api.IQueryParameterType;
-import ca.uhn.fhir.model.api.IResource;
-import ca.uhn.fhir.model.api.Include;
-import ca.uhn.fhir.model.api.ResourceMetadataKeyEnum;
-import ca.uhn.fhir.model.api.TagList;
+import ca.uhn.fhir.jpa.util.jsonpatch.JsonPatchUtils;
+import ca.uhn.fhir.jpa.util.xmlpatch.XmlPatchUtils;
+import ca.uhn.fhir.model.api.*;
 import ca.uhn.fhir.model.primitive.IdDt;
+import ca.uhn.fhir.rest.api.PatchTypeEnum;
 import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
 import ca.uhn.fhir.rest.method.RequestDetails;
 import ca.uhn.fhir.rest.method.RestSearchParameterTypeEnum;
 import ca.uhn.fhir.rest.server.IBundleProvider;
-import ca.uhn.fhir.rest.server.exceptions.InternalErrorException;
-import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
-import ca.uhn.fhir.rest.server.exceptions.PreconditionFailedException;
-import ca.uhn.fhir.rest.server.exceptions.ResourceGoneException;
-import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
-import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
+import ca.uhn.fhir.rest.server.exceptions.*;
 import ca.uhn.fhir.rest.server.interceptor.IServerInterceptor;
 import ca.uhn.fhir.rest.server.interceptor.IServerInterceptor.ActionRequestDetails;
 import ca.uhn.fhir.util.FhirTerser;
 import ca.uhn.fhir.util.ObjectUtil;
+import ca.uhn.fhir.util.OperationOutcomeUtil;
 import ca.uhn.fhir.util.ResourceReferenceInfo;
 
 @Transactional(propagation = Propagation.REQUIRED)
@@ -97,13 +73,10 @@ public abstract class BaseHapiFhirResourceDao<T extends IBaseResource> extends B
 
 	@Autowired
 	private DaoConfig myDaoConfig;
-
 	@Autowired
 	protected PlatformTransactionManager myPlatformTransactionManager;
-
 	@Autowired
 	private IResourceHistoryTableDao myResourceHistoryTableDao;
-
 	@Autowired()
 	protected IResourceIndexedSearchParamUriDao myResourceIndexedSearchParamUriDao;
 	private String myResourceName;
@@ -112,9 +85,7 @@ public abstract class BaseHapiFhirResourceDao<T extends IBaseResource> extends B
 	protected IFulltextSearchSvc mySearchDao;
 	@Autowired()
 	protected ISearchResultDao mySearchResultDao;
-
 	private String mySecondaryPrimaryKeyParamName;
-
 	@Autowired()
 	protected IHapiTerminologySvc myTerminologySvc;
 
@@ -146,10 +117,20 @@ public abstract class BaseHapiFhirResourceDao<T extends IBaseResource> extends B
 
 		ourLog.info("Processed addTag {}/{} on {} in {}ms", new Object[] { theScheme, theTerm, theId, w.getMillisAndRestart() });
 	}
+	
+	@Override
+	public DaoMethodOutcome create(final T theResource) {
+		return create(theResource, null, true, null);
+	}
 
 	@Override
 	public DaoMethodOutcome create(final T theResource, RequestDetails theRequestDetails) {
 		return create(theResource, null, true, theRequestDetails);
+	}
+
+	@Override
+	public DaoMethodOutcome create(final T theResource, String theIfNoneExist) {
+		return create(theResource, theIfNoneExist, null);
 	}
 
 	@Override
@@ -160,9 +141,12 @@ public abstract class BaseHapiFhirResourceDao<T extends IBaseResource> extends B
 					String message = getContext().getLocalizer().getMessage(BaseHapiFhirResourceDao.class, "failedToCreateWithClientAssignedNumericId", theResource.getIdElement().getIdPart());
 					throw new InvalidRequestException(message, createErrorOperationOutcome(message, "processing"));
 				}
-			} else {
+			} else if (getContext().getVersion().getVersion().isOlderThan(FhirVersionEnum.DSTU3)) {
 				String message = getContext().getLocalizer().getMessage(BaseHapiFhirResourceDao.class, "failedToCreateWithClientAssignedId", theResource.getIdElement().getIdPart());
 				throw new InvalidRequestException(message, createErrorOperationOutcome(message, "processing"));
+			} else {
+				// As of DSTU3, ID and version in the body should be ignored for a create/update
+				theResource.setId("");
 			}
 		}
 
@@ -185,13 +169,18 @@ public abstract class BaseHapiFhirResourceDao<T extends IBaseResource> extends B
 	protected abstract IBaseOperationOutcome createOperationOutcome(String theSeverity, String theMessage, String theCode);
 
 	@Override
+	public DaoMethodOutcome delete(IIdType theId) {
+		return delete(theId, null);
+	}
+
+	@Override
 	public ResourceTable delete(IIdType theId, List<DeleteConflict> deleteConflicts, RequestDetails theRequestDetails) {
 		if (theId == null || !theId.hasIdPart()) {
 			throw new InvalidRequestException("Can not perform delete, no ID provided");
 		}
 		final ResourceTable entity = readEntityLatestVersion(theId);
 		if (theId.hasVersionIdPart() && Long.parseLong(theId.getVersionIdPart()) != entity.getVersion()) {
-			throw new InvalidRequestException("Trying to delete " + theId + " but this is not the current version");
+			throw new ResourceVersionConflictException("Trying to delete " + theId + " but this is not the current version");
 		}
 
 		validateOkToDelete(deleteConflicts, entity);
@@ -201,7 +190,7 @@ public abstract class BaseHapiFhirResourceDao<T extends IBaseResource> extends B
 			ActionRequestDetails requestDetails = new ActionRequestDetails(theRequestDetails, getContext(), theId.getResourceType(), theId);
 			notifyInterceptors(RestOperationTypeEnum.DELETE, requestDetails);
 		}
-		
+
 		Date updateTime = new Date();
 		ResourceTable savedEntity = updateEntity(null, entity, updateTime, updateTime);
 
@@ -216,7 +205,7 @@ public abstract class BaseHapiFhirResourceDao<T extends IBaseResource> extends B
 				}
 			}
 		}
-		
+
 		return savedEntity;
 	}
 
@@ -232,7 +221,7 @@ public abstract class BaseHapiFhirResourceDao<T extends IBaseResource> extends B
 		ourLog.info("Processed delete on {} in {}ms", theId.getValue(), w.getMillisAndRestart());
 		return toMethodOutcome(savedEntity, null);
 	}
-
+	
 	@Override
 	public List<ResourceTable> deleteByUrl(String theUrl, List<DeleteConflict> deleteConflicts, RequestDetails theRequestDetails) {
 		Set<Long> resource = processMatchUrl(theUrl, myResourceType);
@@ -280,13 +269,33 @@ public abstract class BaseHapiFhirResourceDao<T extends IBaseResource> extends B
 		List<ResourceTable> deletedResources = deleteByUrl(theUrl, deleteConflicts, theRequestDetails);
 
 		validateDeleteConflictsEmptyOrThrowException(deleteConflicts);
-
+		
+		IBaseOperationOutcome oo;
 		if (deletedResources.isEmpty()) {
-			throw new ResourceNotFoundException(getContext().getLocalizer().getMessage(BaseHapiFhirResourceDao.class, "unableToDeleteNotFound", theUrl));
+			oo = OperationOutcomeUtil.newInstance(getContext());
+			String message = getContext().getLocalizer().getMessage(BaseHapiFhirResourceDao.class, "unableToDeleteNotFound", theUrl);
+			String severity = "warning";
+			String code = "not-found";
+			OperationOutcomeUtil.addIssue(getContext(), oo, severity, message, null, code);
+		} else {
+			oo = OperationOutcomeUtil.newInstance(getContext());
+			String message = getContext().getLocalizer().getMessage(BaseHapiFhirResourceDao.class, "successfulDeletes", theUrl, deletedResources.size(), w.getMillis());
+			String severity = "information";
+			String code = "informational";
+			OperationOutcomeUtil.addIssue(getContext(), oo, severity, message, null, code);
 		}
 
-		ourLog.info("Processed delete on {} (matched {} resource(s)) in {}ms", new Object[] { theUrl, deletedResources.size(), w.getMillisAndRestart() });
-		return new DaoMethodOutcome();
+		ourLog.info("Processed delete on {} (matched {} resource(s)) in {}ms", new Object[] { theUrl, deletedResources.size(), w.getMillis() });
+		DaoMethodOutcome retVal = new DaoMethodOutcome();
+		retVal.setOperationOutcome(oo);
+		return retVal;
+	}
+
+	@PostConstruct
+	public void detectSearchDaoDisabled() {
+		if (mySearchDao != null && mySearchDao.isDisabled()) {
+			mySearchDao = null;
+		}
 	}
 
 	private DaoMethodOutcome doCreate(T theResource, String theIfNoneExist, boolean thePerformIndexing, Date theUpdateTime, RequestDetails theRequestDetails) {
@@ -332,9 +341,9 @@ public abstract class BaseHapiFhirResourceDao<T extends IBaseResource> extends B
 			ActionRequestDetails requestDetails = new ActionRequestDetails(theRequestDetails, getContext(), theResource);
 			notifyInterceptors(RestOperationTypeEnum.CREATE, requestDetails);
 		}
-		
+
 		// Perform actual DB update
-		updateEntity(theResource, entity, null, thePerformIndexing, true, theUpdateTime);
+		updateEntity(theResource, entity, null, thePerformIndexing, thePerformIndexing, theUpdateTime);
 		theResource.setId(entity.getIdDt());
 
 		// Notify JPA interceptors
@@ -347,7 +356,7 @@ public abstract class BaseHapiFhirResourceDao<T extends IBaseResource> extends B
 				}
 			}
 		}
-		
+
 		DaoMethodOutcome outcome = toMethodOutcome(entity, theResource).setCreated(true);
 
 		String msg = getContext().getLocalizer().getMessage(BaseHapiFhirResourceDao.class, "successfulCreate", outcome.getId(), w.getMillisAndRestart());
@@ -473,6 +482,36 @@ public abstract class BaseHapiFhirResourceDao<T extends IBaseResource> extends B
 		return retVal;
 	}
 
+	@Override
+	public <MT extends IBaseMetaType> MT metaAddOperation(IIdType theResourceId, MT theMetaAdd, RequestDetails theRequestDetails) {
+		// Notify interceptors
+		ActionRequestDetails requestDetails = new ActionRequestDetails(theRequestDetails, getResourceName(), theResourceId);
+		notifyInterceptors(RestOperationTypeEnum.META_ADD, requestDetails);
+
+		StopWatch w = new StopWatch();
+		BaseHasResource entity = readEntity(theResourceId);
+		if (entity == null) {
+			throw new ResourceNotFoundException(theResourceId);
+		}
+
+		ResourceTable latestVersion = readEntityLatestVersion(theResourceId);
+		if (latestVersion.getVersion() != entity.getVersion()) {
+			doMetaAdd(theMetaAdd, entity);
+		} else {
+			doMetaAdd(theMetaAdd, latestVersion);
+
+			// Also update history entry
+			ResourceHistoryTable history = myResourceHistoryTableDao.findForIdAndVersion(entity.getId(), entity.getVersion());
+			doMetaAdd(theMetaAdd, history);
+		}
+
+		ourLog.info("Processed metaAddOperation on {} in {}ms", new Object[] { theResourceId, w.getMillisAndRestart() });
+
+		@SuppressWarnings("unchecked")
+		MT retVal = (MT) metaGetOperation(theMetaAdd.getClass(), theResourceId, theRequestDetails);
+		return retVal;
+	}
+
 	// @Override
 	// public IBundleProvider everything(IIdType theId) {
 	// Search search = new Search();
@@ -554,36 +593,6 @@ public abstract class BaseHapiFhirResourceDao<T extends IBaseResource> extends B
 	// }
 	// };
 	// }
-
-	@Override
-	public <MT extends IBaseMetaType> MT metaAddOperation(IIdType theResourceId, MT theMetaAdd, RequestDetails theRequestDetails) {
-		// Notify interceptors
-		ActionRequestDetails requestDetails = new ActionRequestDetails(theRequestDetails, getResourceName(), theResourceId);
-		notifyInterceptors(RestOperationTypeEnum.META_ADD, requestDetails);
-
-		StopWatch w = new StopWatch();
-		BaseHasResource entity = readEntity(theResourceId);
-		if (entity == null) {
-			throw new ResourceNotFoundException(theResourceId);
-		}
-
-		ResourceTable latestVersion = readEntityLatestVersion(theResourceId);
-		if (latestVersion.getVersion() != entity.getVersion()) {
-			doMetaAdd(theMetaAdd, entity);
-		} else {
-			doMetaAdd(theMetaAdd, latestVersion);
-
-			// Also update history entry
-			ResourceHistoryTable history = myResourceHistoryTableDao.findForIdAndVersion(entity.getId(), entity.getVersion());
-			doMetaAdd(theMetaAdd, history);
-		}
-
-		ourLog.info("Processed metaAddOperation on {} in {}ms", new Object[] { theResourceId, w.getMillisAndRestart() });
-
-		@SuppressWarnings("unchecked")
-		MT retVal = (MT) metaGetOperation(theMetaAdd.getClass(), theResourceId, theRequestDetails);
-		return retVal;
-	}
 
 	@Override
 	public <MT extends IBaseMetaType> MT metaDeleteOperation(IIdType theResourceId, MT theMetaDel, RequestDetails theRequestDetails) {
@@ -711,6 +720,11 @@ public abstract class BaseHapiFhirResourceDao<T extends IBaseResource> extends B
 	}
 
 	@Override
+	public T read(IIdType theId) {
+		return read(theId, null);
+	}
+
+	@Override
 	public T read(IIdType theId, RequestDetails theRequestDetails) {
 		validateResourceTypeAndThrowIllegalArgumentException(theId);
 
@@ -720,7 +734,7 @@ public abstract class BaseHapiFhirResourceDao<T extends IBaseResource> extends B
 			RestOperationTypeEnum operationType = theId.hasVersionIdPart() ? RestOperationTypeEnum.VREAD : RestOperationTypeEnum.READ;
 			notifyInterceptors(operationType, requestDetails);
 		}
-		
+
 		StopWatch w = new StopWatch();
 		BaseHasResource entity = readEntity(theId);
 		validateResourceType(entity);
@@ -971,8 +985,18 @@ public abstract class BaseHapiFhirResourceDao<T extends IBaseResource> extends B
 	}
 
 	@Override
+	public DaoMethodOutcome update(T theResource) {
+		return update(theResource, null, null);
+	}
+
+	@Override
 	public DaoMethodOutcome update(T theResource, RequestDetails theRequestDetails) {
 		return update(theResource, null, theRequestDetails);
+	}
+
+	@Override
+	public DaoMethodOutcome update(T theResource, String theMatchUrl) {
+		return update(theResource, theMatchUrl, null);
 	}
 
 	@Override
@@ -1014,7 +1038,7 @@ public abstract class BaseHapiFhirResourceDao<T extends IBaseResource> extends B
 		}
 
 		if (resourceId.hasVersionIdPart() && Long.parseLong(resourceId.getVersionIdPart()) != entity.getVersion()) {
-			throw new InvalidRequestException("Trying to update " + resourceId + " but this is not the current version");
+			throw new ResourceVersionConflictException("Trying to update " + resourceId + " but this is not the current version");
 		}
 
 		if (resourceId.hasResourceType() && !resourceId.getResourceType().equals(getResourceName())) {
@@ -1023,17 +1047,22 @@ public abstract class BaseHapiFhirResourceDao<T extends IBaseResource> extends B
 		}
 
 		// Notify interceptors
-		ActionRequestDetails requestDetails = new ActionRequestDetails(theRequestDetails, theResource, getResourceName(), resourceId);
-		notifyInterceptors(RestOperationTypeEnum.UPDATE, requestDetails);
+		ActionRequestDetails requestDetails = null;
+		if (theRequestDetails != null) {
+			requestDetails = new ActionRequestDetails(theRequestDetails, theResource, getResourceName(), resourceId);
+			notifyInterceptors(RestOperationTypeEnum.UPDATE, requestDetails);
+		}
 
 		// Perform update
-		ResourceTable savedEntity = updateEntity(theResource, entity, null, thePerformIndexing, true, new Date());
+		ResourceTable savedEntity = updateEntity(theResource, entity, null, thePerformIndexing, thePerformIndexing, new Date());
 
 		// Notify interceptors
-		theRequestDetails.getRequestOperationCallback().resourceUpdated(theResource);
-		for (IServerInterceptor next : getConfig().getInterceptors()) {
-			if (next instanceof IJpaServerInterceptor) {
-				((IJpaServerInterceptor) next).resourceUpdated(requestDetails, entity);
+		if (theRequestDetails != null) {
+			theRequestDetails.getRequestOperationCallback().resourceUpdated(theResource);
+			for (IServerInterceptor next : getConfig().getInterceptors()) {
+				if (next instanceof IJpaServerInterceptor) {
+					((IJpaServerInterceptor) next).resourceUpdated(requestDetails, entity);
+				}
 			}
 		}
 
@@ -1046,6 +1075,31 @@ public abstract class BaseHapiFhirResourceDao<T extends IBaseResource> extends B
 		return outcome;
 	}
 
+	@Override
+	public DaoMethodOutcome patch(IIdType theId, PatchTypeEnum thePatchType, String thePatchBody, RequestDetails theRequestDetails) {
+		ResourceTable entityToUpdate = readEntityLatestVersion(theId);
+		if (theId.hasVersionIdPart()) {
+			if (theId.getVersionIdPartAsLong() != entityToUpdate.getVersion()) {
+				throw new ResourceVersionConflictException("Version " + theId.getVersionIdPart() + " is not the most recent version of this resource, unable to apply patch");
+			}
+		}
+		
+		validateResourceType(entityToUpdate);
+		
+		IBaseResource resourceToUpdate = toResource(entityToUpdate, false);
+		IBaseResource destination;
+		if (thePatchType == PatchTypeEnum.JSON_PATCH) {
+			destination = JsonPatchUtils.apply(getContext(), resourceToUpdate, thePatchBody);
+		} else {
+			destination = XmlPatchUtils.apply(getContext(), resourceToUpdate, thePatchBody);
+		}
+		
+		@SuppressWarnings("unchecked")
+		T destinationCasted = (T) destination;
+		return update(destinationCasted, null, true, theRequestDetails);
+	}
+	
+	
 	@Override
 	public DaoMethodOutcome update(T theResource, String theMatchUrl, RequestDetails theRequestDetails) {
 		return update(theResource, theMatchUrl, true, theRequestDetails);

@@ -29,24 +29,127 @@ package org.hl7.fhir.dstu3.model;
   
 */
 
-// Generated on Sat, Jul 2, 2016 11:26-0400 for FHIR v1.4.0
+// Generated on Thu, Aug 25, 2016 23:04-0400 for FHIR v1.6.0
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
-import java.util.*;
-
+import org.hl7.fhir.exceptions.FHIRException;
+import org.hl7.fhir.instance.model.api.IBaseBackboneElement;
 import org.hl7.fhir.utilities.Utilities;
-import ca.uhn.fhir.model.api.annotation.ResourceDef;
-import ca.uhn.fhir.model.api.annotation.SearchParamDefinition;
-import ca.uhn.fhir.model.api.annotation.Child;
-import ca.uhn.fhir.model.api.annotation.ChildOrder;
-import ca.uhn.fhir.model.api.annotation.Description;
-import ca.uhn.fhir.model.api.annotation.Block;
-import org.hl7.fhir.instance.model.api.*;
-import org.hl7.fhir.dstu3.exceptions.FHIRException;
+
+import ca.uhn.fhir.model.api.annotation.*;
 /**
- * This resource allows for the definition of an order set as a sharable, consumable, and executable artifact in support of clinical decision support.
+ * This resource allows for the definition of some activity to be performed, independent of a particular patient, practitioner, or other performance context.
  */
 @ResourceDef(name="ActivityDefinition", profile="http://hl7.org/fhir/Profile/ActivityDefinition")
 public class ActivityDefinition extends DomainResource {
+
+    public enum ActivityDefinitionStatus {
+        /**
+         * The module is in draft state
+         */
+        DRAFT, 
+        /**
+         * The module is active
+         */
+        ACTIVE, 
+        /**
+         * The module is inactive, either rejected before publication, or retired after publication
+         */
+        INACTIVE, 
+        /**
+         * added to help the parsers with the generic types
+         */
+        NULL;
+        public static ActivityDefinitionStatus fromCode(String codeString) throws FHIRException {
+            if (codeString == null || "".equals(codeString))
+                return null;
+        if ("draft".equals(codeString))
+          return DRAFT;
+        if ("active".equals(codeString))
+          return ACTIVE;
+        if ("inactive".equals(codeString))
+          return INACTIVE;
+        if (Configuration.isAcceptInvalidEnums())
+          return null;
+        else
+          throw new FHIRException("Unknown ActivityDefinitionStatus code '"+codeString+"'");
+        }
+        public String toCode() {
+          switch (this) {
+            case DRAFT: return "draft";
+            case ACTIVE: return "active";
+            case INACTIVE: return "inactive";
+            default: return "?";
+          }
+        }
+        public String getSystem() {
+          switch (this) {
+            case DRAFT: return "http://hl7.org/fhir/module-metadata-status";
+            case ACTIVE: return "http://hl7.org/fhir/module-metadata-status";
+            case INACTIVE: return "http://hl7.org/fhir/module-metadata-status";
+            default: return "?";
+          }
+        }
+        public String getDefinition() {
+          switch (this) {
+            case DRAFT: return "The module is in draft state";
+            case ACTIVE: return "The module is active";
+            case INACTIVE: return "The module is inactive, either rejected before publication, or retired after publication";
+            default: return "?";
+          }
+        }
+        public String getDisplay() {
+          switch (this) {
+            case DRAFT: return "Draft";
+            case ACTIVE: return "Active";
+            case INACTIVE: return "Inactive";
+            default: return "?";
+          }
+        }
+    }
+
+  public static class ActivityDefinitionStatusEnumFactory implements EnumFactory<ActivityDefinitionStatus> {
+    public ActivityDefinitionStatus fromCode(String codeString) throws IllegalArgumentException {
+      if (codeString == null || "".equals(codeString))
+            if (codeString == null || "".equals(codeString))
+                return null;
+        if ("draft".equals(codeString))
+          return ActivityDefinitionStatus.DRAFT;
+        if ("active".equals(codeString))
+          return ActivityDefinitionStatus.ACTIVE;
+        if ("inactive".equals(codeString))
+          return ActivityDefinitionStatus.INACTIVE;
+        throw new IllegalArgumentException("Unknown ActivityDefinitionStatus code '"+codeString+"'");
+        }
+        public Enumeration<ActivityDefinitionStatus> fromType(Base code) throws FHIRException {
+          if (code == null || code.isEmpty())
+            return null;
+          String codeString = ((PrimitiveType) code).asStringValue();
+          if (codeString == null || "".equals(codeString))
+            return null;
+        if ("draft".equals(codeString))
+          return new Enumeration<ActivityDefinitionStatus>(this, ActivityDefinitionStatus.DRAFT);
+        if ("active".equals(codeString))
+          return new Enumeration<ActivityDefinitionStatus>(this, ActivityDefinitionStatus.ACTIVE);
+        if ("inactive".equals(codeString))
+          return new Enumeration<ActivityDefinitionStatus>(this, ActivityDefinitionStatus.INACTIVE);
+        throw new FHIRException("Unknown ActivityDefinitionStatus code '"+codeString+"'");
+        }
+    public String toCode(ActivityDefinitionStatus code) {
+      if (code == ActivityDefinitionStatus.DRAFT)
+        return "draft";
+      if (code == ActivityDefinitionStatus.ACTIVE)
+        return "active";
+      if (code == ActivityDefinitionStatus.INACTIVE)
+        return "inactive";
+      return "?";
+      }
+    public String toSystem(ActivityDefinitionStatus code) {
+      return code.getSystem();
+      }
+    }
 
     public enum ActivityDefinitionCategory {
         /**
@@ -54,11 +157,19 @@ public class ActivityDefinition extends DomainResource {
          */
         COMMUNICATION, 
         /**
+         * To use a specific device
+         */
+        DEVICE, 
+        /**
+         * To perform a particular diagnostic
+         */
+        DIAGNOSTIC, 
+        /**
          * To consume food of a specified nature
          */
         DIET, 
         /**
-         * To consume/receive a drug, vaccine or other product
+         * To consume/receive a drug or other product
          */
         DRUG, 
         /**
@@ -66,7 +177,11 @@ public class ActivityDefinition extends DomainResource {
          */
         ENCOUNTER, 
         /**
-         * To capture information about a patient (vitals, labs, diagnostic images, etc.)
+         * To administer a particular immunization
+         */
+        IMMUNIZATION, 
+        /**
+         * To capture information about a patient (vitals, labs, etc.)
          */
         OBSERVATION, 
         /**
@@ -82,6 +197,10 @@ public class ActivityDefinition extends DomainResource {
          */
         SUPPLY, 
         /**
+         * To receive a particular vision correction device
+         */
+        VISION, 
+        /**
          * Some other form of action
          */
         OTHER, 
@@ -94,12 +213,18 @@ public class ActivityDefinition extends DomainResource {
                 return null;
         if ("communication".equals(codeString))
           return COMMUNICATION;
+        if ("device".equals(codeString))
+          return DEVICE;
+        if ("diagnostic".equals(codeString))
+          return DIAGNOSTIC;
         if ("diet".equals(codeString))
           return DIET;
         if ("drug".equals(codeString))
           return DRUG;
         if ("encounter".equals(codeString))
           return ENCOUNTER;
+        if ("immunization".equals(codeString))
+          return IMMUNIZATION;
         if ("observation".equals(codeString))
           return OBSERVATION;
         if ("procedure".equals(codeString))
@@ -108,6 +233,8 @@ public class ActivityDefinition extends DomainResource {
           return REFERRAL;
         if ("supply".equals(codeString))
           return SUPPLY;
+        if ("vision".equals(codeString))
+          return VISION;
         if ("other".equals(codeString))
           return OTHER;
         if (Configuration.isAcceptInvalidEnums())
@@ -118,13 +245,17 @@ public class ActivityDefinition extends DomainResource {
         public String toCode() {
           switch (this) {
             case COMMUNICATION: return "communication";
+            case DEVICE: return "device";
+            case DIAGNOSTIC: return "diagnostic";
             case DIET: return "diet";
             case DRUG: return "drug";
             case ENCOUNTER: return "encounter";
+            case IMMUNIZATION: return "immunization";
             case OBSERVATION: return "observation";
             case PROCEDURE: return "procedure";
             case REFERRAL: return "referral";
             case SUPPLY: return "supply";
+            case VISION: return "vision";
             case OTHER: return "other";
             default: return "?";
           }
@@ -132,13 +263,17 @@ public class ActivityDefinition extends DomainResource {
         public String getSystem() {
           switch (this) {
             case COMMUNICATION: return "http://hl7.org/fhir/activity-definition-category";
+            case DEVICE: return "http://hl7.org/fhir/activity-definition-category";
+            case DIAGNOSTIC: return "http://hl7.org/fhir/activity-definition-category";
             case DIET: return "http://hl7.org/fhir/activity-definition-category";
             case DRUG: return "http://hl7.org/fhir/activity-definition-category";
             case ENCOUNTER: return "http://hl7.org/fhir/activity-definition-category";
+            case IMMUNIZATION: return "http://hl7.org/fhir/activity-definition-category";
             case OBSERVATION: return "http://hl7.org/fhir/activity-definition-category";
             case PROCEDURE: return "http://hl7.org/fhir/activity-definition-category";
             case REFERRAL: return "http://hl7.org/fhir/activity-definition-category";
             case SUPPLY: return "http://hl7.org/fhir/activity-definition-category";
+            case VISION: return "http://hl7.org/fhir/activity-definition-category";
             case OTHER: return "http://hl7.org/fhir/activity-definition-category";
             default: return "?";
           }
@@ -146,13 +281,17 @@ public class ActivityDefinition extends DomainResource {
         public String getDefinition() {
           switch (this) {
             case COMMUNICATION: return "To communicate with a participant in some way";
+            case DEVICE: return "To use a specific device";
+            case DIAGNOSTIC: return "To perform a particular diagnostic";
             case DIET: return "To consume food of a specified nature";
-            case DRUG: return "To consume/receive a drug, vaccine or other product";
+            case DRUG: return "To consume/receive a drug or other product";
             case ENCOUNTER: return "To meet with the patient (in-patient, out-patient, etc.)";
-            case OBSERVATION: return "To capture information about a patient (vitals, labs, diagnostic images, etc.)";
+            case IMMUNIZATION: return "To administer a particular immunization";
+            case OBSERVATION: return "To capture information about a patient (vitals, labs, etc.)";
             case PROCEDURE: return "To modify the patient in some way (surgery, physiotherapy, education, counseling, etc.)";
             case REFERRAL: return "To refer the patient to receive some service";
             case SUPPLY: return "To provide something to the patient (medication, medical supply, etc.)";
+            case VISION: return "To receive a particular vision correction device";
             case OTHER: return "Some other form of action";
             default: return "?";
           }
@@ -160,13 +299,17 @@ public class ActivityDefinition extends DomainResource {
         public String getDisplay() {
           switch (this) {
             case COMMUNICATION: return "Communication";
+            case DEVICE: return "Device";
+            case DIAGNOSTIC: return "Diagnostic";
             case DIET: return "Diet";
             case DRUG: return "Drug";
             case ENCOUNTER: return "Encounter";
+            case IMMUNIZATION: return "Immunization";
             case OBSERVATION: return "Observation";
             case PROCEDURE: return "Procedure";
             case REFERRAL: return "Referral";
             case SUPPLY: return "Supply";
+            case VISION: return "Vision";
             case OTHER: return "Other";
             default: return "?";
           }
@@ -180,12 +323,18 @@ public class ActivityDefinition extends DomainResource {
                 return null;
         if ("communication".equals(codeString))
           return ActivityDefinitionCategory.COMMUNICATION;
+        if ("device".equals(codeString))
+          return ActivityDefinitionCategory.DEVICE;
+        if ("diagnostic".equals(codeString))
+          return ActivityDefinitionCategory.DIAGNOSTIC;
         if ("diet".equals(codeString))
           return ActivityDefinitionCategory.DIET;
         if ("drug".equals(codeString))
           return ActivityDefinitionCategory.DRUG;
         if ("encounter".equals(codeString))
           return ActivityDefinitionCategory.ENCOUNTER;
+        if ("immunization".equals(codeString))
+          return ActivityDefinitionCategory.IMMUNIZATION;
         if ("observation".equals(codeString))
           return ActivityDefinitionCategory.OBSERVATION;
         if ("procedure".equals(codeString))
@@ -194,6 +343,8 @@ public class ActivityDefinition extends DomainResource {
           return ActivityDefinitionCategory.REFERRAL;
         if ("supply".equals(codeString))
           return ActivityDefinitionCategory.SUPPLY;
+        if ("vision".equals(codeString))
+          return ActivityDefinitionCategory.VISION;
         if ("other".equals(codeString))
           return ActivityDefinitionCategory.OTHER;
         throw new IllegalArgumentException("Unknown ActivityDefinitionCategory code '"+codeString+"'");
@@ -206,12 +357,18 @@ public class ActivityDefinition extends DomainResource {
             return null;
         if ("communication".equals(codeString))
           return new Enumeration<ActivityDefinitionCategory>(this, ActivityDefinitionCategory.COMMUNICATION);
+        if ("device".equals(codeString))
+          return new Enumeration<ActivityDefinitionCategory>(this, ActivityDefinitionCategory.DEVICE);
+        if ("diagnostic".equals(codeString))
+          return new Enumeration<ActivityDefinitionCategory>(this, ActivityDefinitionCategory.DIAGNOSTIC);
         if ("diet".equals(codeString))
           return new Enumeration<ActivityDefinitionCategory>(this, ActivityDefinitionCategory.DIET);
         if ("drug".equals(codeString))
           return new Enumeration<ActivityDefinitionCategory>(this, ActivityDefinitionCategory.DRUG);
         if ("encounter".equals(codeString))
           return new Enumeration<ActivityDefinitionCategory>(this, ActivityDefinitionCategory.ENCOUNTER);
+        if ("immunization".equals(codeString))
+          return new Enumeration<ActivityDefinitionCategory>(this, ActivityDefinitionCategory.IMMUNIZATION);
         if ("observation".equals(codeString))
           return new Enumeration<ActivityDefinitionCategory>(this, ActivityDefinitionCategory.OBSERVATION);
         if ("procedure".equals(codeString))
@@ -220,6 +377,8 @@ public class ActivityDefinition extends DomainResource {
           return new Enumeration<ActivityDefinitionCategory>(this, ActivityDefinitionCategory.REFERRAL);
         if ("supply".equals(codeString))
           return new Enumeration<ActivityDefinitionCategory>(this, ActivityDefinitionCategory.SUPPLY);
+        if ("vision".equals(codeString))
+          return new Enumeration<ActivityDefinitionCategory>(this, ActivityDefinitionCategory.VISION);
         if ("other".equals(codeString))
           return new Enumeration<ActivityDefinitionCategory>(this, ActivityDefinitionCategory.OTHER);
         throw new FHIRException("Unknown ActivityDefinitionCategory code '"+codeString+"'");
@@ -227,12 +386,18 @@ public class ActivityDefinition extends DomainResource {
     public String toCode(ActivityDefinitionCategory code) {
       if (code == ActivityDefinitionCategory.COMMUNICATION)
         return "communication";
+      if (code == ActivityDefinitionCategory.DEVICE)
+        return "device";
+      if (code == ActivityDefinitionCategory.DIAGNOSTIC)
+        return "diagnostic";
       if (code == ActivityDefinitionCategory.DIET)
         return "diet";
       if (code == ActivityDefinitionCategory.DRUG)
         return "drug";
       if (code == ActivityDefinitionCategory.ENCOUNTER)
         return "encounter";
+      if (code == ActivityDefinitionCategory.IMMUNIZATION)
+        return "immunization";
       if (code == ActivityDefinitionCategory.OBSERVATION)
         return "observation";
       if (code == ActivityDefinitionCategory.PROCEDURE)
@@ -241,6 +406,8 @@ public class ActivityDefinition extends DomainResource {
         return "referral";
       if (code == ActivityDefinitionCategory.SUPPLY)
         return "supply";
+      if (code == ActivityDefinitionCategory.VISION)
+        return "vision";
       if (code == ActivityDefinitionCategory.OTHER)
         return "other";
       return "?";
@@ -291,9 +458,9 @@ public class ActivityDefinition extends DomainResource {
         }
         public String getSystem() {
           switch (this) {
-            case PATIENT: return "http://hl7.org/fhir/activity-participant-type";
-            case PRACTITIONER: return "http://hl7.org/fhir/activity-participant-type";
-            case RELATEDPERSON: return "http://hl7.org/fhir/activity-participant-type";
+            case PATIENT: return "http://hl7.org/fhir/action-participant-type";
+            case PRACTITIONER: return "http://hl7.org/fhir/action-participant-type";
+            case RELATEDPERSON: return "http://hl7.org/fhir/action-participant-type";
             default: return "?";
           }
         }
@@ -356,124 +523,487 @@ public class ActivityDefinition extends DomainResource {
       }
     }
 
+    @Block()
+    public static class ActivityDefinitionDynamicValueComponent extends BackboneElement implements IBaseBackboneElement {
+        /**
+         * A brief, natural language description of the intended semantics of the dynamic value.
+         */
+        @Child(name = "description", type = {StringType.class}, order=1, min=0, max=1, modifier=false, summary=false)
+        @Description(shortDefinition="Natural language description of the dynamic value", formalDefinition="A brief, natural language description of the intended semantics of the dynamic value." )
+        protected StringType description;
+
+        /**
+         * The path to the element to be customized. This is the path on the resource that will hold the result of the calculation defined by the expression.
+         */
+        @Child(name = "path", type = {StringType.class}, order=2, min=0, max=1, modifier=false, summary=false)
+        @Description(shortDefinition="The path to the element to be set dynamically", formalDefinition="The path to the element to be customized. This is the path on the resource that will hold the result of the calculation defined by the expression." )
+        protected StringType path;
+
+        /**
+         * The media type of the language for the expression.
+         */
+        @Child(name = "language", type = {StringType.class}, order=3, min=0, max=1, modifier=false, summary=false)
+        @Description(shortDefinition="Language of the expression", formalDefinition="The media type of the language for the expression." )
+        protected StringType language;
+
+        /**
+         * An expression specifying the value of the customized element.
+         */
+        @Child(name = "expression", type = {StringType.class}, order=4, min=0, max=1, modifier=false, summary=false)
+        @Description(shortDefinition="An expression that provides the dynamic value for the customization", formalDefinition="An expression specifying the value of the customized element." )
+        protected StringType expression;
+
+        private static final long serialVersionUID = 448404361L;
+
     /**
-     * An absolute URL that is used to identify this module when it is referenced. This SHALL be a URL, SHOULD be globally unique, and SHOULD be an address at which this module definition is (or will be) published.
+     * Constructor
+     */
+      public ActivityDefinitionDynamicValueComponent() {
+        super();
+      }
+
+        /**
+         * @return {@link #description} (A brief, natural language description of the intended semantics of the dynamic value.). This is the underlying object with id, value and extensions. The accessor "getDescription" gives direct access to the value
+         */
+        public StringType getDescriptionElement() { 
+          if (this.description == null)
+            if (Configuration.errorOnAutoCreate())
+              throw new Error("Attempt to auto-create ActivityDefinitionDynamicValueComponent.description");
+            else if (Configuration.doAutoCreate())
+              this.description = new StringType(); // bb
+          return this.description;
+        }
+
+        public boolean hasDescriptionElement() { 
+          return this.description != null && !this.description.isEmpty();
+        }
+
+        public boolean hasDescription() { 
+          return this.description != null && !this.description.isEmpty();
+        }
+
+        /**
+         * @param value {@link #description} (A brief, natural language description of the intended semantics of the dynamic value.). This is the underlying object with id, value and extensions. The accessor "getDescription" gives direct access to the value
+         */
+        public ActivityDefinitionDynamicValueComponent setDescriptionElement(StringType value) { 
+          this.description = value;
+          return this;
+        }
+
+        /**
+         * @return A brief, natural language description of the intended semantics of the dynamic value.
+         */
+        public String getDescription() { 
+          return this.description == null ? null : this.description.getValue();
+        }
+
+        /**
+         * @param value A brief, natural language description of the intended semantics of the dynamic value.
+         */
+        public ActivityDefinitionDynamicValueComponent setDescription(String value) { 
+          if (Utilities.noString(value))
+            this.description = null;
+          else {
+            if (this.description == null)
+              this.description = new StringType();
+            this.description.setValue(value);
+          }
+          return this;
+        }
+
+        /**
+         * @return {@link #path} (The path to the element to be customized. This is the path on the resource that will hold the result of the calculation defined by the expression.). This is the underlying object with id, value and extensions. The accessor "getPath" gives direct access to the value
+         */
+        public StringType getPathElement() { 
+          if (this.path == null)
+            if (Configuration.errorOnAutoCreate())
+              throw new Error("Attempt to auto-create ActivityDefinitionDynamicValueComponent.path");
+            else if (Configuration.doAutoCreate())
+              this.path = new StringType(); // bb
+          return this.path;
+        }
+
+        public boolean hasPathElement() { 
+          return this.path != null && !this.path.isEmpty();
+        }
+
+        public boolean hasPath() { 
+          return this.path != null && !this.path.isEmpty();
+        }
+
+        /**
+         * @param value {@link #path} (The path to the element to be customized. This is the path on the resource that will hold the result of the calculation defined by the expression.). This is the underlying object with id, value and extensions. The accessor "getPath" gives direct access to the value
+         */
+        public ActivityDefinitionDynamicValueComponent setPathElement(StringType value) { 
+          this.path = value;
+          return this;
+        }
+
+        /**
+         * @return The path to the element to be customized. This is the path on the resource that will hold the result of the calculation defined by the expression.
+         */
+        public String getPath() { 
+          return this.path == null ? null : this.path.getValue();
+        }
+
+        /**
+         * @param value The path to the element to be customized. This is the path on the resource that will hold the result of the calculation defined by the expression.
+         */
+        public ActivityDefinitionDynamicValueComponent setPath(String value) { 
+          if (Utilities.noString(value))
+            this.path = null;
+          else {
+            if (this.path == null)
+              this.path = new StringType();
+            this.path.setValue(value);
+          }
+          return this;
+        }
+
+        /**
+         * @return {@link #language} (The media type of the language for the expression.). This is the underlying object with id, value and extensions. The accessor "getLanguage" gives direct access to the value
+         */
+        public StringType getLanguageElement() { 
+          if (this.language == null)
+            if (Configuration.errorOnAutoCreate())
+              throw new Error("Attempt to auto-create ActivityDefinitionDynamicValueComponent.language");
+            else if (Configuration.doAutoCreate())
+              this.language = new StringType(); // bb
+          return this.language;
+        }
+
+        public boolean hasLanguageElement() { 
+          return this.language != null && !this.language.isEmpty();
+        }
+
+        public boolean hasLanguage() { 
+          return this.language != null && !this.language.isEmpty();
+        }
+
+        /**
+         * @param value {@link #language} (The media type of the language for the expression.). This is the underlying object with id, value and extensions. The accessor "getLanguage" gives direct access to the value
+         */
+        public ActivityDefinitionDynamicValueComponent setLanguageElement(StringType value) { 
+          this.language = value;
+          return this;
+        }
+
+        /**
+         * @return The media type of the language for the expression.
+         */
+        public String getLanguage() { 
+          return this.language == null ? null : this.language.getValue();
+        }
+
+        /**
+         * @param value The media type of the language for the expression.
+         */
+        public ActivityDefinitionDynamicValueComponent setLanguage(String value) { 
+          if (Utilities.noString(value))
+            this.language = null;
+          else {
+            if (this.language == null)
+              this.language = new StringType();
+            this.language.setValue(value);
+          }
+          return this;
+        }
+
+        /**
+         * @return {@link #expression} (An expression specifying the value of the customized element.). This is the underlying object with id, value and extensions. The accessor "getExpression" gives direct access to the value
+         */
+        public StringType getExpressionElement() { 
+          if (this.expression == null)
+            if (Configuration.errorOnAutoCreate())
+              throw new Error("Attempt to auto-create ActivityDefinitionDynamicValueComponent.expression");
+            else if (Configuration.doAutoCreate())
+              this.expression = new StringType(); // bb
+          return this.expression;
+        }
+
+        public boolean hasExpressionElement() { 
+          return this.expression != null && !this.expression.isEmpty();
+        }
+
+        public boolean hasExpression() { 
+          return this.expression != null && !this.expression.isEmpty();
+        }
+
+        /**
+         * @param value {@link #expression} (An expression specifying the value of the customized element.). This is the underlying object with id, value and extensions. The accessor "getExpression" gives direct access to the value
+         */
+        public ActivityDefinitionDynamicValueComponent setExpressionElement(StringType value) { 
+          this.expression = value;
+          return this;
+        }
+
+        /**
+         * @return An expression specifying the value of the customized element.
+         */
+        public String getExpression() { 
+          return this.expression == null ? null : this.expression.getValue();
+        }
+
+        /**
+         * @param value An expression specifying the value of the customized element.
+         */
+        public ActivityDefinitionDynamicValueComponent setExpression(String value) { 
+          if (Utilities.noString(value))
+            this.expression = null;
+          else {
+            if (this.expression == null)
+              this.expression = new StringType();
+            this.expression.setValue(value);
+          }
+          return this;
+        }
+
+        protected void listChildren(List<Property> childrenList) {
+          super.listChildren(childrenList);
+          childrenList.add(new Property("description", "string", "A brief, natural language description of the intended semantics of the dynamic value.", 0, java.lang.Integer.MAX_VALUE, description));
+          childrenList.add(new Property("path", "string", "The path to the element to be customized. This is the path on the resource that will hold the result of the calculation defined by the expression.", 0, java.lang.Integer.MAX_VALUE, path));
+          childrenList.add(new Property("language", "string", "The media type of the language for the expression.", 0, java.lang.Integer.MAX_VALUE, language));
+          childrenList.add(new Property("expression", "string", "An expression specifying the value of the customized element.", 0, java.lang.Integer.MAX_VALUE, expression));
+        }
+
+      @Override
+      public Base[] getProperty(int hash, String name, boolean checkValid) throws FHIRException {
+        switch (hash) {
+        case -1724546052: /*description*/ return this.description == null ? new Base[0] : new Base[] {this.description}; // StringType
+        case 3433509: /*path*/ return this.path == null ? new Base[0] : new Base[] {this.path}; // StringType
+        case -1613589672: /*language*/ return this.language == null ? new Base[0] : new Base[] {this.language}; // StringType
+        case -1795452264: /*expression*/ return this.expression == null ? new Base[0] : new Base[] {this.expression}; // StringType
+        default: return super.getProperty(hash, name, checkValid);
+        }
+
+      }
+
+      @Override
+      public void setProperty(int hash, String name, Base value) throws FHIRException {
+        switch (hash) {
+        case -1724546052: // description
+          this.description = castToString(value); // StringType
+          break;
+        case 3433509: // path
+          this.path = castToString(value); // StringType
+          break;
+        case -1613589672: // language
+          this.language = castToString(value); // StringType
+          break;
+        case -1795452264: // expression
+          this.expression = castToString(value); // StringType
+          break;
+        default: super.setProperty(hash, name, value);
+        }
+
+      }
+
+      @Override
+      public void setProperty(String name, Base value) throws FHIRException {
+        if (name.equals("description"))
+          this.description = castToString(value); // StringType
+        else if (name.equals("path"))
+          this.path = castToString(value); // StringType
+        else if (name.equals("language"))
+          this.language = castToString(value); // StringType
+        else if (name.equals("expression"))
+          this.expression = castToString(value); // StringType
+        else
+          super.setProperty(name, value);
+      }
+
+      @Override
+      public Base makeProperty(int hash, String name) throws FHIRException {
+        switch (hash) {
+        case -1724546052: throw new FHIRException("Cannot make property description as it is not a complex type"); // StringType
+        case 3433509: throw new FHIRException("Cannot make property path as it is not a complex type"); // StringType
+        case -1613589672: throw new FHIRException("Cannot make property language as it is not a complex type"); // StringType
+        case -1795452264: throw new FHIRException("Cannot make property expression as it is not a complex type"); // StringType
+        default: return super.makeProperty(hash, name);
+        }
+
+      }
+
+      @Override
+      public Base addChild(String name) throws FHIRException {
+        if (name.equals("description")) {
+          throw new FHIRException("Cannot call addChild on a primitive type ActivityDefinition.description");
+        }
+        else if (name.equals("path")) {
+          throw new FHIRException("Cannot call addChild on a primitive type ActivityDefinition.path");
+        }
+        else if (name.equals("language")) {
+          throw new FHIRException("Cannot call addChild on a primitive type ActivityDefinition.language");
+        }
+        else if (name.equals("expression")) {
+          throw new FHIRException("Cannot call addChild on a primitive type ActivityDefinition.expression");
+        }
+        else
+          return super.addChild(name);
+      }
+
+      public ActivityDefinitionDynamicValueComponent copy() {
+        ActivityDefinitionDynamicValueComponent dst = new ActivityDefinitionDynamicValueComponent();
+        copyValues(dst);
+        dst.description = description == null ? null : description.copy();
+        dst.path = path == null ? null : path.copy();
+        dst.language = language == null ? null : language.copy();
+        dst.expression = expression == null ? null : expression.copy();
+        return dst;
+      }
+
+      @Override
+      public boolean equalsDeep(Base other) {
+        if (!super.equalsDeep(other))
+          return false;
+        if (!(other instanceof ActivityDefinitionDynamicValueComponent))
+          return false;
+        ActivityDefinitionDynamicValueComponent o = (ActivityDefinitionDynamicValueComponent) other;
+        return compareDeep(description, o.description, true) && compareDeep(path, o.path, true) && compareDeep(language, o.language, true)
+           && compareDeep(expression, o.expression, true);
+      }
+
+      @Override
+      public boolean equalsShallow(Base other) {
+        if (!super.equalsShallow(other))
+          return false;
+        if (!(other instanceof ActivityDefinitionDynamicValueComponent))
+          return false;
+        ActivityDefinitionDynamicValueComponent o = (ActivityDefinitionDynamicValueComponent) other;
+        return compareValues(description, o.description, true) && compareValues(path, o.path, true) && compareValues(language, o.language, true)
+           && compareValues(expression, o.expression, true);
+      }
+
+      public boolean isEmpty() {
+        return super.isEmpty() && ca.uhn.fhir.util.ElementUtil.isEmpty(description, path, language
+          , expression);
+      }
+
+  public String fhirType() {
+    return "ActivityDefinition.dynamicValue";
+
+  }
+
+  }
+
+    /**
+     * An absolute URL that is used to identify this asset when it is referenced. This SHALL be a URL, SHOULD be globally unique, and SHOULD be an address at which this asset is (or will be) published.
      */
     @Child(name = "url", type = {UriType.class}, order=0, min=0, max=1, modifier=false, summary=true)
-    @Description(shortDefinition="Logical URL to reference this module", formalDefinition="An absolute URL that is used to identify this module when it is referenced. This SHALL be a URL, SHOULD be globally unique, and SHOULD be an address at which this module definition is (or will be) published." )
+    @Description(shortDefinition="Logical URL to reference this asset", formalDefinition="An absolute URL that is used to identify this asset when it is referenced. This SHALL be a URL, SHOULD be globally unique, and SHOULD be an address at which this asset is (or will be) published." )
     protected UriType url;
 
     /**
-     * A logical identifier for the module such as the CMS or NQF identifiers for a measure artifact.
+     * A logical identifier for the asset such as the CMS or NQF identifiers for a measure. Note that at least one identifier is required for non-experimental active assets.
      */
     @Child(name = "identifier", type = {Identifier.class}, order=1, min=0, max=Child.MAX_UNLIMITED, modifier=false, summary=true)
-    @Description(shortDefinition="Logical identifier(s) for the module", formalDefinition="A logical identifier for the module such as the CMS or NQF identifiers for a measure artifact." )
+    @Description(shortDefinition="Logical identifier(s) for the asset", formalDefinition="A logical identifier for the asset such as the CMS or NQF identifiers for a measure. Note that at least one identifier is required for non-experimental active assets." )
     protected List<Identifier> identifier;
 
     /**
-     * The version of the module, if any. To provide a version consistent with the Decision Support Service specification, use the format Major.Minor.Revision (e.g. 1.0.0). For more information on versioning knowledge modules, refer to the Decision Support Service specification. Note that the version is required for non-experimental published artifact.
+     * The version of the asset, if any. To provide a version consistent with the Decision Support Service specification, use the format Major.Minor.Revision (e.g. 1.0.0). For more information on versioning knowledge assets, refer to the Decision Support Service specification. Note that a version is required for non-experimental active assets.
      */
     @Child(name = "version", type = {StringType.class}, order=2, min=0, max=1, modifier=false, summary=true)
-    @Description(shortDefinition="The version of the module, if any", formalDefinition="The version of the module, if any. To provide a version consistent with the Decision Support Service specification, use the format Major.Minor.Revision (e.g. 1.0.0). For more information on versioning knowledge modules, refer to the Decision Support Service specification. Note that the version is required for non-experimental published artifact." )
+    @Description(shortDefinition="The version of the asset, if any", formalDefinition="The version of the asset, if any. To provide a version consistent with the Decision Support Service specification, use the format Major.Minor.Revision (e.g. 1.0.0). For more information on versioning knowledge assets, refer to the Decision Support Service specification. Note that a version is required for non-experimental active assets." )
     protected StringType version;
 
     /**
-     * A machine-friendly name for the module. This name should be usable as an identifier for the module by machine processing applications such as code generation.
+     * A machine-friendly name for the asset. This name should be usable as an identifier for the asset by machine processing applications such as code generation.
      */
     @Child(name = "name", type = {StringType.class}, order=3, min=0, max=1, modifier=false, summary=true)
-    @Description(shortDefinition="A machine-friendly name for the module", formalDefinition="A machine-friendly name for the module. This name should be usable as an identifier for the module by machine processing applications such as code generation." )
+    @Description(shortDefinition="A machine-friendly name for the asset", formalDefinition="A machine-friendly name for the asset. This name should be usable as an identifier for the asset by machine processing applications such as code generation." )
     protected StringType name;
 
     /**
-     * A short, descriptive, user-friendly title for the module.
+     * A short, descriptive, user-friendly title for the asset.
      */
     @Child(name = "title", type = {StringType.class}, order=4, min=0, max=1, modifier=false, summary=true)
-    @Description(shortDefinition="A user-friendly title for the module", formalDefinition="A short, descriptive, user-friendly title for the module." )
+    @Description(shortDefinition="A user-friendly title for the asset", formalDefinition="A short, descriptive, user-friendly title for the asset." )
     protected StringType title;
 
     /**
-     * The status of the module.
+     * The status of the asset.
      */
     @Child(name = "status", type = {CodeType.class}, order=5, min=1, max=1, modifier=true, summary=true)
-    @Description(shortDefinition="draft | active | inactive", formalDefinition="The status of the module." )
+    @Description(shortDefinition="draft | active | inactive", formalDefinition="The status of the asset." )
     @ca.uhn.fhir.model.api.annotation.Binding(valueSet="http://hl7.org/fhir/ValueSet/module-metadata-status")
-    protected CodeType status;
+    protected Enumeration<ActivityDefinitionStatus> status;
 
     /**
-     * Determines whether the module was developed for testing purposes (or education/evaluation/marketing), and is not intended to be used in production environments.
+     * Determines whether the asset was developed for testing purposes (or education/evaluation/marketing), and is not intended to be used in production environments.
      */
     @Child(name = "experimental", type = {BooleanType.class}, order=6, min=0, max=1, modifier=true, summary=true)
-    @Description(shortDefinition="If for testing purposes, not real usage", formalDefinition="Determines whether the module was developed for testing purposes (or education/evaluation/marketing), and is not intended to be used in production environments." )
+    @Description(shortDefinition="If for testing purposes, not real usage", formalDefinition="Determines whether the asset was developed for testing purposes (or education/evaluation/marketing), and is not intended to be used in production environments." )
     protected BooleanType experimental;
 
     /**
-     * A free text natural language description of the module from the consumer's perspective.
+     * A free text natural language description of the asset from the consumer's perspective.
      */
     @Child(name = "description", type = {StringType.class}, order=7, min=0, max=1, modifier=false, summary=false)
-    @Description(shortDefinition="Natural language description of the module", formalDefinition="A free text natural language description of the module from the consumer's perspective." )
+    @Description(shortDefinition="Natural language description of the asset", formalDefinition="A free text natural language description of the asset from the consumer's perspective." )
     protected StringType description;
 
     /**
-     * A brief description of the purpose of the module.
+     * A brief description of the purpose of the asset.
      */
     @Child(name = "purpose", type = {StringType.class}, order=8, min=0, max=1, modifier=false, summary=false)
-    @Description(shortDefinition="Describes the purpose of the module", formalDefinition="A brief description of the purpose of the module." )
+    @Description(shortDefinition="Describes the purpose of the asset", formalDefinition="A brief description of the purpose of the asset." )
     protected StringType purpose;
 
     /**
-     * A detailed description of how the module is used from a clinical perspective.
+     * A detailed description of how the asset is used from a clinical perspective.
      */
     @Child(name = "usage", type = {StringType.class}, order=9, min=0, max=1, modifier=false, summary=false)
-    @Description(shortDefinition="Describes the clinical usage of the module", formalDefinition="A detailed description of how the module is used from a clinical perspective." )
+    @Description(shortDefinition="Describes the clinical usage of the asset", formalDefinition="A detailed description of how the asset is used from a clinical perspective." )
     protected StringType usage;
 
     /**
-     * The date on which the module was published.
+     * The date on which the asset was published.
      */
     @Child(name = "publicationDate", type = {DateType.class}, order=10, min=0, max=1, modifier=false, summary=false)
-    @Description(shortDefinition="Publication date for this version of the module", formalDefinition="The date on which the module was published." )
+    @Description(shortDefinition="Publication date for this version of the asset", formalDefinition="The date on which the asset was published." )
     protected DateType publicationDate;
 
     /**
-     * The date on which the module content was last reviewed.
+     * The date on which the asset content was last reviewed.
      */
     @Child(name = "lastReviewDate", type = {DateType.class}, order=11, min=0, max=1, modifier=false, summary=false)
-    @Description(shortDefinition="Last review date for the module", formalDefinition="The date on which the module content was last reviewed." )
+    @Description(shortDefinition="Last review date for the asset", formalDefinition="The date on which the asset content was last reviewed." )
     protected DateType lastReviewDate;
 
     /**
-     * The period during which the module content is effective.
+     * The period during which the asset content is effective.
      */
     @Child(name = "effectivePeriod", type = {Period.class}, order=12, min=0, max=1, modifier=false, summary=false)
-    @Description(shortDefinition="The effective date range for the module", formalDefinition="The period during which the module content is effective." )
+    @Description(shortDefinition="The effective date range for the asset", formalDefinition="The period during which the asset content is effective." )
     protected Period effectivePeriod;
 
     /**
-     * Specifies various attributes of the patient population for whom and/or environment of care in which, the knowledge module is applicable.
+     * Specifies various attributes of the patient population for whom and/or environment of care in which, the knowledge asset is applicable.
      */
     @Child(name = "coverage", type = {UsageContext.class}, order=13, min=0, max=Child.MAX_UNLIMITED, modifier=false, summary=false)
-    @Description(shortDefinition="Describes the context of use for this module", formalDefinition="Specifies various attributes of the patient population for whom and/or environment of care in which, the knowledge module is applicable." )
+    @Description(shortDefinition="Describes the context of use for this asset", formalDefinition="Specifies various attributes of the patient population for whom and/or environment of care in which, the knowledge asset is applicable." )
     protected List<UsageContext> coverage;
 
     /**
-     * Clinical topics related to the content of the module.
+     * Clinical topics related to the content of the asset.
      */
     @Child(name = "topic", type = {CodeableConcept.class}, order=14, min=0, max=Child.MAX_UNLIMITED, modifier=false, summary=false)
-    @Description(shortDefinition="Descriptional topics for the module", formalDefinition="Clinical topics related to the content of the module." )
+    @Description(shortDefinition="Descriptional topics for the asset", formalDefinition="Clinical topics related to the content of the asset." )
     protected List<CodeableConcept> topic;
 
     /**
-     * A contributor to the content of the module, including authors, editors, reviewers, and endorsers.
+     * A contributor to the content of the asset, including authors, editors, reviewers, and endorsers.
      */
     @Child(name = "contributor", type = {Contributor.class}, order=15, min=0, max=Child.MAX_UNLIMITED, modifier=false, summary=false)
-    @Description(shortDefinition="A content contributor", formalDefinition="A contributor to the content of the module, including authors, editors, reviewers, and endorsers." )
+    @Description(shortDefinition="A content contributor", formalDefinition="A contributor to the content of the asset, including authors, editors, reviewers, and endorsers." )
     protected List<Contributor> contributor;
 
     /**
-     * The name of the individual or organization that published the module (also known as the steward for the module). This information is required for non-experimental published artifacts.
+     * The name of the individual or organization that published the asset (also known as the steward for the asset). This information is required for non-experimental active artifacts.
      */
     @Child(name = "publisher", type = {StringType.class}, order=16, min=0, max=1, modifier=false, summary=false)
-    @Description(shortDefinition="Name of the publisher (Organization or individual)", formalDefinition="The name of the individual or organization that published the module (also known as the steward for the module). This information is required for non-experimental published artifacts." )
+    @Description(shortDefinition="Name of the publisher (Organization or individual)", formalDefinition="The name of the individual or organization that published the asset (also known as the steward for the asset). This information is required for non-experimental active artifacts." )
     protected StringType publisher;
 
     /**
@@ -484,27 +1014,27 @@ public class ActivityDefinition extends DomainResource {
     protected List<ContactDetail> contact;
 
     /**
-     * A copyright statement relating to the module and/or its contents. Copyright statements are generally legal restrictions on the use and publishing of the module.
+     * A copyright statement relating to the asset and/or its contents. Copyright statements are generally legal restrictions on the use and publishing of the asset.
      */
     @Child(name = "copyright", type = {StringType.class}, order=18, min=0, max=1, modifier=false, summary=false)
-    @Description(shortDefinition="Use and/or publishing restrictions", formalDefinition="A copyright statement relating to the module and/or its contents. Copyright statements are generally legal restrictions on the use and publishing of the module." )
+    @Description(shortDefinition="Use and/or publishing restrictions", formalDefinition="A copyright statement relating to the asset and/or its contents. Copyright statements are generally legal restrictions on the use and publishing of the asset." )
     protected StringType copyright;
 
     /**
      * Related resources such as additional documentation, justification, or bibliographic references.
      */
     @Child(name = "relatedResource", type = {RelatedResource.class}, order=19, min=0, max=Child.MAX_UNLIMITED, modifier=false, summary=false)
-    @Description(shortDefinition="Related resources for the module", formalDefinition="Related resources such as additional documentation, justification, or bibliographic references." )
+    @Description(shortDefinition="Related resources for the asset", formalDefinition="Related resources such as additional documentation, justification, or bibliographic references." )
     protected List<RelatedResource> relatedResource;
 
     /**
-     * A reference to a Library resource containing any formal logic used by the orderset.
+     * A reference to a Library resource containing any formal logic used by the asset.
      */
     @Child(name = "library", type = {Library.class}, order=20, min=0, max=Child.MAX_UNLIMITED, modifier=false, summary=false)
-    @Description(shortDefinition="Logic used by the plan definition", formalDefinition="A reference to a Library resource containing any formal logic used by the orderset." )
+    @Description(shortDefinition="Logic used by the asset", formalDefinition="A reference to a Library resource containing any formal logic used by the asset." )
     protected List<Reference> library;
     /**
-     * The actual objects that are the target of the reference (A reference to a Library resource containing any formal logic used by the orderset.)
+     * The actual objects that are the target of the reference (A reference to a Library resource containing any formal logic used by the asset.)
      */
     protected List<Library> libraryTarget;
 
@@ -513,7 +1043,7 @@ public class ActivityDefinition extends DomainResource {
      * High-level categorization of the type of activity.
      */
     @Child(name = "category", type = {CodeType.class}, order=21, min=0, max=1, modifier=false, summary=false)
-    @Description(shortDefinition="communication | diet | drug | encounter | observation | procedure | referral | supply | other", formalDefinition="High-level categorization of the type of activity." )
+    @Description(shortDefinition="communication | device | diagnostic | diet | drug | encounter | immunization | observation | procedure | referral | supply | vision | other", formalDefinition="High-level categorization of the type of activity." )
     @ca.uhn.fhir.model.api.annotation.Binding(valueSet="http://hl7.org/fhir/ValueSet/activity-definition-category")
     protected Enumeration<ActivityDefinitionCategory> category;
 
@@ -548,7 +1078,7 @@ public class ActivityDefinition extends DomainResource {
      */
     @Child(name = "participantType", type = {CodeType.class}, order=25, min=0, max=Child.MAX_UNLIMITED, modifier=false, summary=false)
     @Description(shortDefinition="patient | practitioner | related-person", formalDefinition="The type of participant in the action." )
-    @ca.uhn.fhir.model.api.annotation.Binding(valueSet="http://hl7.org/fhir/ValueSet/activity-participant-type")
+    @ca.uhn.fhir.model.api.annotation.Binding(valueSet="http://hl7.org/fhir/ValueSet/action-participant-type")
     protected List<Enumeration<ActivityParticipantType>> participantType;
 
     /**
@@ -565,7 +1095,26 @@ public class ActivityDefinition extends DomainResource {
     @Description(shortDefinition="How much is administered/consumed/supplied", formalDefinition="Identifies the quantity expected to be consumed at once (per dose, per meal, etc.)." )
     protected SimpleQuantity quantity;
 
-    private static final long serialVersionUID = -1624469573L;
+    /**
+     * A reference to a StructureMap resource that defines a transform that can be executed to produce the intent resource using the ActivityDefinition instance as the input.
+     */
+    @Child(name = "transform", type = {StructureMap.class}, order=28, min=0, max=1, modifier=false, summary=false)
+    @Description(shortDefinition="Transform to apply the template", formalDefinition="A reference to a StructureMap resource that defines a transform that can be executed to produce the intent resource using the ActivityDefinition instance as the input." )
+    protected Reference transform;
+
+    /**
+     * The actual object that is the target of the reference (A reference to a StructureMap resource that defines a transform that can be executed to produce the intent resource using the ActivityDefinition instance as the input.)
+     */
+    protected StructureMap transformTarget;
+
+    /**
+     * Dynamic values that will be evaluated to produce values for elements of the resulting resource. For example, if the dosage of a medication must be computed based on the patient's weight, a dynamic value would be used to specify an expression that calculated the weight, and the path on the intent resource that would contain the result.
+     */
+    @Child(name = "dynamicValue", type = {}, order=29, min=0, max=Child.MAX_UNLIMITED, modifier=false, summary=false)
+    @Description(shortDefinition="Dynamic aspects of the definition", formalDefinition="Dynamic values that will be evaluated to produce values for elements of the resulting resource. For example, if the dosage of a medication must be computed based on the patient's weight, a dynamic value would be used to specify an expression that calculated the weight, and the path on the intent resource that would contain the result." )
+    protected List<ActivityDefinitionDynamicValueComponent> dynamicValue;
+
+    private static final long serialVersionUID = -606309039L;
 
   /**
    * Constructor
@@ -577,13 +1126,13 @@ public class ActivityDefinition extends DomainResource {
   /**
    * Constructor
    */
-    public ActivityDefinition(CodeType status) {
+    public ActivityDefinition(Enumeration<ActivityDefinitionStatus> status) {
       super();
       this.status = status;
     }
 
     /**
-     * @return {@link #url} (An absolute URL that is used to identify this module when it is referenced. This SHALL be a URL, SHOULD be globally unique, and SHOULD be an address at which this module definition is (or will be) published.). This is the underlying object with id, value and extensions. The accessor "getUrl" gives direct access to the value
+     * @return {@link #url} (An absolute URL that is used to identify this asset when it is referenced. This SHALL be a URL, SHOULD be globally unique, and SHOULD be an address at which this asset is (or will be) published.). This is the underlying object with id, value and extensions. The accessor "getUrl" gives direct access to the value
      */
     public UriType getUrlElement() { 
       if (this.url == null)
@@ -603,7 +1152,7 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @param value {@link #url} (An absolute URL that is used to identify this module when it is referenced. This SHALL be a URL, SHOULD be globally unique, and SHOULD be an address at which this module definition is (or will be) published.). This is the underlying object with id, value and extensions. The accessor "getUrl" gives direct access to the value
+     * @param value {@link #url} (An absolute URL that is used to identify this asset when it is referenced. This SHALL be a URL, SHOULD be globally unique, and SHOULD be an address at which this asset is (or will be) published.). This is the underlying object with id, value and extensions. The accessor "getUrl" gives direct access to the value
      */
     public ActivityDefinition setUrlElement(UriType value) { 
       this.url = value;
@@ -611,14 +1160,14 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @return An absolute URL that is used to identify this module when it is referenced. This SHALL be a URL, SHOULD be globally unique, and SHOULD be an address at which this module definition is (or will be) published.
+     * @return An absolute URL that is used to identify this asset when it is referenced. This SHALL be a URL, SHOULD be globally unique, and SHOULD be an address at which this asset is (or will be) published.
      */
     public String getUrl() { 
       return this.url == null ? null : this.url.getValue();
     }
 
     /**
-     * @param value An absolute URL that is used to identify this module when it is referenced. This SHALL be a URL, SHOULD be globally unique, and SHOULD be an address at which this module definition is (or will be) published.
+     * @param value An absolute URL that is used to identify this asset when it is referenced. This SHALL be a URL, SHOULD be globally unique, and SHOULD be an address at which this asset is (or will be) published.
      */
     public ActivityDefinition setUrl(String value) { 
       if (Utilities.noString(value))
@@ -632,7 +1181,7 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @return {@link #identifier} (A logical identifier for the module such as the CMS or NQF identifiers for a measure artifact.)
+     * @return {@link #identifier} (A logical identifier for the asset such as the CMS or NQF identifiers for a measure. Note that at least one identifier is required for non-experimental active assets.)
      */
     public List<Identifier> getIdentifier() { 
       if (this.identifier == null)
@@ -685,7 +1234,7 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @return {@link #version} (The version of the module, if any. To provide a version consistent with the Decision Support Service specification, use the format Major.Minor.Revision (e.g. 1.0.0). For more information on versioning knowledge modules, refer to the Decision Support Service specification. Note that the version is required for non-experimental published artifact.). This is the underlying object with id, value and extensions. The accessor "getVersion" gives direct access to the value
+     * @return {@link #version} (The version of the asset, if any. To provide a version consistent with the Decision Support Service specification, use the format Major.Minor.Revision (e.g. 1.0.0). For more information on versioning knowledge assets, refer to the Decision Support Service specification. Note that a version is required for non-experimental active assets.). This is the underlying object with id, value and extensions. The accessor "getVersion" gives direct access to the value
      */
     public StringType getVersionElement() { 
       if (this.version == null)
@@ -705,7 +1254,7 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @param value {@link #version} (The version of the module, if any. To provide a version consistent with the Decision Support Service specification, use the format Major.Minor.Revision (e.g. 1.0.0). For more information on versioning knowledge modules, refer to the Decision Support Service specification. Note that the version is required for non-experimental published artifact.). This is the underlying object with id, value and extensions. The accessor "getVersion" gives direct access to the value
+     * @param value {@link #version} (The version of the asset, if any. To provide a version consistent with the Decision Support Service specification, use the format Major.Minor.Revision (e.g. 1.0.0). For more information on versioning knowledge assets, refer to the Decision Support Service specification. Note that a version is required for non-experimental active assets.). This is the underlying object with id, value and extensions. The accessor "getVersion" gives direct access to the value
      */
     public ActivityDefinition setVersionElement(StringType value) { 
       this.version = value;
@@ -713,14 +1262,14 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @return The version of the module, if any. To provide a version consistent with the Decision Support Service specification, use the format Major.Minor.Revision (e.g. 1.0.0). For more information on versioning knowledge modules, refer to the Decision Support Service specification. Note that the version is required for non-experimental published artifact.
+     * @return The version of the asset, if any. To provide a version consistent with the Decision Support Service specification, use the format Major.Minor.Revision (e.g. 1.0.0). For more information on versioning knowledge assets, refer to the Decision Support Service specification. Note that a version is required for non-experimental active assets.
      */
     public String getVersion() { 
       return this.version == null ? null : this.version.getValue();
     }
 
     /**
-     * @param value The version of the module, if any. To provide a version consistent with the Decision Support Service specification, use the format Major.Minor.Revision (e.g. 1.0.0). For more information on versioning knowledge modules, refer to the Decision Support Service specification. Note that the version is required for non-experimental published artifact.
+     * @param value The version of the asset, if any. To provide a version consistent with the Decision Support Service specification, use the format Major.Minor.Revision (e.g. 1.0.0). For more information on versioning knowledge assets, refer to the Decision Support Service specification. Note that a version is required for non-experimental active assets.
      */
     public ActivityDefinition setVersion(String value) { 
       if (Utilities.noString(value))
@@ -734,7 +1283,7 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @return {@link #name} (A machine-friendly name for the module. This name should be usable as an identifier for the module by machine processing applications such as code generation.). This is the underlying object with id, value and extensions. The accessor "getName" gives direct access to the value
+     * @return {@link #name} (A machine-friendly name for the asset. This name should be usable as an identifier for the asset by machine processing applications such as code generation.). This is the underlying object with id, value and extensions. The accessor "getName" gives direct access to the value
      */
     public StringType getNameElement() { 
       if (this.name == null)
@@ -754,7 +1303,7 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @param value {@link #name} (A machine-friendly name for the module. This name should be usable as an identifier for the module by machine processing applications such as code generation.). This is the underlying object with id, value and extensions. The accessor "getName" gives direct access to the value
+     * @param value {@link #name} (A machine-friendly name for the asset. This name should be usable as an identifier for the asset by machine processing applications such as code generation.). This is the underlying object with id, value and extensions. The accessor "getName" gives direct access to the value
      */
     public ActivityDefinition setNameElement(StringType value) { 
       this.name = value;
@@ -762,14 +1311,14 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @return A machine-friendly name for the module. This name should be usable as an identifier for the module by machine processing applications such as code generation.
+     * @return A machine-friendly name for the asset. This name should be usable as an identifier for the asset by machine processing applications such as code generation.
      */
     public String getName() { 
       return this.name == null ? null : this.name.getValue();
     }
 
     /**
-     * @param value A machine-friendly name for the module. This name should be usable as an identifier for the module by machine processing applications such as code generation.
+     * @param value A machine-friendly name for the asset. This name should be usable as an identifier for the asset by machine processing applications such as code generation.
      */
     public ActivityDefinition setName(String value) { 
       if (Utilities.noString(value))
@@ -783,7 +1332,7 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @return {@link #title} (A short, descriptive, user-friendly title for the module.). This is the underlying object with id, value and extensions. The accessor "getTitle" gives direct access to the value
+     * @return {@link #title} (A short, descriptive, user-friendly title for the asset.). This is the underlying object with id, value and extensions. The accessor "getTitle" gives direct access to the value
      */
     public StringType getTitleElement() { 
       if (this.title == null)
@@ -803,7 +1352,7 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @param value {@link #title} (A short, descriptive, user-friendly title for the module.). This is the underlying object with id, value and extensions. The accessor "getTitle" gives direct access to the value
+     * @param value {@link #title} (A short, descriptive, user-friendly title for the asset.). This is the underlying object with id, value and extensions. The accessor "getTitle" gives direct access to the value
      */
     public ActivityDefinition setTitleElement(StringType value) { 
       this.title = value;
@@ -811,14 +1360,14 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @return A short, descriptive, user-friendly title for the module.
+     * @return A short, descriptive, user-friendly title for the asset.
      */
     public String getTitle() { 
       return this.title == null ? null : this.title.getValue();
     }
 
     /**
-     * @param value A short, descriptive, user-friendly title for the module.
+     * @param value A short, descriptive, user-friendly title for the asset.
      */
     public ActivityDefinition setTitle(String value) { 
       if (Utilities.noString(value))
@@ -832,14 +1381,14 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @return {@link #status} (The status of the module.). This is the underlying object with id, value and extensions. The accessor "getStatus" gives direct access to the value
+     * @return {@link #status} (The status of the asset.). This is the underlying object with id, value and extensions. The accessor "getStatus" gives direct access to the value
      */
-    public CodeType getStatusElement() { 
+    public Enumeration<ActivityDefinitionStatus> getStatusElement() { 
       if (this.status == null)
         if (Configuration.errorOnAutoCreate())
           throw new Error("Attempt to auto-create ActivityDefinition.status");
         else if (Configuration.doAutoCreate())
-          this.status = new CodeType(); // bb
+          this.status = new Enumeration<ActivityDefinitionStatus>(new ActivityDefinitionStatusEnumFactory()); // bb
       return this.status;
     }
 
@@ -852,32 +1401,32 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @param value {@link #status} (The status of the module.). This is the underlying object with id, value and extensions. The accessor "getStatus" gives direct access to the value
+     * @param value {@link #status} (The status of the asset.). This is the underlying object with id, value and extensions. The accessor "getStatus" gives direct access to the value
      */
-    public ActivityDefinition setStatusElement(CodeType value) { 
+    public ActivityDefinition setStatusElement(Enumeration<ActivityDefinitionStatus> value) { 
       this.status = value;
       return this;
     }
 
     /**
-     * @return The status of the module.
+     * @return The status of the asset.
      */
-    public String getStatus() { 
+    public ActivityDefinitionStatus getStatus() { 
       return this.status == null ? null : this.status.getValue();
     }
 
     /**
-     * @param value The status of the module.
+     * @param value The status of the asset.
      */
-    public ActivityDefinition setStatus(String value) { 
+    public ActivityDefinition setStatus(ActivityDefinitionStatus value) { 
         if (this.status == null)
-          this.status = new CodeType();
+          this.status = new Enumeration<ActivityDefinitionStatus>(new ActivityDefinitionStatusEnumFactory());
         this.status.setValue(value);
       return this;
     }
 
     /**
-     * @return {@link #experimental} (Determines whether the module was developed for testing purposes (or education/evaluation/marketing), and is not intended to be used in production environments.). This is the underlying object with id, value and extensions. The accessor "getExperimental" gives direct access to the value
+     * @return {@link #experimental} (Determines whether the asset was developed for testing purposes (or education/evaluation/marketing), and is not intended to be used in production environments.). This is the underlying object with id, value and extensions. The accessor "getExperimental" gives direct access to the value
      */
     public BooleanType getExperimentalElement() { 
       if (this.experimental == null)
@@ -897,7 +1446,7 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @param value {@link #experimental} (Determines whether the module was developed for testing purposes (or education/evaluation/marketing), and is not intended to be used in production environments.). This is the underlying object with id, value and extensions. The accessor "getExperimental" gives direct access to the value
+     * @param value {@link #experimental} (Determines whether the asset was developed for testing purposes (or education/evaluation/marketing), and is not intended to be used in production environments.). This is the underlying object with id, value and extensions. The accessor "getExperimental" gives direct access to the value
      */
     public ActivityDefinition setExperimentalElement(BooleanType value) { 
       this.experimental = value;
@@ -905,14 +1454,14 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @return Determines whether the module was developed for testing purposes (or education/evaluation/marketing), and is not intended to be used in production environments.
+     * @return Determines whether the asset was developed for testing purposes (or education/evaluation/marketing), and is not intended to be used in production environments.
      */
     public boolean getExperimental() { 
       return this.experimental == null || this.experimental.isEmpty() ? false : this.experimental.getValue();
     }
 
     /**
-     * @param value Determines whether the module was developed for testing purposes (or education/evaluation/marketing), and is not intended to be used in production environments.
+     * @param value Determines whether the asset was developed for testing purposes (or education/evaluation/marketing), and is not intended to be used in production environments.
      */
     public ActivityDefinition setExperimental(boolean value) { 
         if (this.experimental == null)
@@ -922,7 +1471,7 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @return {@link #description} (A free text natural language description of the module from the consumer's perspective.). This is the underlying object with id, value and extensions. The accessor "getDescription" gives direct access to the value
+     * @return {@link #description} (A free text natural language description of the asset from the consumer's perspective.). This is the underlying object with id, value and extensions. The accessor "getDescription" gives direct access to the value
      */
     public StringType getDescriptionElement() { 
       if (this.description == null)
@@ -942,7 +1491,7 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @param value {@link #description} (A free text natural language description of the module from the consumer's perspective.). This is the underlying object with id, value and extensions. The accessor "getDescription" gives direct access to the value
+     * @param value {@link #description} (A free text natural language description of the asset from the consumer's perspective.). This is the underlying object with id, value and extensions. The accessor "getDescription" gives direct access to the value
      */
     public ActivityDefinition setDescriptionElement(StringType value) { 
       this.description = value;
@@ -950,14 +1499,14 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @return A free text natural language description of the module from the consumer's perspective.
+     * @return A free text natural language description of the asset from the consumer's perspective.
      */
     public String getDescription() { 
       return this.description == null ? null : this.description.getValue();
     }
 
     /**
-     * @param value A free text natural language description of the module from the consumer's perspective.
+     * @param value A free text natural language description of the asset from the consumer's perspective.
      */
     public ActivityDefinition setDescription(String value) { 
       if (Utilities.noString(value))
@@ -971,7 +1520,7 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @return {@link #purpose} (A brief description of the purpose of the module.). This is the underlying object with id, value and extensions. The accessor "getPurpose" gives direct access to the value
+     * @return {@link #purpose} (A brief description of the purpose of the asset.). This is the underlying object with id, value and extensions. The accessor "getPurpose" gives direct access to the value
      */
     public StringType getPurposeElement() { 
       if (this.purpose == null)
@@ -991,7 +1540,7 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @param value {@link #purpose} (A brief description of the purpose of the module.). This is the underlying object with id, value and extensions. The accessor "getPurpose" gives direct access to the value
+     * @param value {@link #purpose} (A brief description of the purpose of the asset.). This is the underlying object with id, value and extensions. The accessor "getPurpose" gives direct access to the value
      */
     public ActivityDefinition setPurposeElement(StringType value) { 
       this.purpose = value;
@@ -999,14 +1548,14 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @return A brief description of the purpose of the module.
+     * @return A brief description of the purpose of the asset.
      */
     public String getPurpose() { 
       return this.purpose == null ? null : this.purpose.getValue();
     }
 
     /**
-     * @param value A brief description of the purpose of the module.
+     * @param value A brief description of the purpose of the asset.
      */
     public ActivityDefinition setPurpose(String value) { 
       if (Utilities.noString(value))
@@ -1020,7 +1569,7 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @return {@link #usage} (A detailed description of how the module is used from a clinical perspective.). This is the underlying object with id, value and extensions. The accessor "getUsage" gives direct access to the value
+     * @return {@link #usage} (A detailed description of how the asset is used from a clinical perspective.). This is the underlying object with id, value and extensions. The accessor "getUsage" gives direct access to the value
      */
     public StringType getUsageElement() { 
       if (this.usage == null)
@@ -1040,7 +1589,7 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @param value {@link #usage} (A detailed description of how the module is used from a clinical perspective.). This is the underlying object with id, value and extensions. The accessor "getUsage" gives direct access to the value
+     * @param value {@link #usage} (A detailed description of how the asset is used from a clinical perspective.). This is the underlying object with id, value and extensions. The accessor "getUsage" gives direct access to the value
      */
     public ActivityDefinition setUsageElement(StringType value) { 
       this.usage = value;
@@ -1048,14 +1597,14 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @return A detailed description of how the module is used from a clinical perspective.
+     * @return A detailed description of how the asset is used from a clinical perspective.
      */
     public String getUsage() { 
       return this.usage == null ? null : this.usage.getValue();
     }
 
     /**
-     * @param value A detailed description of how the module is used from a clinical perspective.
+     * @param value A detailed description of how the asset is used from a clinical perspective.
      */
     public ActivityDefinition setUsage(String value) { 
       if (Utilities.noString(value))
@@ -1069,7 +1618,7 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @return {@link #publicationDate} (The date on which the module was published.). This is the underlying object with id, value and extensions. The accessor "getPublicationDate" gives direct access to the value
+     * @return {@link #publicationDate} (The date on which the asset was published.). This is the underlying object with id, value and extensions. The accessor "getPublicationDate" gives direct access to the value
      */
     public DateType getPublicationDateElement() { 
       if (this.publicationDate == null)
@@ -1089,7 +1638,7 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @param value {@link #publicationDate} (The date on which the module was published.). This is the underlying object with id, value and extensions. The accessor "getPublicationDate" gives direct access to the value
+     * @param value {@link #publicationDate} (The date on which the asset was published.). This is the underlying object with id, value and extensions. The accessor "getPublicationDate" gives direct access to the value
      */
     public ActivityDefinition setPublicationDateElement(DateType value) { 
       this.publicationDate = value;
@@ -1097,14 +1646,14 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @return The date on which the module was published.
+     * @return The date on which the asset was published.
      */
     public Date getPublicationDate() { 
       return this.publicationDate == null ? null : this.publicationDate.getValue();
     }
 
     /**
-     * @param value The date on which the module was published.
+     * @param value The date on which the asset was published.
      */
     public ActivityDefinition setPublicationDate(Date value) { 
       if (value == null)
@@ -1118,7 +1667,7 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @return {@link #lastReviewDate} (The date on which the module content was last reviewed.). This is the underlying object with id, value and extensions. The accessor "getLastReviewDate" gives direct access to the value
+     * @return {@link #lastReviewDate} (The date on which the asset content was last reviewed.). This is the underlying object with id, value and extensions. The accessor "getLastReviewDate" gives direct access to the value
      */
     public DateType getLastReviewDateElement() { 
       if (this.lastReviewDate == null)
@@ -1138,7 +1687,7 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @param value {@link #lastReviewDate} (The date on which the module content was last reviewed.). This is the underlying object with id, value and extensions. The accessor "getLastReviewDate" gives direct access to the value
+     * @param value {@link #lastReviewDate} (The date on which the asset content was last reviewed.). This is the underlying object with id, value and extensions. The accessor "getLastReviewDate" gives direct access to the value
      */
     public ActivityDefinition setLastReviewDateElement(DateType value) { 
       this.lastReviewDate = value;
@@ -1146,14 +1695,14 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @return The date on which the module content was last reviewed.
+     * @return The date on which the asset content was last reviewed.
      */
     public Date getLastReviewDate() { 
       return this.lastReviewDate == null ? null : this.lastReviewDate.getValue();
     }
 
     /**
-     * @param value The date on which the module content was last reviewed.
+     * @param value The date on which the asset content was last reviewed.
      */
     public ActivityDefinition setLastReviewDate(Date value) { 
       if (value == null)
@@ -1167,7 +1716,7 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @return {@link #effectivePeriod} (The period during which the module content is effective.)
+     * @return {@link #effectivePeriod} (The period during which the asset content is effective.)
      */
     public Period getEffectivePeriod() { 
       if (this.effectivePeriod == null)
@@ -1183,7 +1732,7 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @param value {@link #effectivePeriod} (The period during which the module content is effective.)
+     * @param value {@link #effectivePeriod} (The period during which the asset content is effective.)
      */
     public ActivityDefinition setEffectivePeriod(Period value) { 
       this.effectivePeriod = value;
@@ -1191,7 +1740,7 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @return {@link #coverage} (Specifies various attributes of the patient population for whom and/or environment of care in which, the knowledge module is applicable.)
+     * @return {@link #coverage} (Specifies various attributes of the patient population for whom and/or environment of care in which, the knowledge asset is applicable.)
      */
     public List<UsageContext> getCoverage() { 
       if (this.coverage == null)
@@ -1244,7 +1793,7 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @return {@link #topic} (Clinical topics related to the content of the module.)
+     * @return {@link #topic} (Clinical topics related to the content of the asset.)
      */
     public List<CodeableConcept> getTopic() { 
       if (this.topic == null)
@@ -1297,7 +1846,7 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @return {@link #contributor} (A contributor to the content of the module, including authors, editors, reviewers, and endorsers.)
+     * @return {@link #contributor} (A contributor to the content of the asset, including authors, editors, reviewers, and endorsers.)
      */
     public List<Contributor> getContributor() { 
       if (this.contributor == null)
@@ -1350,7 +1899,7 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @return {@link #publisher} (The name of the individual or organization that published the module (also known as the steward for the module). This information is required for non-experimental published artifacts.). This is the underlying object with id, value and extensions. The accessor "getPublisher" gives direct access to the value
+     * @return {@link #publisher} (The name of the individual or organization that published the asset (also known as the steward for the asset). This information is required for non-experimental active artifacts.). This is the underlying object with id, value and extensions. The accessor "getPublisher" gives direct access to the value
      */
     public StringType getPublisherElement() { 
       if (this.publisher == null)
@@ -1370,7 +1919,7 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @param value {@link #publisher} (The name of the individual or organization that published the module (also known as the steward for the module). This information is required for non-experimental published artifacts.). This is the underlying object with id, value and extensions. The accessor "getPublisher" gives direct access to the value
+     * @param value {@link #publisher} (The name of the individual or organization that published the asset (also known as the steward for the asset). This information is required for non-experimental active artifacts.). This is the underlying object with id, value and extensions. The accessor "getPublisher" gives direct access to the value
      */
     public ActivityDefinition setPublisherElement(StringType value) { 
       this.publisher = value;
@@ -1378,14 +1927,14 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @return The name of the individual or organization that published the module (also known as the steward for the module). This information is required for non-experimental published artifacts.
+     * @return The name of the individual or organization that published the asset (also known as the steward for the asset). This information is required for non-experimental active artifacts.
      */
     public String getPublisher() { 
       return this.publisher == null ? null : this.publisher.getValue();
     }
 
     /**
-     * @param value The name of the individual or organization that published the module (also known as the steward for the module). This information is required for non-experimental published artifacts.
+     * @param value The name of the individual or organization that published the asset (also known as the steward for the asset). This information is required for non-experimental active artifacts.
      */
     public ActivityDefinition setPublisher(String value) { 
       if (Utilities.noString(value))
@@ -1452,7 +2001,7 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @return {@link #copyright} (A copyright statement relating to the module and/or its contents. Copyright statements are generally legal restrictions on the use and publishing of the module.). This is the underlying object with id, value and extensions. The accessor "getCopyright" gives direct access to the value
+     * @return {@link #copyright} (A copyright statement relating to the asset and/or its contents. Copyright statements are generally legal restrictions on the use and publishing of the asset.). This is the underlying object with id, value and extensions. The accessor "getCopyright" gives direct access to the value
      */
     public StringType getCopyrightElement() { 
       if (this.copyright == null)
@@ -1472,7 +2021,7 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @param value {@link #copyright} (A copyright statement relating to the module and/or its contents. Copyright statements are generally legal restrictions on the use and publishing of the module.). This is the underlying object with id, value and extensions. The accessor "getCopyright" gives direct access to the value
+     * @param value {@link #copyright} (A copyright statement relating to the asset and/or its contents. Copyright statements are generally legal restrictions on the use and publishing of the asset.). This is the underlying object with id, value and extensions. The accessor "getCopyright" gives direct access to the value
      */
     public ActivityDefinition setCopyrightElement(StringType value) { 
       this.copyright = value;
@@ -1480,14 +2029,14 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @return A copyright statement relating to the module and/or its contents. Copyright statements are generally legal restrictions on the use and publishing of the module.
+     * @return A copyright statement relating to the asset and/or its contents. Copyright statements are generally legal restrictions on the use and publishing of the asset.
      */
     public String getCopyright() { 
       return this.copyright == null ? null : this.copyright.getValue();
     }
 
     /**
-     * @param value A copyright statement relating to the module and/or its contents. Copyright statements are generally legal restrictions on the use and publishing of the module.
+     * @param value A copyright statement relating to the asset and/or its contents. Copyright statements are generally legal restrictions on the use and publishing of the asset.
      */
     public ActivityDefinition setCopyright(String value) { 
       if (Utilities.noString(value))
@@ -1554,7 +2103,7 @@ public class ActivityDefinition extends DomainResource {
     }
 
     /**
-     * @return {@link #library} (A reference to a Library resource containing any formal logic used by the orderset.)
+     * @return {@link #library} (A reference to a Library resource containing any formal logic used by the asset.)
      */
     public List<Reference> getLibrary() { 
       if (this.library == null)
@@ -1920,29 +2469,126 @@ public class ActivityDefinition extends DomainResource {
       return this;
     }
 
+    /**
+     * @return {@link #transform} (A reference to a StructureMap resource that defines a transform that can be executed to produce the intent resource using the ActivityDefinition instance as the input.)
+     */
+    public Reference getTransform() { 
+      if (this.transform == null)
+        if (Configuration.errorOnAutoCreate())
+          throw new Error("Attempt to auto-create ActivityDefinition.transform");
+        else if (Configuration.doAutoCreate())
+          this.transform = new Reference(); // cc
+      return this.transform;
+    }
+
+    public boolean hasTransform() { 
+      return this.transform != null && !this.transform.isEmpty();
+    }
+
+    /**
+     * @param value {@link #transform} (A reference to a StructureMap resource that defines a transform that can be executed to produce the intent resource using the ActivityDefinition instance as the input.)
+     */
+    public ActivityDefinition setTransform(Reference value) { 
+      this.transform = value;
+      return this;
+    }
+
+    /**
+     * @return {@link #transform} The actual object that is the target of the reference. The reference library doesn't populate this, but you can use it to hold the resource if you resolve it. (A reference to a StructureMap resource that defines a transform that can be executed to produce the intent resource using the ActivityDefinition instance as the input.)
+     */
+    public StructureMap getTransformTarget() { 
+      if (this.transformTarget == null)
+        if (Configuration.errorOnAutoCreate())
+          throw new Error("Attempt to auto-create ActivityDefinition.transform");
+        else if (Configuration.doAutoCreate())
+          this.transformTarget = new StructureMap(); // aa
+      return this.transformTarget;
+    }
+
+    /**
+     * @param value {@link #transform} The actual object that is the target of the reference. The reference library doesn't use these, but you can use it to hold the resource if you resolve it. (A reference to a StructureMap resource that defines a transform that can be executed to produce the intent resource using the ActivityDefinition instance as the input.)
+     */
+    public ActivityDefinition setTransformTarget(StructureMap value) { 
+      this.transformTarget = value;
+      return this;
+    }
+
+    /**
+     * @return {@link #dynamicValue} (Dynamic values that will be evaluated to produce values for elements of the resulting resource. For example, if the dosage of a medication must be computed based on the patient's weight, a dynamic value would be used to specify an expression that calculated the weight, and the path on the intent resource that would contain the result.)
+     */
+    public List<ActivityDefinitionDynamicValueComponent> getDynamicValue() { 
+      if (this.dynamicValue == null)
+        this.dynamicValue = new ArrayList<ActivityDefinitionDynamicValueComponent>();
+      return this.dynamicValue;
+    }
+
+    /**
+     * @return Returns a reference to <code>this</code> for easy method chaining
+     */
+    public ActivityDefinition setDynamicValue(List<ActivityDefinitionDynamicValueComponent> theDynamicValue) { 
+      this.dynamicValue = theDynamicValue;
+      return this;
+    }
+
+    public boolean hasDynamicValue() { 
+      if (this.dynamicValue == null)
+        return false;
+      for (ActivityDefinitionDynamicValueComponent item : this.dynamicValue)
+        if (!item.isEmpty())
+          return true;
+      return false;
+    }
+
+    public ActivityDefinitionDynamicValueComponent addDynamicValue() { //3
+      ActivityDefinitionDynamicValueComponent t = new ActivityDefinitionDynamicValueComponent();
+      if (this.dynamicValue == null)
+        this.dynamicValue = new ArrayList<ActivityDefinitionDynamicValueComponent>();
+      this.dynamicValue.add(t);
+      return t;
+    }
+
+    public ActivityDefinition addDynamicValue(ActivityDefinitionDynamicValueComponent t) { //3
+      if (t == null)
+        return this;
+      if (this.dynamicValue == null)
+        this.dynamicValue = new ArrayList<ActivityDefinitionDynamicValueComponent>();
+      this.dynamicValue.add(t);
+      return this;
+    }
+
+    /**
+     * @return The first repetition of repeating field {@link #dynamicValue}, creating it if it does not already exist
+     */
+    public ActivityDefinitionDynamicValueComponent getDynamicValueFirstRep() { 
+      if (getDynamicValue().isEmpty()) {
+        addDynamicValue();
+      }
+      return getDynamicValue().get(0);
+    }
+
       protected void listChildren(List<Property> childrenList) {
         super.listChildren(childrenList);
-        childrenList.add(new Property("url", "uri", "An absolute URL that is used to identify this module when it is referenced. This SHALL be a URL, SHOULD be globally unique, and SHOULD be an address at which this module definition is (or will be) published.", 0, java.lang.Integer.MAX_VALUE, url));
-        childrenList.add(new Property("identifier", "Identifier", "A logical identifier for the module such as the CMS or NQF identifiers for a measure artifact.", 0, java.lang.Integer.MAX_VALUE, identifier));
-        childrenList.add(new Property("version", "string", "The version of the module, if any. To provide a version consistent with the Decision Support Service specification, use the format Major.Minor.Revision (e.g. 1.0.0). For more information on versioning knowledge modules, refer to the Decision Support Service specification. Note that the version is required for non-experimental published artifact.", 0, java.lang.Integer.MAX_VALUE, version));
-        childrenList.add(new Property("name", "string", "A machine-friendly name for the module. This name should be usable as an identifier for the module by machine processing applications such as code generation.", 0, java.lang.Integer.MAX_VALUE, name));
-        childrenList.add(new Property("title", "string", "A short, descriptive, user-friendly title for the module.", 0, java.lang.Integer.MAX_VALUE, title));
-        childrenList.add(new Property("status", "code", "The status of the module.", 0, java.lang.Integer.MAX_VALUE, status));
-        childrenList.add(new Property("experimental", "boolean", "Determines whether the module was developed for testing purposes (or education/evaluation/marketing), and is not intended to be used in production environments.", 0, java.lang.Integer.MAX_VALUE, experimental));
-        childrenList.add(new Property("description", "string", "A free text natural language description of the module from the consumer's perspective.", 0, java.lang.Integer.MAX_VALUE, description));
-        childrenList.add(new Property("purpose", "string", "A brief description of the purpose of the module.", 0, java.lang.Integer.MAX_VALUE, purpose));
-        childrenList.add(new Property("usage", "string", "A detailed description of how the module is used from a clinical perspective.", 0, java.lang.Integer.MAX_VALUE, usage));
-        childrenList.add(new Property("publicationDate", "date", "The date on which the module was published.", 0, java.lang.Integer.MAX_VALUE, publicationDate));
-        childrenList.add(new Property("lastReviewDate", "date", "The date on which the module content was last reviewed.", 0, java.lang.Integer.MAX_VALUE, lastReviewDate));
-        childrenList.add(new Property("effectivePeriod", "Period", "The period during which the module content is effective.", 0, java.lang.Integer.MAX_VALUE, effectivePeriod));
-        childrenList.add(new Property("coverage", "UsageContext", "Specifies various attributes of the patient population for whom and/or environment of care in which, the knowledge module is applicable.", 0, java.lang.Integer.MAX_VALUE, coverage));
-        childrenList.add(new Property("topic", "CodeableConcept", "Clinical topics related to the content of the module.", 0, java.lang.Integer.MAX_VALUE, topic));
-        childrenList.add(new Property("contributor", "Contributor", "A contributor to the content of the module, including authors, editors, reviewers, and endorsers.", 0, java.lang.Integer.MAX_VALUE, contributor));
-        childrenList.add(new Property("publisher", "string", "The name of the individual or organization that published the module (also known as the steward for the module). This information is required for non-experimental published artifacts.", 0, java.lang.Integer.MAX_VALUE, publisher));
+        childrenList.add(new Property("url", "uri", "An absolute URL that is used to identify this asset when it is referenced. This SHALL be a URL, SHOULD be globally unique, and SHOULD be an address at which this asset is (or will be) published.", 0, java.lang.Integer.MAX_VALUE, url));
+        childrenList.add(new Property("identifier", "Identifier", "A logical identifier for the asset such as the CMS or NQF identifiers for a measure. Note that at least one identifier is required for non-experimental active assets.", 0, java.lang.Integer.MAX_VALUE, identifier));
+        childrenList.add(new Property("version", "string", "The version of the asset, if any. To provide a version consistent with the Decision Support Service specification, use the format Major.Minor.Revision (e.g. 1.0.0). For more information on versioning knowledge assets, refer to the Decision Support Service specification. Note that a version is required for non-experimental active assets.", 0, java.lang.Integer.MAX_VALUE, version));
+        childrenList.add(new Property("name", "string", "A machine-friendly name for the asset. This name should be usable as an identifier for the asset by machine processing applications such as code generation.", 0, java.lang.Integer.MAX_VALUE, name));
+        childrenList.add(new Property("title", "string", "A short, descriptive, user-friendly title for the asset.", 0, java.lang.Integer.MAX_VALUE, title));
+        childrenList.add(new Property("status", "code", "The status of the asset.", 0, java.lang.Integer.MAX_VALUE, status));
+        childrenList.add(new Property("experimental", "boolean", "Determines whether the asset was developed for testing purposes (or education/evaluation/marketing), and is not intended to be used in production environments.", 0, java.lang.Integer.MAX_VALUE, experimental));
+        childrenList.add(new Property("description", "string", "A free text natural language description of the asset from the consumer's perspective.", 0, java.lang.Integer.MAX_VALUE, description));
+        childrenList.add(new Property("purpose", "string", "A brief description of the purpose of the asset.", 0, java.lang.Integer.MAX_VALUE, purpose));
+        childrenList.add(new Property("usage", "string", "A detailed description of how the asset is used from a clinical perspective.", 0, java.lang.Integer.MAX_VALUE, usage));
+        childrenList.add(new Property("publicationDate", "date", "The date on which the asset was published.", 0, java.lang.Integer.MAX_VALUE, publicationDate));
+        childrenList.add(new Property("lastReviewDate", "date", "The date on which the asset content was last reviewed.", 0, java.lang.Integer.MAX_VALUE, lastReviewDate));
+        childrenList.add(new Property("effectivePeriod", "Period", "The period during which the asset content is effective.", 0, java.lang.Integer.MAX_VALUE, effectivePeriod));
+        childrenList.add(new Property("coverage", "UsageContext", "Specifies various attributes of the patient population for whom and/or environment of care in which, the knowledge asset is applicable.", 0, java.lang.Integer.MAX_VALUE, coverage));
+        childrenList.add(new Property("topic", "CodeableConcept", "Clinical topics related to the content of the asset.", 0, java.lang.Integer.MAX_VALUE, topic));
+        childrenList.add(new Property("contributor", "Contributor", "A contributor to the content of the asset, including authors, editors, reviewers, and endorsers.", 0, java.lang.Integer.MAX_VALUE, contributor));
+        childrenList.add(new Property("publisher", "string", "The name of the individual or organization that published the asset (also known as the steward for the asset). This information is required for non-experimental active artifacts.", 0, java.lang.Integer.MAX_VALUE, publisher));
         childrenList.add(new Property("contact", "ContactDetail", "Contact details to assist a user in finding and communicating with the publisher.", 0, java.lang.Integer.MAX_VALUE, contact));
-        childrenList.add(new Property("copyright", "string", "A copyright statement relating to the module and/or its contents. Copyright statements are generally legal restrictions on the use and publishing of the module.", 0, java.lang.Integer.MAX_VALUE, copyright));
+        childrenList.add(new Property("copyright", "string", "A copyright statement relating to the asset and/or its contents. Copyright statements are generally legal restrictions on the use and publishing of the asset.", 0, java.lang.Integer.MAX_VALUE, copyright));
         childrenList.add(new Property("relatedResource", "RelatedResource", "Related resources such as additional documentation, justification, or bibliographic references.", 0, java.lang.Integer.MAX_VALUE, relatedResource));
-        childrenList.add(new Property("library", "Reference(Library)", "A reference to a Library resource containing any formal logic used by the orderset.", 0, java.lang.Integer.MAX_VALUE, library));
+        childrenList.add(new Property("library", "Reference(Library)", "A reference to a Library resource containing any formal logic used by the asset.", 0, java.lang.Integer.MAX_VALUE, library));
         childrenList.add(new Property("category", "code", "High-level categorization of the type of activity.", 0, java.lang.Integer.MAX_VALUE, category));
         childrenList.add(new Property("code", "CodeableConcept", "Detailed description of the type of activity; e.g. What lab test, what procedure, what kind of encounter.", 0, java.lang.Integer.MAX_VALUE, code));
         childrenList.add(new Property("timing[x]", "CodeableConcept|Timing", "The period, timing or frequency upon which the described activity is to occur.", 0, java.lang.Integer.MAX_VALUE, timing));
@@ -1950,6 +2596,8 @@ public class ActivityDefinition extends DomainResource {
         childrenList.add(new Property("participantType", "code", "The type of participant in the action.", 0, java.lang.Integer.MAX_VALUE, participantType));
         childrenList.add(new Property("product[x]", "Reference(Medication|Substance)|CodeableConcept", "Identifies the food, drug or other product being consumed or supplied in the activity.", 0, java.lang.Integer.MAX_VALUE, product));
         childrenList.add(new Property("quantity", "SimpleQuantity", "Identifies the quantity expected to be consumed at once (per dose, per meal, etc.).", 0, java.lang.Integer.MAX_VALUE, quantity));
+        childrenList.add(new Property("transform", "Reference(StructureMap)", "A reference to a StructureMap resource that defines a transform that can be executed to produce the intent resource using the ActivityDefinition instance as the input.", 0, java.lang.Integer.MAX_VALUE, transform));
+        childrenList.add(new Property("dynamicValue", "", "Dynamic values that will be evaluated to produce values for elements of the resulting resource. For example, if the dosage of a medication must be computed based on the patient's weight, a dynamic value would be used to specify an expression that calculated the weight, and the path on the intent resource that would contain the result.", 0, java.lang.Integer.MAX_VALUE, dynamicValue));
       }
 
       @Override
@@ -1960,7 +2608,7 @@ public class ActivityDefinition extends DomainResource {
         case 351608024: /*version*/ return this.version == null ? new Base[0] : new Base[] {this.version}; // StringType
         case 3373707: /*name*/ return this.name == null ? new Base[0] : new Base[] {this.name}; // StringType
         case 110371416: /*title*/ return this.title == null ? new Base[0] : new Base[] {this.title}; // StringType
-        case -892481550: /*status*/ return this.status == null ? new Base[0] : new Base[] {this.status}; // CodeType
+        case -892481550: /*status*/ return this.status == null ? new Base[0] : new Base[] {this.status}; // Enumeration<ActivityDefinitionStatus>
         case -404562712: /*experimental*/ return this.experimental == null ? new Base[0] : new Base[] {this.experimental}; // BooleanType
         case -1724546052: /*description*/ return this.description == null ? new Base[0] : new Base[] {this.description}; // StringType
         case -220463842: /*purpose*/ return this.purpose == null ? new Base[0] : new Base[] {this.purpose}; // StringType
@@ -1983,6 +2631,8 @@ public class ActivityDefinition extends DomainResource {
         case 841294093: /*participantType*/ return this.participantType == null ? new Base[0] : this.participantType.toArray(new Base[this.participantType.size()]); // Enumeration<ActivityParticipantType>
         case -309474065: /*product*/ return this.product == null ? new Base[0] : new Base[] {this.product}; // Type
         case -1285004149: /*quantity*/ return this.quantity == null ? new Base[0] : new Base[] {this.quantity}; // SimpleQuantity
+        case 1052666732: /*transform*/ return this.transform == null ? new Base[0] : new Base[] {this.transform}; // Reference
+        case 572625010: /*dynamicValue*/ return this.dynamicValue == null ? new Base[0] : this.dynamicValue.toArray(new Base[this.dynamicValue.size()]); // ActivityDefinitionDynamicValueComponent
         default: return super.getProperty(hash, name, checkValid);
         }
 
@@ -2007,7 +2657,7 @@ public class ActivityDefinition extends DomainResource {
           this.title = castToString(value); // StringType
           break;
         case -892481550: // status
-          this.status = castToCode(value); // CodeType
+          this.status = new ActivityDefinitionStatusEnumFactory().fromType(value); // Enumeration<ActivityDefinitionStatus>
           break;
         case -404562712: // experimental
           this.experimental = castToBoolean(value); // BooleanType
@@ -2075,6 +2725,12 @@ public class ActivityDefinition extends DomainResource {
         case -1285004149: // quantity
           this.quantity = castToSimpleQuantity(value); // SimpleQuantity
           break;
+        case 1052666732: // transform
+          this.transform = castToReference(value); // Reference
+          break;
+        case 572625010: // dynamicValue
+          this.getDynamicValue().add((ActivityDefinitionDynamicValueComponent) value); // ActivityDefinitionDynamicValueComponent
+          break;
         default: super.setProperty(hash, name, value);
         }
 
@@ -2093,7 +2749,7 @@ public class ActivityDefinition extends DomainResource {
         else if (name.equals("title"))
           this.title = castToString(value); // StringType
         else if (name.equals("status"))
-          this.status = castToCode(value); // CodeType
+          this.status = new ActivityDefinitionStatusEnumFactory().fromType(value); // Enumeration<ActivityDefinitionStatus>
         else if (name.equals("experimental"))
           this.experimental = castToBoolean(value); // BooleanType
         else if (name.equals("description"))
@@ -2138,6 +2794,10 @@ public class ActivityDefinition extends DomainResource {
           this.product = (Type) value; // Type
         else if (name.equals("quantity"))
           this.quantity = castToSimpleQuantity(value); // SimpleQuantity
+        else if (name.equals("transform"))
+          this.transform = castToReference(value); // Reference
+        else if (name.equals("dynamicValue"))
+          this.getDynamicValue().add((ActivityDefinitionDynamicValueComponent) value);
         else
           super.setProperty(name, value);
       }
@@ -2150,7 +2810,7 @@ public class ActivityDefinition extends DomainResource {
         case 351608024: throw new FHIRException("Cannot make property version as it is not a complex type"); // StringType
         case 3373707: throw new FHIRException("Cannot make property name as it is not a complex type"); // StringType
         case 110371416: throw new FHIRException("Cannot make property title as it is not a complex type"); // StringType
-        case -892481550: throw new FHIRException("Cannot make property status as it is not a complex type"); // CodeType
+        case -892481550: throw new FHIRException("Cannot make property status as it is not a complex type"); // Enumeration<ActivityDefinitionStatus>
         case -404562712: throw new FHIRException("Cannot make property experimental as it is not a complex type"); // BooleanType
         case -1724546052: throw new FHIRException("Cannot make property description as it is not a complex type"); // StringType
         case -220463842: throw new FHIRException("Cannot make property purpose as it is not a complex type"); // StringType
@@ -2173,6 +2833,8 @@ public class ActivityDefinition extends DomainResource {
         case 841294093: throw new FHIRException("Cannot make property participantType as it is not a complex type"); // Enumeration<ActivityParticipantType>
         case 1753005361:  return getProduct(); // Type
         case -1285004149:  return getQuantity(); // SimpleQuantity
+        case 1052666732:  return getTransform(); // Reference
+        case 572625010:  return addDynamicValue(); // ActivityDefinitionDynamicValueComponent
         default: return super.makeProperty(hash, name);
         }
 
@@ -2278,6 +2940,13 @@ public class ActivityDefinition extends DomainResource {
           this.quantity = new SimpleQuantity();
           return this.quantity;
         }
+        else if (name.equals("transform")) {
+          this.transform = new Reference();
+          return this.transform;
+        }
+        else if (name.equals("dynamicValue")) {
+          return addDynamicValue();
+        }
         else
           return super.addChild(name);
       }
@@ -2350,6 +3019,12 @@ public class ActivityDefinition extends DomainResource {
         };
         dst.product = product == null ? null : product.copy();
         dst.quantity = quantity == null ? null : quantity.copy();
+        dst.transform = transform == null ? null : transform.copy();
+        if (dynamicValue != null) {
+          dst.dynamicValue = new ArrayList<ActivityDefinitionDynamicValueComponent>();
+          for (ActivityDefinitionDynamicValueComponent i : dynamicValue)
+            dst.dynamicValue.add(i.copy());
+        };
         return dst;
       }
 
@@ -2374,7 +3049,8 @@ public class ActivityDefinition extends DomainResource {
            && compareDeep(relatedResource, o.relatedResource, true) && compareDeep(library, o.library, true)
            && compareDeep(category, o.category, true) && compareDeep(code, o.code, true) && compareDeep(timing, o.timing, true)
            && compareDeep(location, o.location, true) && compareDeep(participantType, o.participantType, true)
-           && compareDeep(product, o.product, true) && compareDeep(quantity, o.quantity, true);
+           && compareDeep(product, o.product, true) && compareDeep(quantity, o.quantity, true) && compareDeep(transform, o.transform, true)
+           && compareDeep(dynamicValue, o.dynamicValue, true);
       }
 
       @Override
@@ -2397,7 +3073,7 @@ public class ActivityDefinition extends DomainResource {
           , name, title, status, experimental, description, purpose, usage, publicationDate
           , lastReviewDate, effectivePeriod, coverage, topic, contributor, publisher, contact
           , copyright, relatedResource, library, category, code, timing, location, participantType
-          , product, quantity);
+          , product, quantity, transform, dynamicValue);
       }
 
   @Override

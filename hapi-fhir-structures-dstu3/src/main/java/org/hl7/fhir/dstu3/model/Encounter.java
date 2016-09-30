@@ -29,26 +29,21 @@ package org.hl7.fhir.dstu3.model;
   
 */
 
-// Generated on Sat, Jul 2, 2016 11:26-0400 for FHIR v1.4.0
+// Generated on Thu, Aug 25, 2016 23:04-0400 for FHIR v1.6.0
+import java.util.ArrayList;
+import java.util.List;
 
-import java.util.*;
+import org.hl7.fhir.exceptions.FHIRException;
+import org.hl7.fhir.instance.model.api.IBaseBackboneElement;
 
-import org.hl7.fhir.utilities.Utilities;
-import ca.uhn.fhir.model.api.annotation.ResourceDef;
-import ca.uhn.fhir.model.api.annotation.SearchParamDefinition;
-import ca.uhn.fhir.model.api.annotation.Child;
-import ca.uhn.fhir.model.api.annotation.ChildOrder;
-import ca.uhn.fhir.model.api.annotation.Description;
-import ca.uhn.fhir.model.api.annotation.Block;
-import org.hl7.fhir.instance.model.api.*;
-import org.hl7.fhir.dstu3.exceptions.FHIRException;
+import ca.uhn.fhir.model.api.annotation.*;
 /**
  * An interaction between a patient and healthcare provider(s) for the purpose of providing healthcare service(s) or assessing the health status of a patient.
  */
 @ResourceDef(name="Encounter", profile="http://hl7.org/fhir/Profile/Encounter")
 public class Encounter extends DomainResource {
 
-    public enum EncounterState {
+    public enum EncounterStatus {
         /**
          * The Encounter has not yet started.
          */
@@ -74,10 +69,14 @@ public class Encounter extends DomainResource {
          */
         CANCELLED, 
         /**
+         * This instance should not have been part of this patient's medical record.
+         */
+        ENTEREDINERROR, 
+        /**
          * added to help the parsers with the generic types
          */
         NULL;
-        public static EncounterState fromCode(String codeString) throws FHIRException {
+        public static EncounterStatus fromCode(String codeString) throws FHIRException {
             if (codeString == null || "".equals(codeString))
                 return null;
         if ("planned".equals(codeString))
@@ -92,10 +91,12 @@ public class Encounter extends DomainResource {
           return FINISHED;
         if ("cancelled".equals(codeString))
           return CANCELLED;
+        if ("entered-in-error".equals(codeString))
+          return ENTEREDINERROR;
         if (Configuration.isAcceptInvalidEnums())
           return null;
         else
-          throw new FHIRException("Unknown EncounterState code '"+codeString+"'");
+          throw new FHIRException("Unknown EncounterStatus code '"+codeString+"'");
         }
         public String toCode() {
           switch (this) {
@@ -105,17 +106,19 @@ public class Encounter extends DomainResource {
             case ONLEAVE: return "onleave";
             case FINISHED: return "finished";
             case CANCELLED: return "cancelled";
+            case ENTEREDINERROR: return "entered-in-error";
             default: return "?";
           }
         }
         public String getSystem() {
           switch (this) {
-            case PLANNED: return "http://hl7.org/fhir/encounter-state";
-            case ARRIVED: return "http://hl7.org/fhir/encounter-state";
-            case INPROGRESS: return "http://hl7.org/fhir/encounter-state";
-            case ONLEAVE: return "http://hl7.org/fhir/encounter-state";
-            case FINISHED: return "http://hl7.org/fhir/encounter-state";
-            case CANCELLED: return "http://hl7.org/fhir/encounter-state";
+            case PLANNED: return "http://hl7.org/fhir/encounter-status";
+            case ARRIVED: return "http://hl7.org/fhir/encounter-status";
+            case INPROGRESS: return "http://hl7.org/fhir/encounter-status";
+            case ONLEAVE: return "http://hl7.org/fhir/encounter-status";
+            case FINISHED: return "http://hl7.org/fhir/encounter-status";
+            case CANCELLED: return "http://hl7.org/fhir/encounter-status";
+            case ENTEREDINERROR: return "http://hl7.org/fhir/encounter-status";
             default: return "?";
           }
         }
@@ -127,6 +130,7 @@ public class Encounter extends DomainResource {
             case ONLEAVE: return "The Encounter has begun, but the patient is temporarily on leave.";
             case FINISHED: return "The Encounter has ended.";
             case CANCELLED: return "The Encounter has ended before it has begun.";
+            case ENTEREDINERROR: return "This instance should not have been part of this patient's medical record.";
             default: return "?";
           }
         }
@@ -134,70 +138,77 @@ public class Encounter extends DomainResource {
           switch (this) {
             case PLANNED: return "Planned";
             case ARRIVED: return "Arrived";
-            case INPROGRESS: return "in Progress";
+            case INPROGRESS: return "In Progress";
             case ONLEAVE: return "On Leave";
             case FINISHED: return "Finished";
             case CANCELLED: return "Cancelled";
+            case ENTEREDINERROR: return "Entered in Error";
             default: return "?";
           }
         }
     }
 
-  public static class EncounterStateEnumFactory implements EnumFactory<EncounterState> {
-    public EncounterState fromCode(String codeString) throws IllegalArgumentException {
+  public static class EncounterStatusEnumFactory implements EnumFactory<EncounterStatus> {
+    public EncounterStatus fromCode(String codeString) throws IllegalArgumentException {
       if (codeString == null || "".equals(codeString))
             if (codeString == null || "".equals(codeString))
                 return null;
         if ("planned".equals(codeString))
-          return EncounterState.PLANNED;
+          return EncounterStatus.PLANNED;
         if ("arrived".equals(codeString))
-          return EncounterState.ARRIVED;
+          return EncounterStatus.ARRIVED;
         if ("in-progress".equals(codeString))
-          return EncounterState.INPROGRESS;
+          return EncounterStatus.INPROGRESS;
         if ("onleave".equals(codeString))
-          return EncounterState.ONLEAVE;
+          return EncounterStatus.ONLEAVE;
         if ("finished".equals(codeString))
-          return EncounterState.FINISHED;
+          return EncounterStatus.FINISHED;
         if ("cancelled".equals(codeString))
-          return EncounterState.CANCELLED;
-        throw new IllegalArgumentException("Unknown EncounterState code '"+codeString+"'");
+          return EncounterStatus.CANCELLED;
+        if ("entered-in-error".equals(codeString))
+          return EncounterStatus.ENTEREDINERROR;
+        throw new IllegalArgumentException("Unknown EncounterStatus code '"+codeString+"'");
         }
-        public Enumeration<EncounterState> fromType(Base code) throws FHIRException {
+        public Enumeration<EncounterStatus> fromType(Base code) throws FHIRException {
           if (code == null || code.isEmpty())
             return null;
           String codeString = ((PrimitiveType) code).asStringValue();
           if (codeString == null || "".equals(codeString))
             return null;
         if ("planned".equals(codeString))
-          return new Enumeration<EncounterState>(this, EncounterState.PLANNED);
+          return new Enumeration<EncounterStatus>(this, EncounterStatus.PLANNED);
         if ("arrived".equals(codeString))
-          return new Enumeration<EncounterState>(this, EncounterState.ARRIVED);
+          return new Enumeration<EncounterStatus>(this, EncounterStatus.ARRIVED);
         if ("in-progress".equals(codeString))
-          return new Enumeration<EncounterState>(this, EncounterState.INPROGRESS);
+          return new Enumeration<EncounterStatus>(this, EncounterStatus.INPROGRESS);
         if ("onleave".equals(codeString))
-          return new Enumeration<EncounterState>(this, EncounterState.ONLEAVE);
+          return new Enumeration<EncounterStatus>(this, EncounterStatus.ONLEAVE);
         if ("finished".equals(codeString))
-          return new Enumeration<EncounterState>(this, EncounterState.FINISHED);
+          return new Enumeration<EncounterStatus>(this, EncounterStatus.FINISHED);
         if ("cancelled".equals(codeString))
-          return new Enumeration<EncounterState>(this, EncounterState.CANCELLED);
-        throw new FHIRException("Unknown EncounterState code '"+codeString+"'");
+          return new Enumeration<EncounterStatus>(this, EncounterStatus.CANCELLED);
+        if ("entered-in-error".equals(codeString))
+          return new Enumeration<EncounterStatus>(this, EncounterStatus.ENTEREDINERROR);
+        throw new FHIRException("Unknown EncounterStatus code '"+codeString+"'");
         }
-    public String toCode(EncounterState code) {
-      if (code == EncounterState.PLANNED)
+    public String toCode(EncounterStatus code) {
+      if (code == EncounterStatus.PLANNED)
         return "planned";
-      if (code == EncounterState.ARRIVED)
+      if (code == EncounterStatus.ARRIVED)
         return "arrived";
-      if (code == EncounterState.INPROGRESS)
+      if (code == EncounterStatus.INPROGRESS)
         return "in-progress";
-      if (code == EncounterState.ONLEAVE)
+      if (code == EncounterStatus.ONLEAVE)
         return "onleave";
-      if (code == EncounterState.FINISHED)
+      if (code == EncounterStatus.FINISHED)
         return "finished";
-      if (code == EncounterState.CANCELLED)
+      if (code == EncounterStatus.CANCELLED)
         return "cancelled";
+      if (code == EncounterStatus.ENTEREDINERROR)
+        return "entered-in-error";
       return "?";
       }
-    public String toSystem(EncounterState code) {
+    public String toSystem(EncounterStatus code) {
       return code.getSystem();
       }
     }
@@ -208,9 +219,7 @@ public class Encounter extends DomainResource {
          */
         PLANNED, 
         /**
-         * The patient is currently at this location, or was between the period specified.
-
-A system may update these records when the patient leaves the location to either reserved, or completed
+         * The patient is currently at this location, or was between the period specified.A system may update these records when the patient leaves the location to either reserved, or completed
          */
         ACTIVE, 
         /**
@@ -218,9 +227,7 @@ A system may update these records when the patient leaves the location to either
          */
         RESERVED, 
         /**
-         * The patient was at this location during the period specified.
-
-Not to be used when the patient is currently at the location
+         * The patient was at this location during the period specified.Not to be used when the patient is currently at the location
          */
         COMPLETED, 
         /**
@@ -264,9 +271,9 @@ Not to be used when the patient is currently at the location
         public String getDefinition() {
           switch (this) {
             case PLANNED: return "The patient is planned to be moved to this location at some point in the future.";
-            case ACTIVE: return "The patient is currently at this location, or was between the period specified.\n\nA system may update these records when the patient leaves the location to either reserved, or completed";
+            case ACTIVE: return "The patient is currently at this location, or was between the period specified.\r\rA system may update these records when the patient leaves the location to either reserved, or completed";
             case RESERVED: return "This location is held empty for this patient.";
-            case COMPLETED: return "The patient was at this location during the period specified.\n\nNot to be used when the patient is currently at the location";
+            case COMPLETED: return "The patient was at this location during the period specified.\r\rNot to be used when the patient is currently at the location";
             default: return "?";
           }
         }
@@ -331,12 +338,12 @@ Not to be used when the patient is currently at the location
     @Block()
     public static class EncounterStatusHistoryComponent extends BackboneElement implements IBaseBackboneElement {
         /**
-         * planned | arrived | in-progress | onleave | finished | cancelled.
+         * planned | arrived | in-progress | onleave | finished | cancelled | entered-in-error.
          */
         @Child(name = "status", type = {CodeType.class}, order=1, min=1, max=1, modifier=false, summary=false)
-        @Description(shortDefinition="planned | arrived | in-progress | onleave | finished | cancelled", formalDefinition="planned | arrived | in-progress | onleave | finished | cancelled." )
-        @ca.uhn.fhir.model.api.annotation.Binding(valueSet="http://hl7.org/fhir/ValueSet/encounter-state")
-        protected Enumeration<EncounterState> status;
+        @Description(shortDefinition="planned | arrived | in-progress | onleave | finished | cancelled | entered-in-error", formalDefinition="planned | arrived | in-progress | onleave | finished | cancelled | entered-in-error." )
+        @ca.uhn.fhir.model.api.annotation.Binding(valueSet="http://hl7.org/fhir/ValueSet/encounter-status")
+        protected Enumeration<EncounterStatus> status;
 
         /**
          * The time that the episode was in the specified status.
@@ -345,7 +352,7 @@ Not to be used when the patient is currently at the location
         @Description(shortDefinition="The time that the episode was in the specified status", formalDefinition="The time that the episode was in the specified status." )
         protected Period period;
 
-        private static final long serialVersionUID = 919229161L;
+        private static final long serialVersionUID = -1893906736L;
 
     /**
      * Constructor
@@ -357,21 +364,21 @@ Not to be used when the patient is currently at the location
     /**
      * Constructor
      */
-      public EncounterStatusHistoryComponent(Enumeration<EncounterState> status, Period period) {
+      public EncounterStatusHistoryComponent(Enumeration<EncounterStatus> status, Period period) {
         super();
         this.status = status;
         this.period = period;
       }
 
         /**
-         * @return {@link #status} (planned | arrived | in-progress | onleave | finished | cancelled.). This is the underlying object with id, value and extensions. The accessor "getStatus" gives direct access to the value
+         * @return {@link #status} (planned | arrived | in-progress | onleave | finished | cancelled | entered-in-error.). This is the underlying object with id, value and extensions. The accessor "getStatus" gives direct access to the value
          */
-        public Enumeration<EncounterState> getStatusElement() { 
+        public Enumeration<EncounterStatus> getStatusElement() { 
           if (this.status == null)
             if (Configuration.errorOnAutoCreate())
               throw new Error("Attempt to auto-create EncounterStatusHistoryComponent.status");
             else if (Configuration.doAutoCreate())
-              this.status = new Enumeration<EncounterState>(new EncounterStateEnumFactory()); // bb
+              this.status = new Enumeration<EncounterStatus>(new EncounterStatusEnumFactory()); // bb
           return this.status;
         }
 
@@ -384,26 +391,26 @@ Not to be used when the patient is currently at the location
         }
 
         /**
-         * @param value {@link #status} (planned | arrived | in-progress | onleave | finished | cancelled.). This is the underlying object with id, value and extensions. The accessor "getStatus" gives direct access to the value
+         * @param value {@link #status} (planned | arrived | in-progress | onleave | finished | cancelled | entered-in-error.). This is the underlying object with id, value and extensions. The accessor "getStatus" gives direct access to the value
          */
-        public EncounterStatusHistoryComponent setStatusElement(Enumeration<EncounterState> value) { 
+        public EncounterStatusHistoryComponent setStatusElement(Enumeration<EncounterStatus> value) { 
           this.status = value;
           return this;
         }
 
         /**
-         * @return planned | arrived | in-progress | onleave | finished | cancelled.
+         * @return planned | arrived | in-progress | onleave | finished | cancelled | entered-in-error.
          */
-        public EncounterState getStatus() { 
+        public EncounterStatus getStatus() { 
           return this.status == null ? null : this.status.getValue();
         }
 
         /**
-         * @param value planned | arrived | in-progress | onleave | finished | cancelled.
+         * @param value planned | arrived | in-progress | onleave | finished | cancelled | entered-in-error.
          */
-        public EncounterStatusHistoryComponent setStatus(EncounterState value) { 
+        public EncounterStatusHistoryComponent setStatus(EncounterStatus value) { 
             if (this.status == null)
-              this.status = new Enumeration<EncounterState>(new EncounterStateEnumFactory());
+              this.status = new Enumeration<EncounterStatus>(new EncounterStatusEnumFactory());
             this.status.setValue(value);
           return this;
         }
@@ -434,14 +441,14 @@ Not to be used when the patient is currently at the location
 
         protected void listChildren(List<Property> childrenList) {
           super.listChildren(childrenList);
-          childrenList.add(new Property("status", "code", "planned | arrived | in-progress | onleave | finished | cancelled.", 0, java.lang.Integer.MAX_VALUE, status));
+          childrenList.add(new Property("status", "code", "planned | arrived | in-progress | onleave | finished | cancelled | entered-in-error.", 0, java.lang.Integer.MAX_VALUE, status));
           childrenList.add(new Property("period", "Period", "The time that the episode was in the specified status.", 0, java.lang.Integer.MAX_VALUE, period));
         }
 
       @Override
       public Base[] getProperty(int hash, String name, boolean checkValid) throws FHIRException {
         switch (hash) {
-        case -892481550: /*status*/ return this.status == null ? new Base[0] : new Base[] {this.status}; // Enumeration<EncounterState>
+        case -892481550: /*status*/ return this.status == null ? new Base[0] : new Base[] {this.status}; // Enumeration<EncounterStatus>
         case -991726143: /*period*/ return this.period == null ? new Base[0] : new Base[] {this.period}; // Period
         default: return super.getProperty(hash, name, checkValid);
         }
@@ -452,7 +459,7 @@ Not to be used when the patient is currently at the location
       public void setProperty(int hash, String name, Base value) throws FHIRException {
         switch (hash) {
         case -892481550: // status
-          this.status = new EncounterStateEnumFactory().fromType(value); // Enumeration<EncounterState>
+          this.status = new EncounterStatusEnumFactory().fromType(value); // Enumeration<EncounterStatus>
           break;
         case -991726143: // period
           this.period = castToPeriod(value); // Period
@@ -465,7 +472,7 @@ Not to be used when the patient is currently at the location
       @Override
       public void setProperty(String name, Base value) throws FHIRException {
         if (name.equals("status"))
-          this.status = new EncounterStateEnumFactory().fromType(value); // Enumeration<EncounterState>
+          this.status = new EncounterStatusEnumFactory().fromType(value); // Enumeration<EncounterStatus>
         else if (name.equals("period"))
           this.period = castToPeriod(value); // Period
         else
@@ -475,7 +482,7 @@ Not to be used when the patient is currently at the location
       @Override
       public Base makeProperty(int hash, String name) throws FHIRException {
         switch (hash) {
-        case -892481550: throw new FHIRException("Cannot make property status as it is not a complex type"); // Enumeration<EncounterState>
+        case -892481550: throw new FHIRException("Cannot make property status as it is not a complex type"); // Enumeration<EncounterStatus>
         case -991726143:  return getPeriod(); // Period
         default: return super.makeProperty(hash, name);
         }
@@ -855,6 +862,7 @@ Not to be used when the patient is currently at the location
          */
         @Child(name = "reAdmission", type = {CodeableConcept.class}, order=5, min=0, max=1, modifier=false, summary=false)
         @Description(shortDefinition="The type of hospital re-admission that has occurred (if any). If the value is absent, then this is not identified as a readmission", formalDefinition="Whether this hospitalization is a readmission and why if known." )
+        @ca.uhn.fhir.model.api.annotation.Binding(valueSet="http://hl7.org/fhir/ValueSet/v2-0092")
         protected CodeableConcept reAdmission;
 
         /**
@@ -1945,12 +1953,12 @@ Not to be used when the patient is currently at the location
     protected List<Identifier> identifier;
 
     /**
-     * planned | arrived | in-progress | onleave | finished | cancelled.
+     * planned | arrived | in-progress | onleave | finished | cancelled | entered-in-error.
      */
     @Child(name = "status", type = {CodeType.class}, order=1, min=1, max=1, modifier=true, summary=true)
-    @Description(shortDefinition="planned | arrived | in-progress | onleave | finished | cancelled", formalDefinition="planned | arrived | in-progress | onleave | finished | cancelled." )
-    @ca.uhn.fhir.model.api.annotation.Binding(valueSet="http://hl7.org/fhir/ValueSet/encounter-state")
-    protected Enumeration<EncounterState> status;
+    @Description(shortDefinition="planned | arrived | in-progress | onleave | finished | cancelled | entered-in-error", formalDefinition="planned | arrived | in-progress | onleave | finished | cancelled | entered-in-error." )
+    @ca.uhn.fhir.model.api.annotation.Binding(valueSet="http://hl7.org/fhir/ValueSet/encounter-status")
+    protected Enumeration<EncounterStatus> status;
 
     /**
      * The status history permits the encounter resource to contain the status history without needing to read through the historical versions of the resource, or even have the server store them.
@@ -1980,7 +1988,7 @@ Not to be used when the patient is currently at the location
      */
     @Child(name = "priority", type = {CodeableConcept.class}, order=5, min=0, max=1, modifier=false, summary=false)
     @Description(shortDefinition="Indicates the urgency of the encounter", formalDefinition="Indicates the urgency of the encounter." )
-    @ca.uhn.fhir.model.api.annotation.Binding(valueSet="http://hl7.org/fhir/ValueSet/encounter-priority")
+    @ca.uhn.fhir.model.api.annotation.Binding(valueSet="http://hl7.org/fhir/ValueSet/v3-ActPriority")
     protected CodeableConcept priority;
 
     /**
@@ -2073,23 +2081,35 @@ Not to be used when the patient is currently at the location
 
 
     /**
+     * The set of accounts that may be used for billing for this Encounter.
+     */
+    @Child(name = "account", type = {Account.class}, order=15, min=0, max=Child.MAX_UNLIMITED, modifier=false, summary=false)
+    @Description(shortDefinition="The set of accounts that may be used for billing for this Encounter", formalDefinition="The set of accounts that may be used for billing for this Encounter." )
+    protected List<Reference> account;
+    /**
+     * The actual objects that are the target of the reference (The set of accounts that may be used for billing for this Encounter.)
+     */
+    protected List<Account> accountTarget;
+
+
+    /**
      * Details about the admission to a healthcare service.
      */
-    @Child(name = "hospitalization", type = {}, order=15, min=0, max=1, modifier=false, summary=false)
+    @Child(name = "hospitalization", type = {}, order=16, min=0, max=1, modifier=false, summary=false)
     @Description(shortDefinition="Details about the admission to a healthcare service", formalDefinition="Details about the admission to a healthcare service." )
     protected EncounterHospitalizationComponent hospitalization;
 
     /**
      * List of locations where  the patient has been during this encounter.
      */
-    @Child(name = "location", type = {}, order=16, min=0, max=Child.MAX_UNLIMITED, modifier=false, summary=false)
+    @Child(name = "location", type = {}, order=17, min=0, max=Child.MAX_UNLIMITED, modifier=false, summary=false)
     @Description(shortDefinition="List of locations where the patient has been", formalDefinition="List of locations where  the patient has been during this encounter." )
     protected List<EncounterLocationComponent> location;
 
     /**
      * An organization that is in charge of maintaining the information of this Encounter (e.g. who maintains the report or the master service catalog item, etc.). This MAY be the same as the organization on the Patient record, however it could be different. This MAY not be not the Service Delivery Location's Organization.
      */
-    @Child(name = "serviceProvider", type = {Organization.class}, order=17, min=0, max=1, modifier=false, summary=false)
+    @Child(name = "serviceProvider", type = {Organization.class}, order=18, min=0, max=1, modifier=false, summary=false)
     @Description(shortDefinition="The custodian organization of this Encounter record", formalDefinition="An organization that is in charge of maintaining the information of this Encounter (e.g. who maintains the report or the master service catalog item, etc.). This MAY be the same as the organization on the Patient record, however it could be different. This MAY not be not the Service Delivery Location's Organization." )
     protected Reference serviceProvider;
 
@@ -2101,7 +2121,7 @@ Not to be used when the patient is currently at the location
     /**
      * Another Encounter of which this encounter is a part of (administratively or in time).
      */
-    @Child(name = "partOf", type = {Encounter.class}, order=18, min=0, max=1, modifier=false, summary=false)
+    @Child(name = "partOf", type = {Encounter.class}, order=19, min=0, max=1, modifier=false, summary=false)
     @Description(shortDefinition="Another Encounter this encounter is part of", formalDefinition="Another Encounter of which this encounter is a part of (administratively or in time)." )
     protected Reference partOf;
 
@@ -2110,7 +2130,7 @@ Not to be used when the patient is currently at the location
      */
     protected Encounter partOfTarget;
 
-    private static final long serialVersionUID = 770948560L;
+    private static final long serialVersionUID = -2045444336L;
 
   /**
    * Constructor
@@ -2122,7 +2142,7 @@ Not to be used when the patient is currently at the location
   /**
    * Constructor
    */
-    public Encounter(Enumeration<EncounterState> status) {
+    public Encounter(Enumeration<EncounterStatus> status) {
       super();
       this.status = status;
     }
@@ -2181,14 +2201,14 @@ Not to be used when the patient is currently at the location
     }
 
     /**
-     * @return {@link #status} (planned | arrived | in-progress | onleave | finished | cancelled.). This is the underlying object with id, value and extensions. The accessor "getStatus" gives direct access to the value
+     * @return {@link #status} (planned | arrived | in-progress | onleave | finished | cancelled | entered-in-error.). This is the underlying object with id, value and extensions. The accessor "getStatus" gives direct access to the value
      */
-    public Enumeration<EncounterState> getStatusElement() { 
+    public Enumeration<EncounterStatus> getStatusElement() { 
       if (this.status == null)
         if (Configuration.errorOnAutoCreate())
           throw new Error("Attempt to auto-create Encounter.status");
         else if (Configuration.doAutoCreate())
-          this.status = new Enumeration<EncounterState>(new EncounterStateEnumFactory()); // bb
+          this.status = new Enumeration<EncounterStatus>(new EncounterStatusEnumFactory()); // bb
       return this.status;
     }
 
@@ -2201,26 +2221,26 @@ Not to be used when the patient is currently at the location
     }
 
     /**
-     * @param value {@link #status} (planned | arrived | in-progress | onleave | finished | cancelled.). This is the underlying object with id, value and extensions. The accessor "getStatus" gives direct access to the value
+     * @param value {@link #status} (planned | arrived | in-progress | onleave | finished | cancelled | entered-in-error.). This is the underlying object with id, value and extensions. The accessor "getStatus" gives direct access to the value
      */
-    public Encounter setStatusElement(Enumeration<EncounterState> value) { 
+    public Encounter setStatusElement(Enumeration<EncounterStatus> value) { 
       this.status = value;
       return this;
     }
 
     /**
-     * @return planned | arrived | in-progress | onleave | finished | cancelled.
+     * @return planned | arrived | in-progress | onleave | finished | cancelled | entered-in-error.
      */
-    public EncounterState getStatus() { 
+    public EncounterStatus getStatus() { 
       return this.status == null ? null : this.status.getValue();
     }
 
     /**
-     * @param value planned | arrived | in-progress | onleave | finished | cancelled.
+     * @param value planned | arrived | in-progress | onleave | finished | cancelled | entered-in-error.
      */
-    public Encounter setStatus(EncounterState value) { 
+    public Encounter setStatus(EncounterStatus value) { 
         if (this.status == null)
-          this.status = new Enumeration<EncounterState>(new EncounterStateEnumFactory());
+          this.status = new Enumeration<EncounterStatus>(new EncounterStatusEnumFactory());
         this.status.setValue(value);
       return this;
     }
@@ -2835,6 +2855,81 @@ Not to be used when the patient is currently at the location
     }
 
     /**
+     * @return {@link #account} (The set of accounts that may be used for billing for this Encounter.)
+     */
+    public List<Reference> getAccount() { 
+      if (this.account == null)
+        this.account = new ArrayList<Reference>();
+      return this.account;
+    }
+
+    /**
+     * @return Returns a reference to <code>this</code> for easy method chaining
+     */
+    public Encounter setAccount(List<Reference> theAccount) { 
+      this.account = theAccount;
+      return this;
+    }
+
+    public boolean hasAccount() { 
+      if (this.account == null)
+        return false;
+      for (Reference item : this.account)
+        if (!item.isEmpty())
+          return true;
+      return false;
+    }
+
+    public Reference addAccount() { //3
+      Reference t = new Reference();
+      if (this.account == null)
+        this.account = new ArrayList<Reference>();
+      this.account.add(t);
+      return t;
+    }
+
+    public Encounter addAccount(Reference t) { //3
+      if (t == null)
+        return this;
+      if (this.account == null)
+        this.account = new ArrayList<Reference>();
+      this.account.add(t);
+      return this;
+    }
+
+    /**
+     * @return The first repetition of repeating field {@link #account}, creating it if it does not already exist
+     */
+    public Reference getAccountFirstRep() { 
+      if (getAccount().isEmpty()) {
+        addAccount();
+      }
+      return getAccount().get(0);
+    }
+
+    /**
+     * @deprecated Use Reference#setResource(IBaseResource) instead
+     */
+    @Deprecated
+    public List<Account> getAccountTarget() { 
+      if (this.accountTarget == null)
+        this.accountTarget = new ArrayList<Account>();
+      return this.accountTarget;
+    }
+
+    /**
+     * @deprecated Use Reference#setResource(IBaseResource) instead
+     */
+    @Deprecated
+    public Account addAccountTarget() { 
+      Account r = new Account();
+      if (this.accountTarget == null)
+        this.accountTarget = new ArrayList<Account>();
+      this.accountTarget.add(r);
+      return r;
+    }
+
+    /**
      * @return {@link #hospitalization} (Details about the admission to a healthcare service.)
      */
     public EncounterHospitalizationComponent getHospitalization() { 
@@ -3002,7 +3097,7 @@ Not to be used when the patient is currently at the location
       protected void listChildren(List<Property> childrenList) {
         super.listChildren(childrenList);
         childrenList.add(new Property("identifier", "Identifier", "Identifier(s) by which this encounter is known.", 0, java.lang.Integer.MAX_VALUE, identifier));
-        childrenList.add(new Property("status", "code", "planned | arrived | in-progress | onleave | finished | cancelled.", 0, java.lang.Integer.MAX_VALUE, status));
+        childrenList.add(new Property("status", "code", "planned | arrived | in-progress | onleave | finished | cancelled | entered-in-error.", 0, java.lang.Integer.MAX_VALUE, status));
         childrenList.add(new Property("statusHistory", "", "The status history permits the encounter resource to contain the status history without needing to read through the historical versions of the resource, or even have the server store them.", 0, java.lang.Integer.MAX_VALUE, statusHistory));
         childrenList.add(new Property("class", "Coding", "inpatient | outpatient | ambulatory | emergency +.", 0, java.lang.Integer.MAX_VALUE, class_));
         childrenList.add(new Property("type", "CodeableConcept", "Specific type of encounter (e.g. e-mail consultation, surgical day-care, skilled nursing, rehabilitation).", 0, java.lang.Integer.MAX_VALUE, type));
@@ -3016,6 +3111,7 @@ Not to be used when the patient is currently at the location
         childrenList.add(new Property("length", "Duration", "Quantity of time the encounter lasted. This excludes the time during leaves of absence.", 0, java.lang.Integer.MAX_VALUE, length));
         childrenList.add(new Property("reason", "CodeableConcept", "Reason the encounter takes place, expressed as a code. For admissions, this can be used for a coded admission diagnosis.", 0, java.lang.Integer.MAX_VALUE, reason));
         childrenList.add(new Property("indication", "Reference(Condition|Procedure)", "Reason the encounter takes place, as specified using information from another resource. For admissions, this is the admission diagnosis. The indication will typically be a Condition (with other resources referenced in the evidence.detail), or a Procedure.", 0, java.lang.Integer.MAX_VALUE, indication));
+        childrenList.add(new Property("account", "Reference(Account)", "The set of accounts that may be used for billing for this Encounter.", 0, java.lang.Integer.MAX_VALUE, account));
         childrenList.add(new Property("hospitalization", "", "Details about the admission to a healthcare service.", 0, java.lang.Integer.MAX_VALUE, hospitalization));
         childrenList.add(new Property("location", "", "List of locations where  the patient has been during this encounter.", 0, java.lang.Integer.MAX_VALUE, location));
         childrenList.add(new Property("serviceProvider", "Reference(Organization)", "An organization that is in charge of maintaining the information of this Encounter (e.g. who maintains the report or the master service catalog item, etc.). This MAY be the same as the organization on the Patient record, however it could be different. This MAY not be not the Service Delivery Location's Organization.", 0, java.lang.Integer.MAX_VALUE, serviceProvider));
@@ -3026,7 +3122,7 @@ Not to be used when the patient is currently at the location
       public Base[] getProperty(int hash, String name, boolean checkValid) throws FHIRException {
         switch (hash) {
         case -1618432855: /*identifier*/ return this.identifier == null ? new Base[0] : this.identifier.toArray(new Base[this.identifier.size()]); // Identifier
-        case -892481550: /*status*/ return this.status == null ? new Base[0] : new Base[] {this.status}; // Enumeration<EncounterState>
+        case -892481550: /*status*/ return this.status == null ? new Base[0] : new Base[] {this.status}; // Enumeration<EncounterStatus>
         case -986695614: /*statusHistory*/ return this.statusHistory == null ? new Base[0] : this.statusHistory.toArray(new Base[this.statusHistory.size()]); // EncounterStatusHistoryComponent
         case 94742904: /*class*/ return this.class_ == null ? new Base[0] : new Base[] {this.class_}; // Coding
         case 3575610: /*type*/ return this.type == null ? new Base[0] : this.type.toArray(new Base[this.type.size()]); // CodeableConcept
@@ -3040,6 +3136,7 @@ Not to be used when the patient is currently at the location
         case -1106363674: /*length*/ return this.length == null ? new Base[0] : new Base[] {this.length}; // Duration
         case -934964668: /*reason*/ return this.reason == null ? new Base[0] : this.reason.toArray(new Base[this.reason.size()]); // CodeableConcept
         case -597168804: /*indication*/ return this.indication == null ? new Base[0] : this.indication.toArray(new Base[this.indication.size()]); // Reference
+        case -1177318867: /*account*/ return this.account == null ? new Base[0] : this.account.toArray(new Base[this.account.size()]); // Reference
         case 1057894634: /*hospitalization*/ return this.hospitalization == null ? new Base[0] : new Base[] {this.hospitalization}; // EncounterHospitalizationComponent
         case 1901043637: /*location*/ return this.location == null ? new Base[0] : this.location.toArray(new Base[this.location.size()]); // EncounterLocationComponent
         case 243182534: /*serviceProvider*/ return this.serviceProvider == null ? new Base[0] : new Base[] {this.serviceProvider}; // Reference
@@ -3056,7 +3153,7 @@ Not to be used when the patient is currently at the location
           this.getIdentifier().add(castToIdentifier(value)); // Identifier
           break;
         case -892481550: // status
-          this.status = new EncounterStateEnumFactory().fromType(value); // Enumeration<EncounterState>
+          this.status = new EncounterStatusEnumFactory().fromType(value); // Enumeration<EncounterStatus>
           break;
         case -986695614: // statusHistory
           this.getStatusHistory().add((EncounterStatusHistoryComponent) value); // EncounterStatusHistoryComponent
@@ -3097,6 +3194,9 @@ Not to be used when the patient is currently at the location
         case -597168804: // indication
           this.getIndication().add(castToReference(value)); // Reference
           break;
+        case -1177318867: // account
+          this.getAccount().add(castToReference(value)); // Reference
+          break;
         case 1057894634: // hospitalization
           this.hospitalization = (EncounterHospitalizationComponent) value; // EncounterHospitalizationComponent
           break;
@@ -3119,7 +3219,7 @@ Not to be used when the patient is currently at the location
         if (name.equals("identifier"))
           this.getIdentifier().add(castToIdentifier(value));
         else if (name.equals("status"))
-          this.status = new EncounterStateEnumFactory().fromType(value); // Enumeration<EncounterState>
+          this.status = new EncounterStatusEnumFactory().fromType(value); // Enumeration<EncounterStatus>
         else if (name.equals("statusHistory"))
           this.getStatusHistory().add((EncounterStatusHistoryComponent) value);
         else if (name.equals("class"))
@@ -3146,6 +3246,8 @@ Not to be used when the patient is currently at the location
           this.getReason().add(castToCodeableConcept(value));
         else if (name.equals("indication"))
           this.getIndication().add(castToReference(value));
+        else if (name.equals("account"))
+          this.getAccount().add(castToReference(value));
         else if (name.equals("hospitalization"))
           this.hospitalization = (EncounterHospitalizationComponent) value; // EncounterHospitalizationComponent
         else if (name.equals("location"))
@@ -3162,7 +3264,7 @@ Not to be used when the patient is currently at the location
       public Base makeProperty(int hash, String name) throws FHIRException {
         switch (hash) {
         case -1618432855:  return addIdentifier(); // Identifier
-        case -892481550: throw new FHIRException("Cannot make property status as it is not a complex type"); // Enumeration<EncounterState>
+        case -892481550: throw new FHIRException("Cannot make property status as it is not a complex type"); // Enumeration<EncounterStatus>
         case -986695614:  return addStatusHistory(); // EncounterStatusHistoryComponent
         case 94742904:  return getClass_(); // Coding
         case 3575610:  return addType(); // CodeableConcept
@@ -3176,6 +3278,7 @@ Not to be used when the patient is currently at the location
         case -1106363674:  return getLength(); // Duration
         case -934964668:  return addReason(); // CodeableConcept
         case -597168804:  return addIndication(); // Reference
+        case -1177318867:  return addAccount(); // Reference
         case 1057894634:  return getHospitalization(); // EncounterHospitalizationComponent
         case 1901043637:  return addLocation(); // EncounterLocationComponent
         case 243182534:  return getServiceProvider(); // Reference
@@ -3237,6 +3340,9 @@ Not to be used when the patient is currently at the location
         }
         else if (name.equals("indication")) {
           return addIndication();
+        }
+        else if (name.equals("account")) {
+          return addAccount();
         }
         else if (name.equals("hospitalization")) {
           this.hospitalization = new EncounterHospitalizationComponent();
@@ -3312,6 +3418,11 @@ Not to be used when the patient is currently at the location
           for (Reference i : indication)
             dst.indication.add(i.copy());
         };
+        if (account != null) {
+          dst.account = new ArrayList<Reference>();
+          for (Reference i : account)
+            dst.account.add(i.copy());
+        };
         dst.hospitalization = hospitalization == null ? null : hospitalization.copy();
         if (location != null) {
           dst.location = new ArrayList<EncounterLocationComponent>();
@@ -3339,7 +3450,7 @@ Not to be used when the patient is currently at the location
            && compareDeep(patient, o.patient, true) && compareDeep(episodeOfCare, o.episodeOfCare, true) && compareDeep(incomingReferral, o.incomingReferral, true)
            && compareDeep(participant, o.participant, true) && compareDeep(appointment, o.appointment, true)
            && compareDeep(period, o.period, true) && compareDeep(length, o.length, true) && compareDeep(reason, o.reason, true)
-           && compareDeep(indication, o.indication, true) && compareDeep(hospitalization, o.hospitalization, true)
+           && compareDeep(indication, o.indication, true) && compareDeep(account, o.account, true) && compareDeep(hospitalization, o.hospitalization, true)
            && compareDeep(location, o.location, true) && compareDeep(serviceProvider, o.serviceProvider, true)
            && compareDeep(partOf, o.partOf, true);
       }
@@ -3357,8 +3468,8 @@ Not to be used when the patient is currently at the location
       public boolean isEmpty() {
         return super.isEmpty() && ca.uhn.fhir.util.ElementUtil.isEmpty(identifier, status, statusHistory
           , class_, type, priority, patient, episodeOfCare, incomingReferral, participant
-          , appointment, period, length, reason, indication, hospitalization, location, serviceProvider
-          , partOf);
+          , appointment, period, length, reason, indication, account, hospitalization, location
+          , serviceProvider, partOf);
       }
 
   @Override
@@ -3835,17 +3946,17 @@ Not to be used when the patient is currently at the location
  /**
    * Search parameter: <b>status</b>
    * <p>
-   * Description: <b>planned | arrived | in-progress | onleave | finished | cancelled</b><br>
+   * Description: <b>planned | arrived | in-progress | onleave | finished | cancelled | entered-in-error</b><br>
    * Type: <b>token</b><br>
    * Path: <b>Encounter.status</b><br>
    * </p>
    */
-  @SearchParamDefinition(name="status", path="Encounter.status", description="planned | arrived | in-progress | onleave | finished | cancelled", type="token" )
+  @SearchParamDefinition(name="status", path="Encounter.status", description="planned | arrived | in-progress | onleave | finished | cancelled | entered-in-error", type="token" )
   public static final String SP_STATUS = "status";
  /**
    * <b>Fluent Client</b> search parameter constant for <b>status</b>
    * <p>
-   * Description: <b>planned | arrived | in-progress | onleave | finished | cancelled</b><br>
+   * Description: <b>planned | arrived | in-progress | onleave | finished | cancelled | entered-in-error</b><br>
    * Type: <b>token</b><br>
    * Path: <b>Encounter.status</b><br>
    * </p>

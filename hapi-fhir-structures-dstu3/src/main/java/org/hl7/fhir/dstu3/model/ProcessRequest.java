@@ -29,20 +29,16 @@ package org.hl7.fhir.dstu3.model;
   
 */
 
-// Generated on Sat, Jul 2, 2016 11:26-0400 for FHIR v1.4.0
+// Generated on Thu, Aug 25, 2016 23:04-0400 for FHIR v1.6.0
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
-import java.util.*;
-
+import org.hl7.fhir.exceptions.FHIRException;
+import org.hl7.fhir.instance.model.api.IBaseBackboneElement;
 import org.hl7.fhir.utilities.Utilities;
-import org.hl7.fhir.dstu3.model.Enumerations.*;
-import ca.uhn.fhir.model.api.annotation.ResourceDef;
-import ca.uhn.fhir.model.api.annotation.SearchParamDefinition;
-import ca.uhn.fhir.model.api.annotation.Child;
-import ca.uhn.fhir.model.api.annotation.ChildOrder;
-import ca.uhn.fhir.model.api.annotation.Description;
-import ca.uhn.fhir.model.api.annotation.Block;
-import org.hl7.fhir.instance.model.api.*;
-import org.hl7.fhir.dstu3.exceptions.FHIRException;
+
+import ca.uhn.fhir.model.api.annotation.*;
 /**
  * This resource provides the target, request and response, and action details for an action to be performed by the target on or about existing resources.
  */
@@ -507,30 +503,30 @@ public class ProcessRequest extends DomainResource {
     protected Type target;
 
     /**
-     * The practitioner who is responsible for the action specified in thise request.
+     * The practitioner who is responsible for the action specified in this request.
      */
     @Child(name = "provider", type = {Identifier.class, Practitioner.class}, order=7, min=0, max=1, modifier=false, summary=false)
-    @Description(shortDefinition="Responsible practitioner", formalDefinition="The practitioner who is responsible for the action specified in thise request." )
+    @Description(shortDefinition="Responsible practitioner", formalDefinition="The practitioner who is responsible for the action specified in this request." )
     protected Type provider;
 
     /**
-     * The organization which is responsible for the action speccified in thise request.
+     * The organization which is responsible for the action speccified in this request.
      */
     @Child(name = "organization", type = {Identifier.class, Organization.class}, order=8, min=0, max=1, modifier=false, summary=false)
-    @Description(shortDefinition="Responsible organization", formalDefinition="The organization which is responsible for the action speccified in thise request." )
+    @Description(shortDefinition="Responsible organization", formalDefinition="The organization which is responsible for the action speccified in this request." )
     protected Type organization;
 
     /**
      * Reference of resource which is the target or subject of this action.
      */
-    @Child(name = "request", type = {Identifier.class}, order=9, min=0, max=1, modifier=false, summary=false)
+    @Child(name = "request", type = {Identifier.class, Reference.class}, order=9, min=0, max=1, modifier=false, summary=false)
     @Description(shortDefinition="Request reference", formalDefinition="Reference of resource which is the target or subject of this action." )
     protected Type request;
 
     /**
      * Reference of a prior response to resource which is the target or subject of this action.
      */
-    @Child(name = "response", type = {Identifier.class}, order=10, min=0, max=1, modifier=false, summary=false)
+    @Child(name = "response", type = {Identifier.class, Reference.class}, order=10, min=0, max=1, modifier=false, summary=false)
     @Description(shortDefinition="Response reference", formalDefinition="Reference of a prior response to resource which is the target or subject of this action." )
     protected Type response;
 
@@ -880,14 +876,14 @@ public class ProcessRequest extends DomainResource {
     }
 
     /**
-     * @return {@link #provider} (The practitioner who is responsible for the action specified in thise request.)
+     * @return {@link #provider} (The practitioner who is responsible for the action specified in this request.)
      */
     public Type getProvider() { 
       return this.provider;
     }
 
     /**
-     * @return {@link #provider} (The practitioner who is responsible for the action specified in thise request.)
+     * @return {@link #provider} (The practitioner who is responsible for the action specified in this request.)
      */
     public Identifier getProviderIdentifier() throws FHIRException { 
       if (!(this.provider instanceof Identifier))
@@ -900,7 +896,7 @@ public class ProcessRequest extends DomainResource {
     }
 
     /**
-     * @return {@link #provider} (The practitioner who is responsible for the action specified in thise request.)
+     * @return {@link #provider} (The practitioner who is responsible for the action specified in this request.)
      */
     public Reference getProviderReference() throws FHIRException { 
       if (!(this.provider instanceof Reference))
@@ -917,7 +913,7 @@ public class ProcessRequest extends DomainResource {
     }
 
     /**
-     * @param value {@link #provider} (The practitioner who is responsible for the action specified in thise request.)
+     * @param value {@link #provider} (The practitioner who is responsible for the action specified in this request.)
      */
     public ProcessRequest setProvider(Type value) { 
       this.provider = value;
@@ -925,14 +921,14 @@ public class ProcessRequest extends DomainResource {
     }
 
     /**
-     * @return {@link #organization} (The organization which is responsible for the action speccified in thise request.)
+     * @return {@link #organization} (The organization which is responsible for the action speccified in this request.)
      */
     public Type getOrganization() { 
       return this.organization;
     }
 
     /**
-     * @return {@link #organization} (The organization which is responsible for the action speccified in thise request.)
+     * @return {@link #organization} (The organization which is responsible for the action speccified in this request.)
      */
     public Identifier getOrganizationIdentifier() throws FHIRException { 
       if (!(this.organization instanceof Identifier))
@@ -945,7 +941,7 @@ public class ProcessRequest extends DomainResource {
     }
 
     /**
-     * @return {@link #organization} (The organization which is responsible for the action speccified in thise request.)
+     * @return {@link #organization} (The organization which is responsible for the action speccified in this request.)
      */
     public Reference getOrganizationReference() throws FHIRException { 
       if (!(this.organization instanceof Reference))
@@ -962,7 +958,7 @@ public class ProcessRequest extends DomainResource {
     }
 
     /**
-     * @param value {@link #organization} (The organization which is responsible for the action speccified in thise request.)
+     * @param value {@link #organization} (The organization which is responsible for the action speccified in this request.)
      */
     public ProcessRequest setOrganization(Type value) { 
       this.organization = value;
@@ -1361,8 +1357,8 @@ public class ProcessRequest extends DomainResource {
         childrenList.add(new Property("action", "code", "The type of processing action being requested, for example Reversal, Readjudication, StatusRequest,PendedRequest.", 0, java.lang.Integer.MAX_VALUE, action));
         childrenList.add(new Property("created", "dateTime", "The date when this resource was created.", 0, java.lang.Integer.MAX_VALUE, created));
         childrenList.add(new Property("target[x]", "Identifier|Reference(Organization)", "The organization which is the target of the request.", 0, java.lang.Integer.MAX_VALUE, target));
-        childrenList.add(new Property("provider[x]", "Identifier|Reference(Practitioner)", "The practitioner who is responsible for the action specified in thise request.", 0, java.lang.Integer.MAX_VALUE, provider));
-        childrenList.add(new Property("organization[x]", "Identifier|Reference(Organization)", "The organization which is responsible for the action speccified in thise request.", 0, java.lang.Integer.MAX_VALUE, organization));
+        childrenList.add(new Property("provider[x]", "Identifier|Reference(Practitioner)", "The practitioner who is responsible for the action specified in this request.", 0, java.lang.Integer.MAX_VALUE, provider));
+        childrenList.add(new Property("organization[x]", "Identifier|Reference(Organization)", "The organization which is responsible for the action speccified in this request.", 0, java.lang.Integer.MAX_VALUE, organization));
         childrenList.add(new Property("request[x]", "Identifier|Reference(Any)", "Reference of resource which is the target or subject of this action.", 0, java.lang.Integer.MAX_VALUE, request));
         childrenList.add(new Property("response[x]", "Identifier|Reference(Any)", "Reference of a prior response to resource which is the target or subject of this action.", 0, java.lang.Integer.MAX_VALUE, response));
         childrenList.add(new Property("nullify", "boolean", "If true remove all history excluding audit.", 0, java.lang.Integer.MAX_VALUE, nullify));
@@ -1715,24 +1711,50 @@ public class ProcessRequest extends DomainResource {
   public static final ca.uhn.fhir.rest.gclient.TokenClientParam IDENTIFIER = new ca.uhn.fhir.rest.gclient.TokenClientParam(SP_IDENTIFIER);
 
  /**
-   * Search parameter: <b>organizationidentifier</b>
+   * Search parameter: <b>organization-reference</b>
    * <p>
    * Description: <b>The organization who generated this request</b><br>
-   * Type: <b>token</b><br>
-   * Path: <b>ProcessRequest.organizationIdentifier</b><br>
+   * Type: <b>reference</b><br>
+   * Path: <b>ProcessRequest.organizationReference</b><br>
    * </p>
    */
-  @SearchParamDefinition(name="organizationidentifier", path="ProcessRequest.organization.as(Identifier)", description="The organization who generated this request", type="token" )
-  public static final String SP_ORGANIZATIONIDENTIFIER = "organizationidentifier";
+  @SearchParamDefinition(name="organization-reference", path="ProcessRequest.organization.as(Reference)", description="The organization who generated this request", type="reference", target={Organization.class } )
+  public static final String SP_ORGANIZATION_REFERENCE = "organization-reference";
  /**
-   * <b>Fluent Client</b> search parameter constant for <b>organizationidentifier</b>
+   * <b>Fluent Client</b> search parameter constant for <b>organization-reference</b>
+   * <p>
+   * Description: <b>The organization who generated this request</b><br>
+   * Type: <b>reference</b><br>
+   * Path: <b>ProcessRequest.organizationReference</b><br>
+   * </p>
+   */
+  public static final ca.uhn.fhir.rest.gclient.ReferenceClientParam ORGANIZATION_REFERENCE = new ca.uhn.fhir.rest.gclient.ReferenceClientParam(SP_ORGANIZATION_REFERENCE);
+
+/**
+   * Constant for fluent queries to be used to add include statements. Specifies
+   * the path value of "<b>ProcessRequest:organization-reference</b>".
+   */
+  public static final ca.uhn.fhir.model.api.Include INCLUDE_ORGANIZATION_REFERENCE = new ca.uhn.fhir.model.api.Include("ProcessRequest:organization-reference").toLocked();
+
+ /**
+   * Search parameter: <b>organization-identifier</b>
    * <p>
    * Description: <b>The organization who generated this request</b><br>
    * Type: <b>token</b><br>
    * Path: <b>ProcessRequest.organizationIdentifier</b><br>
    * </p>
    */
-  public static final ca.uhn.fhir.rest.gclient.TokenClientParam ORGANIZATIONIDENTIFIER = new ca.uhn.fhir.rest.gclient.TokenClientParam(SP_ORGANIZATIONIDENTIFIER);
+  @SearchParamDefinition(name="organization-identifier", path="ProcessRequest.organization.as(Identifier)", description="The organization who generated this request", type="token" )
+  public static final String SP_ORGANIZATION_IDENTIFIER = "organization-identifier";
+ /**
+   * <b>Fluent Client</b> search parameter constant for <b>organization-identifier</b>
+   * <p>
+   * Description: <b>The organization who generated this request</b><br>
+   * Type: <b>token</b><br>
+   * Path: <b>ProcessRequest.organizationIdentifier</b><br>
+   * </p>
+   */
+  public static final ca.uhn.fhir.rest.gclient.TokenClientParam ORGANIZATION_IDENTIFIER = new ca.uhn.fhir.rest.gclient.TokenClientParam(SP_ORGANIZATION_IDENTIFIER);
 
  /**
    * Search parameter: <b>action</b>
@@ -1755,76 +1777,50 @@ public class ProcessRequest extends DomainResource {
   public static final ca.uhn.fhir.rest.gclient.TokenClientParam ACTION = new ca.uhn.fhir.rest.gclient.TokenClientParam(SP_ACTION);
 
  /**
-   * Search parameter: <b>organizationreference</b>
-   * <p>
-   * Description: <b>The organization who generated this request</b><br>
-   * Type: <b>reference</b><br>
-   * Path: <b>ProcessRequest.organizationReference</b><br>
-   * </p>
-   */
-  @SearchParamDefinition(name="organizationreference", path="ProcessRequest.organization.as(Reference)", description="The organization who generated this request", type="reference", target={Organization.class } )
-  public static final String SP_ORGANIZATIONREFERENCE = "organizationreference";
- /**
-   * <b>Fluent Client</b> search parameter constant for <b>organizationreference</b>
-   * <p>
-   * Description: <b>The organization who generated this request</b><br>
-   * Type: <b>reference</b><br>
-   * Path: <b>ProcessRequest.organizationReference</b><br>
-   * </p>
-   */
-  public static final ca.uhn.fhir.rest.gclient.ReferenceClientParam ORGANIZATIONREFERENCE = new ca.uhn.fhir.rest.gclient.ReferenceClientParam(SP_ORGANIZATIONREFERENCE);
-
-/**
-   * Constant for fluent queries to be used to add include statements. Specifies
-   * the path value of "<b>ProcessRequest:organizationreference</b>".
-   */
-  public static final ca.uhn.fhir.model.api.Include INCLUDE_ORGANIZATIONREFERENCE = new ca.uhn.fhir.model.api.Include("ProcessRequest:organizationreference").toLocked();
-
- /**
-   * Search parameter: <b>providerreference</b>
-   * <p>
-   * Description: <b>The provider who regenerated this request</b><br>
-   * Type: <b>reference</b><br>
-   * Path: <b>ProcessRequest.providerReference</b><br>
-   * </p>
-   */
-  @SearchParamDefinition(name="providerreference", path="ProcessRequest.provider.as(Reference)", description="The provider who regenerated this request", type="reference", providesMembershipIn={ @ca.uhn.fhir.model.api.annotation.Compartment(name="Practitioner") }, target={Practitioner.class } )
-  public static final String SP_PROVIDERREFERENCE = "providerreference";
- /**
-   * <b>Fluent Client</b> search parameter constant for <b>providerreference</b>
-   * <p>
-   * Description: <b>The provider who regenerated this request</b><br>
-   * Type: <b>reference</b><br>
-   * Path: <b>ProcessRequest.providerReference</b><br>
-   * </p>
-   */
-  public static final ca.uhn.fhir.rest.gclient.ReferenceClientParam PROVIDERREFERENCE = new ca.uhn.fhir.rest.gclient.ReferenceClientParam(SP_PROVIDERREFERENCE);
-
-/**
-   * Constant for fluent queries to be used to add include statements. Specifies
-   * the path value of "<b>ProcessRequest:providerreference</b>".
-   */
-  public static final ca.uhn.fhir.model.api.Include INCLUDE_PROVIDERREFERENCE = new ca.uhn.fhir.model.api.Include("ProcessRequest:providerreference").toLocked();
-
- /**
-   * Search parameter: <b>provideridentifier</b>
+   * Search parameter: <b>provider-identifier</b>
    * <p>
    * Description: <b>The provider who regenerated this request</b><br>
    * Type: <b>token</b><br>
    * Path: <b>ProcessRequest.providerIdentifier</b><br>
    * </p>
    */
-  @SearchParamDefinition(name="provideridentifier", path="ProcessRequest.provider.as(Identifier)", description="The provider who regenerated this request", type="token" )
-  public static final String SP_PROVIDERIDENTIFIER = "provideridentifier";
+  @SearchParamDefinition(name="provider-identifier", path="ProcessRequest.provider.as(Identifier)", description="The provider who regenerated this request", type="token" )
+  public static final String SP_PROVIDER_IDENTIFIER = "provider-identifier";
  /**
-   * <b>Fluent Client</b> search parameter constant for <b>provideridentifier</b>
+   * <b>Fluent Client</b> search parameter constant for <b>provider-identifier</b>
    * <p>
    * Description: <b>The provider who regenerated this request</b><br>
    * Type: <b>token</b><br>
    * Path: <b>ProcessRequest.providerIdentifier</b><br>
    * </p>
    */
-  public static final ca.uhn.fhir.rest.gclient.TokenClientParam PROVIDERIDENTIFIER = new ca.uhn.fhir.rest.gclient.TokenClientParam(SP_PROVIDERIDENTIFIER);
+  public static final ca.uhn.fhir.rest.gclient.TokenClientParam PROVIDER_IDENTIFIER = new ca.uhn.fhir.rest.gclient.TokenClientParam(SP_PROVIDER_IDENTIFIER);
+
+ /**
+   * Search parameter: <b>provider-reference</b>
+   * <p>
+   * Description: <b>The provider who regenerated this request</b><br>
+   * Type: <b>reference</b><br>
+   * Path: <b>ProcessRequest.providerReference</b><br>
+   * </p>
+   */
+  @SearchParamDefinition(name="provider-reference", path="ProcessRequest.provider.as(Reference)", description="The provider who regenerated this request", type="reference", providesMembershipIn={ @ca.uhn.fhir.model.api.annotation.Compartment(name="Practitioner") }, target={Practitioner.class } )
+  public static final String SP_PROVIDER_REFERENCE = "provider-reference";
+ /**
+   * <b>Fluent Client</b> search parameter constant for <b>provider-reference</b>
+   * <p>
+   * Description: <b>The provider who regenerated this request</b><br>
+   * Type: <b>reference</b><br>
+   * Path: <b>ProcessRequest.providerReference</b><br>
+   * </p>
+   */
+  public static final ca.uhn.fhir.rest.gclient.ReferenceClientParam PROVIDER_REFERENCE = new ca.uhn.fhir.rest.gclient.ReferenceClientParam(SP_PROVIDER_REFERENCE);
+
+/**
+   * Constant for fluent queries to be used to add include statements. Specifies
+   * the path value of "<b>ProcessRequest:provider-reference</b>".
+   */
+  public static final ca.uhn.fhir.model.api.Include INCLUDE_PROVIDER_REFERENCE = new ca.uhn.fhir.model.api.Include("ProcessRequest:provider-reference").toLocked();
 
 
 }

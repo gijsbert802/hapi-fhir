@@ -29,19 +29,16 @@ package org.hl7.fhir.dstu3.model;
   
 */
 
-// Generated on Sat, Jul 2, 2016 11:26-0400 for FHIR v1.4.0
+// Generated on Thu, Aug 25, 2016 23:04-0400 for FHIR v1.6.0
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
-import java.util.*;
-
+import org.hl7.fhir.exceptions.FHIRException;
+import org.hl7.fhir.instance.model.api.IBaseBackboneElement;
 import org.hl7.fhir.utilities.Utilities;
-import ca.uhn.fhir.model.api.annotation.ResourceDef;
-import ca.uhn.fhir.model.api.annotation.SearchParamDefinition;
-import ca.uhn.fhir.model.api.annotation.Child;
-import ca.uhn.fhir.model.api.annotation.ChildOrder;
-import ca.uhn.fhir.model.api.annotation.Description;
-import ca.uhn.fhir.model.api.annotation.Block;
-import org.hl7.fhir.instance.model.api.*;
-import org.hl7.fhir.dstu3.exceptions.FHIRException;
+
+import ca.uhn.fhir.model.api.annotation.*;
 /**
  * A set of information summarized from a list of other resources.
  */
@@ -287,7 +284,7 @@ public class ListResource extends DomainResource {
         /**
          * A reference to the actual resource from which data was derived.
          */
-        @Child(name = "item", type = {}, order=4, min=1, max=1, modifier=false, summary=false)
+        @Child(name = "item", type = {Reference.class}, order=4, min=1, max=1, modifier=false, summary=false)
         @Description(shortDefinition="Actual entry", formalDefinition="A reference to the actual resource from which data was derived." )
         protected Reference item;
 

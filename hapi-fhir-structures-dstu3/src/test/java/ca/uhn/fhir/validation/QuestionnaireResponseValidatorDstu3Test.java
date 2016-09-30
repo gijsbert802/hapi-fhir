@@ -9,6 +9,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,19 +37,20 @@ import org.hl7.fhir.dstu3.model.Reference;
 import org.hl7.fhir.dstu3.model.StringType;
 import org.hl7.fhir.dstu3.model.Type;
 import org.hl7.fhir.dstu3.model.ValueSet;
-import org.hl7.fhir.dstu3.utils.IWorkerContext;
+import org.hl7.fhir.dstu3.context.IWorkerContext;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.internal.stubbing.answers.ThrowsException;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.parser.DataFormatException;
 import ca.uhn.fhir.util.TestUtil;
 
 public class QuestionnaireResponseValidatorDstu3Test {
 	private static DefaultProfileValidationSupport myDefaultValidationSupport = new DefaultProfileValidationSupport();
 
-	private static final FhirContext ourCtx = FhirContext.forDstu3();
+	private static FhirContext ourCtx = FhirContext.forDstu3();
 	private static final org.slf4j.Logger ourLog = org.slf4j.LoggerFactory.getLogger(QuestionnaireResponseValidatorDstu3Test.class);
 
 	private FhirInstanceValidator myInstanceVal;
@@ -182,6 +184,7 @@ public class QuestionnaireResponseValidatorDstu3Test {
 		ourLog.info(errors.toString());
 		assertThat(errors.toString(), containsString("No LinkId, so can't be validated"));
 	}
+	
 
 	@Test
 	public void testItemWithNoType() {
