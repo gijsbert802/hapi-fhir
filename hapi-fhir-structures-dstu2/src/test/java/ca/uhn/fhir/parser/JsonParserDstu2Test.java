@@ -23,6 +23,7 @@ import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.Matchers;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Test;
@@ -47,6 +48,7 @@ import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
 import ca.uhn.fhir.model.dstu2.composite.CodingDt;
 import ca.uhn.fhir.model.dstu2.composite.HumanNameDt;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
+import ca.uhn.fhir.model.dstu2.resource.Basic;
 import ca.uhn.fhir.model.dstu2.resource.Binary;
 import ca.uhn.fhir.model.dstu2.resource.Bundle.Entry;
 import ca.uhn.fhir.model.dstu2.resource.Condition;
@@ -106,8 +108,6 @@ public class JsonParserDstu2Test {
 		assertEquals("ORG", o.getName());
 	}
 	
-
-	
 	/**
 	 * See #308
 	 */
@@ -143,7 +143,7 @@ public class JsonParserDstu2Test {
 		assertEquals("123", b.getId().getIdPart());
 		assertEquals(0, b.getEntry().size());
 	}
-	
+
 	@Test
 	public void testEncodeAndParseExtensions() throws Exception {
 
@@ -229,6 +229,7 @@ public class JsonParserDstu2Test {
 
 	}
 	
+	
 	@Test
 	public void testEncodeAndParseLanguage() {
 		Patient p = new Patient();
@@ -245,7 +246,7 @@ public class JsonParserDstu2Test {
 		p = (Patient) ourCtx.newJsonParser().parseResource("{\"resourceType\":\"Patient\",\"language\":[\"en_CA\"]}");
 		assertEquals("en_CA", p.getLanguage().getValue());
 	}
-
+	
 	@Test
 	public void testEncodeAndParseMetaProfileAndTags() {
 		Patient p = new Patient();
@@ -301,7 +302,6 @@ public class JsonParserDstu2Test {
 		assertEquals(new Tag("scheme1", "term1", "label1"), tagList.get(0));
 		assertEquals(new Tag("scheme2", "term2", "label2"), tagList.get(1));
 	}
-
 	
 	/**
 	 * See #336
@@ -359,8 +359,7 @@ public class JsonParserDstu2Test {
 		assertEquals(null, name.getFamily().get(2).getAllUndeclaredExtensions().get(0).getElementSpecificId());
 
 	}
-
-
+	
 	@Test
 	public void testEncodeAndParseSecurityLabels() {
 		Patient p = new Patient();
@@ -425,7 +424,6 @@ public class JsonParserDstu2Test {
 		assertEquals("VERSION2", label.getVersion());
 	}
 
-	
 	@Test
 	public void testEncodeBundleNewBundleNoText() {
 
@@ -446,6 +444,7 @@ public class JsonParserDstu2Test {
 		assertThat(val, not(containsString("text")));
 
 	}
+
 	
 	@Test
 	public void testEncodeBundleOldBundleNoText() {
@@ -465,7 +464,8 @@ public class JsonParserDstu2Test {
 		assertEquals(1, b.getEntries().size());
 
 	}
-	
+
+
 	/**
 	 * Fixing #89
 	 */
@@ -485,6 +485,7 @@ public class JsonParserDstu2Test {
 		//@formatter:on
 	}
 
+	
 	@Test
 	public void testEncodeDoesntIncludeUuidId() {
 		Patient p = new Patient();
@@ -494,13 +495,13 @@ public class JsonParserDstu2Test {
 		String actual = ourCtx.newJsonParser().setPrettyPrint(true).encodeResourceToString(p);
 		assertThat(actual, not(containsString("78ef6f64c2f2")));
 	}
-
+	
 	@Test
 	public void testEncodeEmptyBinary() {
 		String output = ourCtx.newJsonParser().encodeResourceToString(new Binary());
 		assertEquals("{\"resourceType\":\"Binary\"}", output);
 	}
-
+	
 	/**
 	 * #158
 	 */
@@ -535,7 +536,6 @@ public class JsonParserDstu2Test {
 		assertThat(encoded, not(containsString("Label")));
 	}
 
-	
 	@Test
 	public void testEncodeExtensionInPrimitiveElement() {
 
@@ -564,7 +564,6 @@ public class JsonParserDstu2Test {
 		assertEquals(encoded, "{\"resourceType\":\"Conformance\",\"acceptUnknown\":\"elements\",\"_acceptUnknown\":{\"extension\":[{\"url\":\"http://foo\",\"valueString\":\"AAA\"}]}}");
 
 	}
-
 
 	@Test
 	public void testEncodeExtensionUndeclaredNonModifier() {
@@ -647,6 +646,7 @@ public class JsonParserDstu2Test {
 		assertEquals("sub_ext_value", ((StringDt)obs.getUndeclaredExtensions().get(0).getExtension().get(0).getValue()).getValue());
 	}
 
+	
 	/**
 	 * See #428
 	 */
@@ -668,6 +668,7 @@ public class JsonParserDstu2Test {
 			logger.setLevel(initialLevel);
 		}
 	}
+
 
 	@Test
 	public void testEncodeForceResourceId() {
@@ -1362,6 +1363,66 @@ public class JsonParserDstu2Test {
 		assertEquals("patient family", p.getNameFirstRep().getFamilyAsSingleString());
 	}
 
+	/**
+	 * See #414
+	 */
+	@Test
+	public void testParseJsonExtensionWithoutUrl() {
+		//@formatter:off
+		String input = 
+			"{\"resourceType\":\"Patient\"," +
+			"\"extension\":[ {\"valueDateTime\":\"2011-01-02T11:13:15\"} ]" +
+			"}";
+		//@formatter:on
+
+		IParser parser = ourCtx.newJsonParser();
+		parser.setParserErrorHandler(new LenientErrorHandler());
+		Patient parsed = (Patient) parser.parseResource(input);
+		assertEquals(1, parsed.getAllUndeclaredExtensions().size());
+		assertEquals(null, parsed.getAllUndeclaredExtensions().get(0).getUrl());
+		assertEquals("2011-01-02T11:13:15", parsed.getAllUndeclaredExtensions().get(0).getValueAsPrimitive().getValueAsString());
+
+		try {
+			parser = ourCtx.newJsonParser();
+			parser.setParserErrorHandler(new StrictErrorHandler());
+			parser.parseResource(input);
+			fail();
+		} catch (DataFormatException e) {
+			assertEquals("Resource is missing required element 'url' in parent element 'extension'", e.getMessage());
+		}
+		
+	}
+
+	/**
+	 * See #414
+	 */
+	@Test
+	public void testParseJsonModifierExtensionWithoutUrl() {
+		//@formatter:off
+		String input = 
+			"{\"resourceType\":\"Patient\"," +
+			"\"modifierExtension\":[ {\"valueDateTime\":\"2011-01-02T11:13:15\"} ]" +
+			"}";
+		//@formatter:on
+
+		IParser parser = ourCtx.newJsonParser();
+		parser.setParserErrorHandler(new LenientErrorHandler());
+		Patient parsed = (Patient) parser.parseResource(input);
+		assertEquals(1, parsed.getAllUndeclaredExtensions().size());
+		assertEquals(null, parsed.getAllUndeclaredExtensions().get(0).getUrl());
+		assertEquals("2011-01-02T11:13:15", parsed.getAllUndeclaredExtensions().get(0).getValueAsPrimitive().getValueAsString());
+
+		try {
+			parser = ourCtx.newJsonParser();
+			parser.setParserErrorHandler(new StrictErrorHandler());
+			parser.parseResource(input);
+			fail();
+		} catch (DataFormatException e) {
+			assertEquals("Resource is missing required element 'url' in parent element 'modifierExtension'", e.getMessage());
+		}
+		
+	}
+
 	@Test
 	public void testParseMetadata() throws Exception {
 		//@formatter:off
@@ -1428,6 +1489,16 @@ public class JsonParserDstu2Test {
 
 		assertEquals(exp, act);
 
+	}
+
+	/**
+	 * See #484
+	 */
+	@Test
+	public void testParseNarrativeWithEmptyDiv() {
+		String input = "{\"resourceType\":\"Basic\",\"id\":\"1\",\"text\":{\"status\":\"generated\",\"div\":\"<div/>\"}}";
+		Basic basic = ourCtx.newJsonParser().parseResource(Basic.class, input);
+		assertEquals("<div/>", basic.getText().getDivAsString());
 	}
 
 	/**
@@ -1628,8 +1699,48 @@ public class JsonParserDstu2Test {
 			ourCtx.newJsonParser().parseResource(Conformance.class, input);
 			fail();
 		} catch (DataFormatException e) {
-			assertEquals("Syntax error parsing JSON FHIR structure: Expected ARRAY at element 'modifierExtension', found 'JsonObject'", e.getMessage());
+			assertEquals("Syntax error parsing JSON FHIR structure: Expected ARRAY at element 'modifierExtension', found 'OBJECT'", e.getMessage());
 		}
+	}
+
+	/**
+	 * See #449
+	 */
+	@Test
+	public void testReferenceEncodingOnCustomType() {
+		Organization org = new Organization();
+		org.setId("000111");
+		org.setName("Owner institution");
+		
+		ExtendedDevice dev = new ExtendedDevice();
+		dev.setId("000222");
+		CodingDt devType = new CodingDt();
+		
+		devType.setSystem("http://devTypeSystem");
+		devType.setCode("0");
+		dev.getType().addCoding(devType);
+		
+		ExtensionDt someExt = new ExtensionDt();
+		someExt.setUrl("http://extensionsBaseUrl/Device#someExt");
+		ResourceReferenceDt orgRef = new ResourceReferenceDt();
+		orgRef.setResource(org);
+		someExt.setValue(orgRef); //this works
+		dev.addUndeclaredExtension(someExt);
+		
+		dev.getSomeOrg().setResource(org); //this doesn't work
+		dev.setSomeOtherOrg(new ResourceReferenceDt(org)); //this almost works, the Organization/ prefix is missing
+		
+		dev.getOwner().setResource(org); //this works
+		
+		ca.uhn.fhir.model.dstu2.resource.Bundle bundle = new ca.uhn.fhir.model.dstu2.resource.Bundle();
+		bundle.setId(new IdDt("000333"));
+		bundle.addEntry().setResource(dev);
+		bundle.addEntry().setResource(org);
+		
+		String encoded = ourCtx.newJsonParser().setPrettyPrint(true).encodeResourceToString(bundle);
+		ourLog.info(encoded);
+		
+		assertThat(encoded, containsString("reference\": \"Organization/000111\""));
 	}
 
 	/**

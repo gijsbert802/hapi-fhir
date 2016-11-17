@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>ca.uhn.hapi.fhir</groupId>
 		<artifactId>hapi-deployable-pom</artifactId>
-		<version>2.1-SNAPSHOT</version>
+		<version>2.2-SNAPSHOT</version>
 		<relativePath>../hapi-deployable-pom/pom.xml</relativePath>
 	</parent>
 
@@ -19,47 +19,47 @@
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-base</artifactId>
-			<version>2.1-SNAPSHOT</version>
+			<version>2.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-structures-dstu</artifactId>
-			<version>2.1-SNAPSHOT</version>
+			<version>2.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-structures-dstu2</artifactId>
-			<version>2.1-SNAPSHOT</version>
+			<version>2.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-structures-dstu3</artifactId>
-			<version>2.1-SNAPSHOT</version>
+			<version>2.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-structures-hl7org-dstu2</artifactId>
-			<version>2.1-SNAPSHOT</version>
+			<version>2.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-validation-resources-dstu2</artifactId>
-			<version>2.1-SNAPSHOT</version>
+			<version>2.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-validation-resources-dstu3</artifactId>
-			<version>2.1-SNAPSHOT</version>
+			<version>2.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-jpaserver-base</artifactId>
-			<version>2.1-SNAPSHOT</version>
+			<version>2.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-client-okhttp</artifactId>
-			<version>2.1-SNAPSHOT</version>
+			<version>2.2-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
@@ -275,25 +275,6 @@
 							</sources>
 						</configuration>
 					</execution>
-					<!-- 
-					<execution>
-						<id>add-test-source</id>
-						<phase>generate-test-sources</phase>
-						<goals>
-							<goal>add-test-source</goal>
-						</goals>
-						<configuration>
-							<sources>
-								<source>../hapi-fhir-structures-dstu/src/test/java</source>
-								<source>../hapi-fhir-structures-dstu2/src/test/java</source>
-								<source>../hapi-fhir-structures-hl7org-dstu2/src/test/java</source>
-								<source>../hapi-fhir-structures-dstu3/src/test/java</source>
-								<source>../hapi-fhir-jpaserver-base/src/test/java</source>
-								<source>../hapi-fhir-base/src/test/java</source>
-							</sources>
-						</configuration>
-					</execution>
-					-->
 				</executions>
 			</plugin>
 			<plugin>
@@ -331,6 +312,9 @@
 			</testResource>
 			<testResource>
 				<directory>../hapi-fhir-structures-dstu3/src/test/resources</directory>
+			</testResource>
+			<testResource>
+				<directory>../hapi-fhir-client-okhttp/src/test/resources</directory>
 			</testResource>
 		</testResources>
 	</build>

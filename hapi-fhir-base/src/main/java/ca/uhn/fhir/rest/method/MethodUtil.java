@@ -160,24 +160,18 @@ public class MethodUtil {
 		return PatchMethodBinding.createPatchInvocation(theContext, theId, thePatchType, theBody);
 	}
 	
-	/** End Patch **/
+	public static HttpPatchClientInvocation createPatchInvocation(FhirContext theContext, String theUrl, PatchTypeEnum thePatchType, String theBody) {
+		return PatchMethodBinding.createPatchInvocation(theContext, theUrl, thePatchType, theBody);
+	}
+
+	public static HttpPatchClientInvocation createPatchInvocation(FhirContext theContext, PatchTypeEnum thePatchType, String theBody, String theResourceType, Map<String, List<String>> theMatchParams) {
+		return PatchMethodBinding.createPatchInvocation(theContext, thePatchType, theBody, theResourceType, theMatchParams);
+	}
 
 	public static HttpPutClientInvocation createUpdateInvocation(FhirContext theContext, IBaseResource theResource, String theResourceBody, Map<String, List<String>> theMatchParams) {
-		StringBuilder b = new StringBuilder();
-
 		String resourceType = theContext.getResourceDefinition(theResource).getName();
-		b.append(resourceType);
 
-		boolean haveQuestionMark = false;
-		for (Entry<String, List<String>> nextEntry : theMatchParams.entrySet()) {
-			for (String nextValue : nextEntry.getValue()) {
-				b.append(haveQuestionMark ? '&' : '?');
-				haveQuestionMark = true;
-				b.append(UrlUtil.escape(nextEntry.getKey()));
-				b.append('=');
-				b.append(UrlUtil.escape(nextValue));
-			}
-		}
+		StringBuilder b = createUrl(resourceType, theMatchParams);
 
 		HttpPutClientInvocation retVal;
 		if (StringUtils.isBlank(theResourceBody)) {
@@ -189,6 +183,25 @@ public class MethodUtil {
 		addTagsToPostOrPut(theContext, theResource, retVal);
 
 		return retVal;
+	}
+
+
+	public static StringBuilder createUrl(String theResourceType, Map<String, List<String>> theMatchParams) {
+		StringBuilder b = new StringBuilder();
+
+		b.append(theResourceType);
+
+		boolean haveQuestionMark = false;
+		for (Entry<String, List<String>> nextEntry : theMatchParams.entrySet()) {
+			for (String nextValue : nextEntry.getValue()) {
+				b.append(haveQuestionMark ? '&' : '?');
+				haveQuestionMark = true;
+				b.append(UrlUtil.escape(nextEntry.getKey()));
+				b.append('=');
+				b.append(UrlUtil.escape(nextValue));
+			}
+		}
+		return b;
 	}
 
 	
@@ -354,7 +367,7 @@ public class MethodUtil {
 			}
 			
 			/* 
-			 * Note: for the frst two here, we're using strings instead of static binding
+			 * Note: for the first two here, we're using strings instead of static binding
 			 * so that we don't need the java.servlet JAR on the classpath in order to use
 			 * this class 
 			 */
@@ -546,6 +559,14 @@ public class MethodUtil {
 			}
 		}
 
+		List<String> locationHeaders = theHeaders.get(Constants.HEADER_LOCATION_LC);
+		if (locationHeaders != null && locationHeaders.size() > 0 && StringUtils.isNotBlank(locationHeaders.get(0))) {
+			String headerValue = locationHeaders.get(0);
+			if (isNotBlank(headerValue)) {
+				new IdDt(headerValue).applyTo(resource);
+			}
+		}
+
 		IdDt existing = IdDt.of(resource);
 
 		List<String> eTagHeaders = theHeaders.get(Constants.HEADER_ETAG_LC);
@@ -608,16 +629,16 @@ public class MethodUtil {
 	/**
 	 * This is a utility method intended provided to help the JPA module.
 	 */
-	public static IQueryParameterAnd<?> parseQueryParams(RuntimeSearchParam theParamDef, String theUnqualifiedParamName, List<QualifiedParamList> theParameters) {
+	public static IQueryParameterAnd<?> parseQueryParams(FhirContext theContext, RuntimeSearchParam theParamDef, String theUnqualifiedParamName, List<QualifiedParamList> theParameters) {
 		RestSearchParameterTypeEnum paramType = theParamDef.getParamType();
-		return parseQueryParams(paramType, theUnqualifiedParamName, theParameters);
+		return parseQueryParams(theContext, paramType, theUnqualifiedParamName, theParameters);
 	}
 
 
 	/**
 	 * This is a utility method intended provided to help the JPA module.
 	 */
-	public static IQueryParameterAnd<?> parseQueryParams(RestSearchParameterTypeEnum paramType, String theUnqualifiedParamName, List<QualifiedParamList> theParameters) {
+	public static IQueryParameterAnd<?> parseQueryParams(FhirContext theContext, RestSearchParameterTypeEnum paramType, String theUnqualifiedParamName, List<QualifiedParamList> theParameters) {
 		QueryParameterAndBinder binder = null;
 		switch (paramType) {
 		case COMPOSITE:
@@ -648,7 +669,7 @@ public class MethodUtil {
 			break;
 		}
 
-		return binder.parse(theUnqualifiedParamName, theParameters);
+		return binder.parse(theContext, theUnqualifiedParamName, theParameters);
 	}
 
 	public static void parseTagValue(TagList tagList, String nextTagComplete) {
@@ -779,7 +800,7 @@ public class MethodUtil {
 		return retVal;
 	}
 
-	public static IQueryParameterOr<?> singleton(final IQueryParameterType theParam) {
+	public static IQueryParameterOr<?> singleton(final IQueryParameterType theParam, final String theParamName) {
 		return new IQueryParameterOr<IQueryParameterType>() {
 
 			@Override
@@ -788,14 +809,14 @@ public class MethodUtil {
 			}
 
 			@Override
-			public void setValuesAsQueryTokens(QualifiedParamList theParameters) {
+			public void setValuesAsQueryTokens(FhirContext theContext, String theParamName, QualifiedParamList theParameters) {
 				if (theParameters.isEmpty()) {
 					return;
 				}
 				if (theParameters.size() > 1) {
 					throw new IllegalArgumentException("Type " + theParam.getClass().getCanonicalName() + " does not support multiple values");
 				}
-				theParam.setValueAsQueryToken(theParameters.getQualifier(), theParameters.get(0));
+				theParam.setValueAsQueryToken(theContext, theParamName, theParameters.getQualifier(), theParameters.get(0));
 			}
 		};
 	}

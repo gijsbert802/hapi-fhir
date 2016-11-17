@@ -103,7 +103,7 @@ public class FhirSystemDaoDstu3Test extends BaseJpaDstu3SystemTest {
 		ourLog.info(myFhirCtx.newXmlParser().setPrettyPrint(true).encodeResourceToString(output));
 		
 		IdType id = new IdType(output.getEntry().get(1).getResponse().getLocation());
-		MedicationOrder mo = myMedicationOrderDao.read(id);
+		MedicationRequest mo = myMedicationRequestDao.read(id);
 		ourLog.info(myFhirCtx.newXmlParser().setPrettyPrint(true).encodeResourceToString(mo));
 	}
 
@@ -624,6 +624,33 @@ public class FhirSystemDaoDstu3Test extends BaseJpaDstu3SystemTest {
 
 		o = (Observation) myObservationDao.read(new IdType(respEntry.getResponse().getLocationElement()), mySrd);
 		assertEquals(new IdType(patientId).toUnqualifiedVersionless().getValue(), o.getSubject().getReference());
+	}
+
+	/**
+	 * See #467
+	 */
+	@Test
+	public void testTransactionWithLink() {
+		String methodName = "testTransactionWithLink";
+		Bundle request = new Bundle();
+
+		Patient p = new Patient();
+		p.addIdentifier().setSystem("urn:system").setValue(methodName);
+		p.addName().addFamily("Hello");
+		p.setId("Patient/" + methodName);
+		request.addEntry().setResource(p).getRequest().setMethod(HTTPVerb.POST);
+
+		Observation o = new Observation();
+		o.getCode().setText("Some Observation");
+		o.getSubject().setReference("Patient/" + methodName);
+		request.addEntry().setResource(o).getRequest().setMethod(HTTPVerb.POST);
+
+		Bundle resp = mySystemDao.transaction(mySrd, request);
+		assertEquals(BundleType.TRANSACTIONRESPONSE, resp.getTypeElement().getValue());
+		assertEquals(2, resp.getEntry().size());
+
+//		o = (Observation) myObservationDao.read(new IdType(respEntry.getResponse().getLocationElement()), mySrd);
+//		assertEquals(new IdType(patientId).toUnqualifiedVersionless().getValue(), o.getSubject().getReference());
 	}
 
 	@Test
@@ -1817,7 +1844,7 @@ public class FhirSystemDaoDstu3Test extends BaseJpaDstu3SystemTest {
 		med.getCode().addCoding().setSystem("billscodes").setCode("theCode");
 		bundle.addEntry().setResource(med).setFullUrl(medId.getValue()).getRequest().setMethod(HTTPVerb.POST).setIfNoneExist("Medication?code=billscodes|theCode");
 
-		MedicationOrder mo = new MedicationOrder();
+		MedicationRequest mo = new MedicationRequest();
 		mo.setMedication(new Reference(medId));
 		bundle.addEntry().setResource(mo).setFullUrl(mo.getIdElement().getValue()).getRequest().setMethod(HTTPVerb.POST);
 
@@ -1841,7 +1868,7 @@ public class FhirSystemDaoDstu3Test extends BaseJpaDstu3SystemTest {
 		med.getCode().addCoding().setSystem("billscodes").setCode("theCode");
 		bundle.addEntry().setResource(med).setFullUrl(medId.getValue()).getRequest().setMethod(HTTPVerb.POST).setIfNoneExist("Medication?code=billscodes|theCode");
 
-		mo = new MedicationOrder();
+		mo = new MedicationRequest();
 		mo.setMedication(new Reference(medId));
 		bundle.addEntry().setResource(mo).setFullUrl(mo.getIdElement().getValue()).getRequest().setMethod(HTTPVerb.POST);
 

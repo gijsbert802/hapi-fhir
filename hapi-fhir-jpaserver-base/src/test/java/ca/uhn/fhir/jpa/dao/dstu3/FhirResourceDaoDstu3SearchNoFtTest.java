@@ -3,8 +3,10 @@ package ca.uhn.fhir.jpa.dao.dstu3;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsInRelativeOrder;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
@@ -22,7 +24,11 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.boot.model.source.spi.IdentifierSourceSimple;
 import org.hl7.fhir.dstu3.model.*;
+import org.hl7.fhir.dstu3.model.Bundle.BundleEntryComponent;
+import org.hl7.fhir.dstu3.model.Bundle.BundleType;
+import org.hl7.fhir.dstu3.model.Bundle.HTTPVerb;
 import org.hl7.fhir.dstu3.model.ContactPoint.ContactPointSystem;
 import org.hl7.fhir.dstu3.model.Enumerations.AdministrativeGender;
 import org.hl7.fhir.dstu3.model.Subscription.SubscriptionChannelType;
@@ -30,6 +36,7 @@ import org.hl7.fhir.dstu3.model.Subscription.SubscriptionStatus;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IIdType;
+import org.hl7.fhir.instance.model.api.IPrimitiveType;
 import org.junit.AfterClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -39,10 +46,14 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import ca.uhn.fhir.jpa.dao.BaseHapiFhirDao;
 import ca.uhn.fhir.jpa.dao.SearchParameterMap;
+import ca.uhn.fhir.jpa.dao.SearchParameterMap.EverythingModeEnum;
 import ca.uhn.fhir.jpa.entity.*;
 import ca.uhn.fhir.model.api.IQueryParameterType;
 import ca.uhn.fhir.model.api.Include;
+import ca.uhn.fhir.model.dstu.composite.ResourceReferenceDt;
+import ca.uhn.fhir.model.dstu.resource.MedicationPrescription;
 import ca.uhn.fhir.model.dstu.valueset.QuantityCompararatorEnum;
+import ca.uhn.fhir.parser.DataFormatException;
 import ca.uhn.fhir.rest.api.SortOrderEnum;
 import ca.uhn.fhir.rest.api.SortSpec;
 import ca.uhn.fhir.rest.param.*;
@@ -96,7 +107,75 @@ public class FhirResourceDaoDstu3SearchNoFtTest extends BaseJpaDstu3Test {
 		myCodeSystemDao.create(cs);
 	}
 	
+	/**
+	 * See #441
+	 */
+	@Test
+	public void testChainedMedication() {
+		Medication medication = new Medication();
+		medication.getCode().addCoding().setSystem("SYSTEM").setCode("04823543");
+		IIdType medId = myMedicationDao.create(medication).getId().toUnqualifiedVersionless();
+		
+		MedicationAdministration ma = new MedicationAdministration();
+		ma.setMedication(new Reference(medId));
+		IIdType moId = myMedicationAdministrationDao.create(ma).getId().toUnqualified();
+		
+		SearchParameterMap map = new SearchParameterMap();
+		map.add(MedicationAdministration.SP_MEDICATION, new ReferenceAndListParam().addAnd(new ReferenceOrListParam().add(new ReferenceParam("code", "04823543"))));
+		IBundleProvider results = myMedicationAdministrationDao.search(map);
+		List<String> ids = toUnqualifiedIdValues(results);
+		
+		assertThat(ids, contains(moId.getValue()));
+	}
 	
+	/**
+	 * Per message from David Hay on Skype
+	 */
+	@Test
+	public void testEverythingWithLargeSet() throws Exception {
+		String inputString = IOUtils.toString(getClass().getResourceAsStream("/david_big_bundle.json"), StandardCharsets.UTF_8);
+		Bundle inputBundle = myFhirCtx.newJsonParser().parseResource(Bundle.class, inputString);
+		inputBundle.setType(BundleType.TRANSACTION);
+		
+		Set<String> allIds = new TreeSet<String>();
+		for (BundleEntryComponent nextEntry : inputBundle.getEntry()) {
+			nextEntry.getRequest().setMethod(HTTPVerb.PUT);
+			nextEntry.getRequest().setUrl(nextEntry.getResource().getId());
+			allIds.add(nextEntry.getResource().getIdElement().toUnqualifiedVersionless().getValue());
+		}
+		
+		mySystemDao.transaction(mySrd, inputBundle);
+
+		SearchParameterMap map = new SearchParameterMap();
+		map.setEverythingMode(EverythingModeEnum.PATIENT_INSTANCE);
+		IPrimitiveType<Integer> count = new IntegerType(1000);
+		IBundleProvider everything = myPatientDao.patientInstanceEverything(mySrd.getServletRequest(), new IdType("Patient/A161443"), count, null, null, null, null, mySrd);
+		
+		TreeSet<String> ids = new TreeSet<String>(toUnqualifiedVersionlessIdValues(everything));
+		assertThat(ids, hasItem("List/A161444"));
+		assertThat(ids, hasItem("List/A161468"));
+		assertThat(ids, hasItem("List/A161500"));
+
+		ourLog.info("Expected {} - {}", allIds.size(), allIds);
+		ourLog.info("Actual   {} - {}", ids.size(), ids);
+		assertEquals(allIds, ids);
+		
+		ids = new TreeSet<String>();
+		for (int i = 0; i < everything.size(); i++) {
+			for (IBaseResource next : everything.getResources(i, i+1)) {
+				ids.add(next.getIdElement().toUnqualifiedVersionless().getValue());
+			}
+		}
+		assertThat(ids, hasItem("List/A161444"));
+		assertThat(ids, hasItem("List/A161468"));
+		assertThat(ids, hasItem("List/A161500"));
+		
+		ourLog.info("Expected {} - {}", allIds.size(), allIds);
+		ourLog.info("Actual   {} - {}", ids.size(), ids);
+		assertEquals(allIds, ids);
+		
+	}
+
 	@Test
 	public void testCodeSearch() {
 		Subscription subs = new Subscription();
@@ -134,10 +213,10 @@ public class FhirResourceDaoDstu3SearchNoFtTest extends BaseJpaDstu3Test {
 		pat2.getManagingOrganization().setReferenceElement(orgId);
 		IIdType patId2 = myPatientDao.create(pat2, mySrd).getId().toUnqualifiedVersionless();
 
-		MedicationOrder mo = new MedicationOrder();
+		MedicationRequest mo = new MedicationRequest();
 		mo.getPatient().setReferenceElement(patId);
 		mo.setMedication(new Reference(medId));
-		IIdType moId = myMedicationOrderDao.create(mo, mySrd).getId().toUnqualifiedVersionless();
+		IIdType moId = myMedicationRequestDao.create(mo, mySrd).getId().toUnqualifiedVersionless();
 		
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		IBundleProvider resp = myPatientDao.patientTypeEverything(request, null, null, null, null, null, mySrd);

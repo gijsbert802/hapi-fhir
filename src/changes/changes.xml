@@ -6,7 +6,42 @@
 		<title>HAPI FHIR Changelog</title>
 	</properties>
 	<body>
-		<release version="2.1" date="TBD">
+		<release version="2.2" date="TBD">
+			<action type="fix">
+				Fix issue in AuthorizationIntetceptor where
+				transactions are blocked even when they
+				should not be
+			</action>
+			<action type="fix">
+				Fix regression in HAPI FHIR 2.1 JPA 
+				server where some search parameters on
+				metadata resources did not appear
+				(e.g. "StructureDefinition.url"). Thanks
+				to David Hay for reporting!
+			</action>
+		<release version="2.1" date="2016-11-11">
+			<action type="add">
+				STU3 structure definitions have been updated to the 
+				STU3 latest definitions (1.7.0 - SVN 10129). In 
+				particular, this version supports the new CapabilityStatement
+				resource which replaces the previous Conformance
+				resource (in order to reduce upgrade pain, both resource
+				types are included in this version of HAPI)
+			</action>
+			<action type="add">
+				Bump the version of a few dependencies to the
+				latest versions (dependent HAPI modules listed in brackets):
+				<![CDATA[
+					<ul>
+						<li>spring-data-orm (JPA): 1.10.2 -&gt; 1.10.4</li>
+					</ul>
+				]]>
+			</action>
+			<action type="fix">
+				Fix a fairly significant issue in JPA Server when using the <![CDATA[<code>DatabaseBackedPagingProvider</code>]]>: When paging over the results
+				of a search / $everything operation, under certain circumstances resources may be missing from the last page of results
+				that is returned. Thanks to David Hay for reporting!
+			</action>
 			<action type="add">
 				Client, Server, and JPA server now support experimental support
 				for 
@@ -18,6 +53,16 @@
 				<![CDATA[<br/>]]>
 				Thanks to Pater Girard for all of his help during the connectathon
 				in implementing this feature!
+			</action>
+			<action type="add">
+				Android library now uses OkHttp client by default instead
+				of Apache HttpClient. This should lead to much simpler
+				support for Android in the future.
+			</action>
+			<action type="add">
+				Both client and server now use the new STU3 mime types by default
+				if running in STU3 mode (in other words, using an STU3 
+				FhirContext).
 			</action>
 			<action type="fix">
 				In server, when returning a list of resources, the server sometimes failed to add
@@ -114,12 +159,123 @@
 				STU3 validator has been upgrated to include fixes made since the
 				1.6.0 ballot
 			</action>
+			<action type="fix">
+				Prevent JPA server from creating a bunch of
+				FhirContext objects for versions of FHIR that
+				aren't actually being used
+			</action>
 			<action type="fix" issue="443">
 				XhtmlNode.equalsDeep() contained a bug which caused resources
 				containing a narrative to always return
 				<![CDATA[<code>false</code>]]> for STU3 
 				<![CDATA[<code>Resource#equalsDeep()</code>]]>. Thanks to 
 				GitHub user @XcrigX for reporting!
+			</action>
+			<action type="fix" issue="441">
+				JPA server did not correctly process searches for chained parameters
+				where the chain passed across a field that was a choice between a
+				reference and a non-reference type (e.g. 
+				<![CDATA[<code>MedicationAdministration.medication[x]</code>]]>. 
+				Thanks to GitHub user @Crudelus for reporting!
+			</action>
+			<action type="fix" issue="414">
+				Handle parsing an extension without a URL more gracefully. In HAPI FHIR 2.0 this caused
+				a NullPointerException to be thrown. Now it will trigger a warning, or throw a 
+				DataFormatException if the StrictErrorHandler is configured on the parser.
+			</action>
+			<action type="fix">
+				Calling a HAPI server URL with a chain on a parameter that shouldn't accept
+				chains (e.g.
+				<![CDATA[<code>GET [base]/Patient?name.foo=smith</code>]]>)
+				did not return an error and instead just ignored the chained part
+				and treated the parameter as though it did not have the chain. This
+				led to confusing and potentially unsafe behaviour. This has been
+				corrected to return an error to the client. Thanks to
+				Kevin Tallevi for finding this!
+			</action>
+			<action type="fix" issue="411">
+				Fix #411 - Searching by <![CDATA[<code>POST [base]/_search</code>]]> with urlencoded parameters doesn't work correctly if
+				interceptors are accessing the parameters and there is are also
+				parameters on the URL. Thanks to Jim Steel for reporting!
+			</action>
+			<action type="add">
+				Fluent client can now return types other than Parameters
+				when invoking operations.
+			</action>
+			<action type="fix">
+				JPA server shouldn't report a totalCount in Bundle of "-1" when
+				there are no results
+			</action>
+			<action type="fix" issue="454">
+				JPA server was not correctly normalizing strings with non-latin characters
+				(e.g. Chinese chars). Thanks to GitHub user @YinAqu for reporting and providing
+				some great analysis of the issue! 
+			</action>
+			<action type="add">
+				Add a new method to ReferenceClientParam which allows you to
+				pass in a number of IDs by a collection of Strings. Thanks to
+				Thomas Andersen for the pul request!
+			</action>
+			<action type="fix" issue="327">
+				When encoding a resource in JSON where the resource has
+				an extension with a value where the value is a reference to a 
+				contained resource, the reference value (e.g. "#1") did not
+				get serialized. Thanks to GitHub user @fw060 for reporting!
+			</action>
+			<action type="fix" issue="464">
+				ResponseHighlighterInterceptor now pretty-prints responses
+				by default unless the user has explicitly requested
+				a non-pretty-printed response (ie.
+				using <![CDATA[<code>?_pretty=false</code>]]>. Thanks to 
+				Allan Brohansen and Jens Villadsen for the suggestion!
+			</action>
+			<action type="add" issue="469">
+				Add a new JSON library abstraction layer to the JSON parser.
+				This contribution shouldn't have any end-user impact but does
+				make it easier to use the JSON parser to generate custom structures
+				for other purposes, and should allow us to support RDF more
+				easily at some point. Thanks to Bill Denton for the pull
+				request and the contribution!
+			</action>
+			<action type="add" issue="455">
+				DSTU1 Bundle encoder did not include the Bundle entry author in
+				the generated bundle. Thanks to Hannes Venter for the pull
+				request and contribution!
+			</action>
+			<action type="fix">
+				Remove unused field (myIsContained) from ResourceTable
+				in JPA server.
+			</action>
+			<action type="add">
+				AuthorizationInterceptor is now a bit more aggressive
+				at blocking read operations, stopping them on the
+				way in if there is no way they will be accepted
+				to the resource check on the way out. In addition
+				it can now be configured to allow/deny operation
+				invocations at the instance level on any
+				instance of a given type
+			</action>
+			<action type="fix" issue="472">
+				STU3 servers were incorrectly returning the 
+				<![CDATA[<code>Content-Location</code>]]>
+				header instead of the
+				<![CDATA[<code>Content</code>]]>
+				header. The former has been removed from the 
+				FHIR specification in STU3, but the 
+				latter got removed in HAPI's code base.
+				Thanks to Jim Steel for reporting!
+			</action>
+			<action type="fix">
+				Correct several documentation issues. Thanks to Vadim Peretokin
+				for the pull requests!
+			</action>
+			<action type="add">
+				Remove an unneccesary database flush
+				from JPA persistence operations
+			</action>
+			<action type="add" issue="470">
+				Add method to fluent client to allow OR search across several
+				profiles. Thanks to Thomas Andersen for the pull request!
 			</action>
 		</release>
 		<release version="2.0" date="2016-08-30">
