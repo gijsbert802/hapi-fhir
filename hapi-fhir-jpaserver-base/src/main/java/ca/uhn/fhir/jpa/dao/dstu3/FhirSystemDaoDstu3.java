@@ -4,7 +4,7 @@ package ca.uhn.fhir.jpa.dao.dstu3;
  * #%L
  * HAPI FHIR JPA Server
  * %%
- * Copyright (C) 2014 - 2016 University Health Network
+ * Copyright (C) 2014 - 2017 University Health Network
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,6 +50,7 @@ import com.google.common.collect.ArrayListMultimap;
 import ca.uhn.fhir.context.RuntimeResourceDefinition;
 import ca.uhn.fhir.jpa.dao.BaseHapiFhirSystemDao;
 import ca.uhn.fhir.jpa.dao.DaoMethodOutcome;
+import ca.uhn.fhir.jpa.dao.DeleteMethodOutcome;
 import ca.uhn.fhir.jpa.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.entity.ResourceTable;
 import ca.uhn.fhir.jpa.entity.TagDefinition;
@@ -253,8 +254,17 @@ public class FhirSystemDaoDstu3 extends BaseHapiFhirSystemDao<Bundle, Meta> {
 		return transaction((ServletRequestDetails) theRequestDetails, theRequest, actionName);
 	}
 
-	@SuppressWarnings("unchecked")
 	private Bundle transaction(ServletRequestDetails theRequestDetails, Bundle theRequest, String theActionName) {
+		super.markRequestAsProcessingSubRequest(theRequestDetails);
+		try {
+			return doTransaction(theRequestDetails, theRequest, theActionName);
+		} finally {
+			super.clearRequestAsProcessingSubRequest(theRequestDetails);
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	private Bundle doTransaction(ServletRequestDetails theRequestDetails, Bundle theRequest, String theActionName) {
 		BundleType transactionType = theRequest.getTypeElement().getValue();
 		if (transactionType == BundleType.BATCH) {
 			return batch(theRequestDetails, theRequest);
@@ -360,6 +370,12 @@ public class FhirSystemDaoDstu3 extends BaseHapiFhirSystemDao<Bundle, Meta> {
 					}
 				}
 
+//			} else {
+//				
+//				if (isNotBlank(nextReqEntry.getRequest().getUrl())) {
+//					nextResourceId = new IdType(nextReqEntry.getRequest().getUrl());
+//				}
+				
 			}
 
 			HTTPVerb verb = nextReqEntry.getRequest().getMethodElement().getValue();
@@ -374,8 +390,11 @@ public class FhirSystemDaoDstu3 extends BaseHapiFhirSystemDao<Bundle, Meta> {
 				IFhirResourceDao resourceDao = getDaoOrThrowException(res.getClass());
 				res.setId((String) null);
 				DaoMethodOutcome outcome;
-				outcome = resourceDao.create(res, nextReqEntry.getRequest().getIfNoneExist(), false, theRequestDetails);
-				handleTransactionCreateOrUpdateOutcome(idSubstitutions, idToPersistedOutcome, nextResourceId, outcome, nextRespEntry, resourceType, res);
+				String matchUrl = nextReqEntry.getRequest().getIfNoneExist();
+				outcome = resourceDao.create(res, matchUrl, false, theRequestDetails);
+				if (nextResourceId != null) {
+					handleTransactionCreateOrUpdateOutcome(idSubstitutions, idToPersistedOutcome, nextResourceId, outcome, nextRespEntry, resourceType, res);
+				}
 				entriesToProcess.put(nextRespEntry, outcome.getEntity());
 				if (outcome.getCreated() == false) {
 					nonUpdatedEntities.add(outcome.getEntity());
@@ -392,22 +411,27 @@ public class FhirSystemDaoDstu3 extends BaseHapiFhirSystemDao<Bundle, Meta> {
 				if (parts.getResourceId() != null) {
 					IdType deleteId = new IdType(parts.getResourceType(), parts.getResourceId());
 					if (!deletedResources.contains(deleteId.getValueAsString())) {
-						ResourceTable deleted = dao.delete(deleteId, deleteConflicts, theRequestDetails);
-						if (deleted != null) {
+						DaoMethodOutcome outcome = dao.delete(deleteId, deleteConflicts, theRequestDetails);
+						if (outcome.getEntity() != null) {
 							deletedResources.add(deleteId.getValueAsString());
+							entriesToProcess.put(nextRespEntry, outcome.getEntity());
 						}
 					}
 				} else {
-					List<ResourceTable> allDeleted = dao.deleteByUrl(parts.getResourceType() + '?' + parts.getParams(), deleteConflicts, theRequestDetails);
+					DeleteMethodOutcome deleteOutcome = dao.deleteByUrl(parts.getResourceType() + '?' + parts.getParams(), deleteConflicts, theRequestDetails);
+					List<ResourceTable> allDeleted = deleteOutcome.getDeletedEntities();
 					for (ResourceTable deleted : allDeleted) {
 						deletedResources.add(deleted.getIdDt().toUnqualifiedVersionless().getValueAsString());
 					}
 					if (allDeleted.isEmpty()) {
 						status = Constants.STATUS_HTTP_204_NO_CONTENT;
 					}
+					
+					nextRespEntry.getResponse().setOutcome((Resource) deleteOutcome.getOperationOutcome());
 				}
 
 				nextRespEntry.getResponse().setStatus(toStatusString(status));
+				
 				break;
 			}
 			case PUT: {
@@ -480,7 +504,9 @@ public class FhirSystemDaoDstu3 extends BaseHapiFhirSystemDao<Bundle, Meta> {
 			IPrimitiveType<Date> deletedInstantOrNull = ResourceMetadataKeyEnum.DELETED_AT.get((IAnyResource) nextResource);
 			Date deletedTimestampOrNull = deletedInstantOrNull != null ? deletedInstantOrNull.getValue() : null;
 			boolean shouldUpdate = !nonUpdatedEntities.contains(nextOutcome.getEntity());
-			updateEntity(nextResource, nextOutcome.getEntity(), deletedTimestampOrNull, shouldUpdate, shouldUpdate, updateTime);
+			if (shouldUpdate) {
+				updateEntity(nextResource, nextOutcome.getEntity(), deletedTimestampOrNull, shouldUpdate, true, updateTime);
+			}
 		}
 
 		myEntityManager.flush();
@@ -593,6 +619,8 @@ public class FhirSystemDaoDstu3 extends BaseHapiFhirSystemDao<Bundle, Meta> {
 		return response;
 	}
 
+	
+	
 	private static void handleTransactionCreateOrUpdateOutcome(Map<IdType, IdType> idSubstitutions, Map<IdType, DaoMethodOutcome> idToPersistedOutcome, IdType nextResourceId, DaoMethodOutcome outcome,
 			BundleEntryComponent newEntry, String theResourceType, IBaseResource theRes) {
 		IdType newId = (IdType) outcome.getId().toUnqualifiedVersionless();
@@ -616,8 +644,10 @@ public class FhirSystemDaoDstu3 extends BaseHapiFhirSystemDao<Bundle, Meta> {
 	}
 
 	private static boolean isPlaceholder(IdType theId) {
-		if ("urn:oid:".equals(theId.getBaseUrl()) || "urn:uuid:".equals(theId.getBaseUrl())) {
-			return true;
+		if (theId != null && theId.getValue() != null) {
+			if (theId.getValue().startsWith("urn:oid:") || theId.getValue().startsWith("urn:uuid:")) {
+				return true;
+			}
 		}
 		return false;
 	}

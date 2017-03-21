@@ -4,7 +4,7 @@ package ca.uhn.fhir.parser;
  * #%L
  * HAPI FHIR - Core Library
  * %%
- * Copyright (C) 2014 - 2016 University Health Network
+ * Copyright (C) 2014 - 2017 University Health Network
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,6 +77,7 @@ import ca.uhn.fhir.model.api.TagList;
 import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.rest.server.Constants;
 import ca.uhn.fhir.rest.server.exceptions.InternalErrorException;
+import ca.uhn.fhir.util.UrlUtil;
 
 public abstract class BaseParser implements IParser {
 
@@ -305,24 +306,20 @@ public abstract class BaseParser implements IParser {
 				}
 			}
 			return reference;
-		} else {
-			if (!ref.hasResourceType() && !ref.isLocal() && theRef.getResource() != null) {
-				ref = ref.withResourceType(myContext.getResourceDefinition(theRef.getResource()).getName());
-			}
-			if (isNotBlank(myServerBaseUrl) && StringUtils.equals(myServerBaseUrl, ref.getBaseUrl())) {
-				if (isStripVersionsFromReferences(theCompositeChildElement)) {
-					return ref.toUnqualifiedVersionless().getValue();
-				} else {
-					return ref.toUnqualified().getValue();
-				}
-			} else {
-				if (isStripVersionsFromReferences(theCompositeChildElement)) {
-					return ref.toVersionless().getValue();
-				} else {
-					return ref.getValue();
-				}
-			}
 		}
+		if (!ref.hasResourceType() && !ref.isLocal() && theRef.getResource() != null) {
+			ref = ref.withResourceType(myContext.getResourceDefinition(theRef.getResource()).getName());
+		}
+		if (isNotBlank(myServerBaseUrl) && StringUtils.equals(myServerBaseUrl, ref.getBaseUrl())) {
+			if (isStripVersionsFromReferences(theCompositeChildElement)) {
+				return ref.toUnqualifiedVersionless().getValue();
+			}
+			return ref.toUnqualified().getValue();
+		}
+		if (isStripVersionsFromReferences(theCompositeChildElement)) {
+			return ref.toVersionless().getValue();
+		}
+		return ref.getValue();
 	}
 
 	private boolean isStripVersionsFromReferences(CompositeChildElement theCompositeChildElement) {
@@ -855,7 +852,17 @@ public abstract class BaseParser implements IParser {
 
 	@Override
 	public void setPreferTypes(List<Class<? extends IBaseResource>> thePreferTypes) {
-		myPreferTypes = thePreferTypes;
+		if (thePreferTypes != null) {
+			ArrayList<Class<? extends IBaseResource>> types = new ArrayList<Class<? extends IBaseResource>>();
+			for (Class<? extends IBaseResource> next : thePreferTypes) {
+				if (Modifier.isAbstract(next.getModifiers()) == false) {
+					types.add(next);
+				}
+			}
+			myPreferTypes = Collections.unmodifiableList(types);
+		} else {
+			myPreferTypes = thePreferTypes;
+		}
 	}
 
 	@Override
@@ -931,6 +938,18 @@ public abstract class BaseParser implements IParser {
 		return retVal;
 	}
 
+	protected String getExtensionUrl(final String extensionUrl) {
+		String url = extensionUrl;
+		if (StringUtils.isNotBlank(extensionUrl) && StringUtils.isNotBlank(myServerBaseUrl)) {
+			url = !UrlUtil.isValid(extensionUrl) && extensionUrl.startsWith("/") ? myServerBaseUrl + extensionUrl : extensionUrl;
+		}
+		return url;
+	}
+
+  protected String getServerBaseUrl() {
+		return  myServerBaseUrl;
+	}
+  
 	/**
 	 * Used for DSTU2 only
 	 */
@@ -1112,9 +1131,8 @@ public abstract class BaseParser implements IParser {
 				}
 				if (theElements.contains(thePathBuilder.toString())) {
 					return true;
-				} else {
-					return false;
 				}
+				return false;
 			} else if (myParent != null) {
 				boolean parentCheck;
 				if (theCheckingForWhitelist) {

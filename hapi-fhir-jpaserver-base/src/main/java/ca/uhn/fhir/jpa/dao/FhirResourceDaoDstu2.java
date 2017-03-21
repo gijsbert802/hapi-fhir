@@ -8,7 +8,7 @@ import java.util.ArrayList;
  * #%L
  * HAPI FHIR JPA Server
  * %%
- * Copyright (C) 2014 - 2016 University Health Network
+ * Copyright (C) 2014 - 2017 University Health Network
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,6 +56,7 @@ import ca.uhn.fhir.rest.method.RequestDetails;
 import ca.uhn.fhir.rest.server.EncodingEnum;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import ca.uhn.fhir.rest.server.exceptions.PreconditionFailedException;
+import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
 import ca.uhn.fhir.rest.server.interceptor.IServerInterceptor.ActionRequestDetails;
 import ca.uhn.fhir.util.CoverageIgnore;
 import ca.uhn.fhir.util.FhirTerser;
@@ -79,7 +80,8 @@ public class FhirResourceDaoDstu2<T extends IResource> extends BaseHapiFhirResou
 			values.addAll(theTerser.getAllPopulatedChildElementsOfType(theResource, BaseResourceReferenceDt.class));
 		} else if (theInclude.getValue().startsWith(theResourceDef.getName() + ":")) {
 			values = new ArrayList<Object>();
-			RuntimeSearchParam sp = theResourceDef.getSearchParam(theInclude.getValue().substring(theInclude.getValue().indexOf(':') + 1));
+			String paramName = theInclude.getValue().substring(theInclude.getValue().indexOf(':') + 1);
+			RuntimeSearchParam sp = getSearchParamByName(theResourceDef, paramName);
 			for (String nextPath : sp.getPathsSplit()) {
 				values.addAll(theTerser.getValues(theResource, nextPath));
 			}
@@ -132,8 +134,11 @@ public class FhirResourceDaoDstu2<T extends IResource> extends BaseHapiFhirResou
 		ValidationResult result;
 		if (isNotBlank(theRawResource)) {
 			result = validator.validateWithResult(theRawResource);
-		} else {
+		} else if (theResource != null) {
 			result = validator.validateWithResult(theResource);
+		} else {
+			String msg = getContext().getLocalizer().getMessage(BaseHapiFhirResourceDao.class, "cantValidateWithNoResource");
+			throw new InvalidRequestException(msg);
 		}
 
 		if (result.isSuccessful()) {
@@ -159,11 +164,11 @@ public class FhirResourceDaoDstu2<T extends IResource> extends BaseHapiFhirResou
 			boolean hasId = theCtx.getResource().getIdElement().hasIdPart();
 			if (myMode == ValidationModeEnum.CREATE) {
 				if (hasId) {
-					throw new InvalidRequestException("Resource has an ID - ID must not be populated for a FHIR create");
+					throw new UnprocessableEntityException("Resource has an ID - ID must not be populated for a FHIR create");
 				}
 			} else if (myMode == ValidationModeEnum.UPDATE) {
 				if (hasId == false) {
-					throw new InvalidRequestException("Resource has no ID - ID must be populated for a FHIR update");
+					throw new UnprocessableEntityException("Resource has no ID - ID must be populated for a FHIR update");
 				}
 			}
 

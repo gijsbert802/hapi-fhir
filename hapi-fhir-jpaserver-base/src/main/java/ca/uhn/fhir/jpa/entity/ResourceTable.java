@@ -4,7 +4,7 @@ package ca.uhn.fhir.jpa.entity;
  * #%L
  * HAPI FHIR JPA Server
  * %%
- * Copyright (C) 2014 - 2016 University Health Network
+ * Copyright (C) 2014 - 2017 University Health Network
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,6 +77,7 @@ import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
 	@Index(name = "IDX_RES_DATE", columnList="RES_UPDATED"), 
 	@Index(name = "IDX_RES_LANG", columnList="RES_TYPE,RES_LANGUAGE"), 
 	@Index(name = "IDX_RES_PROFILE", columnList="RES_PROFILE"),
+	@Index(name = "IDX_RES_TYPE", columnList="RES_TYPE"),
 	@Index(name = "IDX_INDEXSTATUS", columnList="SP_INDEX_STATUS")
 })
 @AnalyzerDefs({

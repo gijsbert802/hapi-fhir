@@ -4,7 +4,7 @@ package ca.uhn.fhir.rest.method;
  * #%L
  * HAPI FHIR - Core Library
  * %%
- * Copyright (C) 2014 - 2016 University Health Network
+ * Copyright (C) 2014 - 2017 University Health Network
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,9 +81,8 @@ public class PageMethodBinding extends BaseResourceReturningMethodBinding {
 		IBase bundle = handlePagingRequest(theServer, theRequest, theRequest.getParameters().get(Constants.PARAM_PAGINGACTION)[0]);
 		if (bundle instanceof Bundle) {
 			return new ResourceOrDstu1Bundle((Bundle) bundle);
-		} else {
-			return new ResourceOrDstu1Bundle((IBaseResource) bundle);
 		}
+		return new ResourceOrDstu1Bundle((IBaseResource) bundle);
 	}
 	
 	private IBase handlePagingRequest(IRestfulServer<?> theServer, RequestDetails theRequest, String thePagingAction) {
@@ -144,9 +143,8 @@ public class PageMethodBinding extends BaseResourceReturningMethodBinding {
 		Bundle bundle = bundleFactory.getDstu1Bundle();
 		if (bundle != null) {
 			return bundle;
-		} else {
-			return bundleFactory.getResourceBundle();
 		}
+		return bundleFactory.getResourceBundle();
 		// if (bundle != null) {
 		// for (int i = getInterceptors().size() - 1; i >= 0; i--) {
 		// IServerInterceptor next = getInterceptors().get(i);

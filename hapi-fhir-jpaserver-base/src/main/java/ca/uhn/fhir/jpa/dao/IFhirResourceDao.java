@@ -4,7 +4,7 @@ package ca.uhn.fhir.jpa.dao;
  * #%L
  * HAPI FHIR JPA Server
  * %%
- * Copyright (C) 2014 - 2016 University Health Network
+ * Copyright (C) 2014 - 2017 University Health Network
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,7 @@ import ca.uhn.fhir.rest.api.ValidationModeEnum;
 import ca.uhn.fhir.rest.method.RequestDetails;
 import ca.uhn.fhir.rest.server.EncodingEnum;
 import ca.uhn.fhir.rest.server.IBundleProvider;
+import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 
 public interface IFhirResourceDao<T extends IBaseResource> extends IDao {
@@ -82,7 +83,7 @@ public interface IFhirResourceDao<T extends IBaseResource> extends IDao {
 	 * in the provided list
 	 * @param theRequestDetails TODO
 	 */
-	ResourceTable delete(IIdType theResource, List<DeleteConflict> theDeleteConflictsListToPopulate, RequestDetails theRequestDetails);
+	DaoMethodOutcome delete(IIdType theResource, List<DeleteConflict> theDeleteConflictsListToPopulate, RequestDetails theRequestDetails);
 
 	/**
 	 * This method throws an exception if there are delete conflicts
@@ -93,12 +94,12 @@ public interface IFhirResourceDao<T extends IBaseResource> extends IDao {
 	 * This method does not throw an exception if there are delete conflicts, but populates them
 	 * in the provided list
 	 */
-	List<ResourceTable> deleteByUrl(String theUrl, List<DeleteConflict> theDeleteConflictsListToPopulate, RequestDetails theRequestDetails);
+	DeleteMethodOutcome deleteByUrl(String theUrl, List<DeleteConflict> theDeleteConflictsListToPopulate, RequestDetails theRequestDetails);
 
 	/**
 	 * This method throws an exception if there are delete conflicts
 	 */
-	DaoMethodOutcome deleteByUrl(String theString, RequestDetails theRequestDetails);
+	DeleteMethodOutcome deleteByUrl(String theString, RequestDetails theRequestDetails);
 
 	TagList getAllResourceTags(RequestDetails theRequestDetails);
 
@@ -133,6 +134,8 @@ public interface IFhirResourceDao<T extends IBaseResource> extends IDao {
 	 * @param theRequestDetails TODO
 	 */
 	<MT extends IBaseMetaType> MT metaGetOperation(Class<MT> theType, RequestDetails theRequestDetails);
+
+	DaoMethodOutcome patch(IIdType theId, PatchTypeEnum thePatchType, String thePatchBody, RequestDetails theRequestDetails);
 
 	Set<Long> processMatchUrl(String theMatchUrl);
 
@@ -182,6 +185,15 @@ public interface IFhirResourceDao<T extends IBaseResource> extends IDao {
 	Set<Long> searchForIdsWithAndOr(SearchParameterMap theParams);
 
 	/**
+	 * Takes a map of incoming raw search parameters and translates/parses them into 
+	 * appropriate {@link IQueryParameterType} instances of the appropriate type
+	 * for the given param
+	 * 
+	 * @throws InvalidRequestException If any of the parameters are not known
+	 */
+	void translateRawParameters(Map<String, List<String>> theSource, SearchParameterMap theTarget);
+
+	/**
 	 * Update a resource - Note that this variant of the method does not take in a {@link RequestDetails} and 
 	 * therefore can not fire any interceptors. Use only for internal system calls 
 	 */
@@ -210,8 +222,6 @@ public interface IFhirResourceDao<T extends IBaseResource> extends IDao {
 	 * @param theRequestDetails TODO
 	 */
 	MethodOutcome validate(T theResource, IIdType theId, String theRawResource, EncodingEnum theEncoding, ValidationModeEnum theMode, String theProfile, RequestDetails theRequestDetails);
-
-	DaoMethodOutcome patch(IIdType theId, PatchTypeEnum thePatchType, String thePatchBody, RequestDetails theRequestDetails);
 
 //	/**
 //	 * Invoke the everything operation

@@ -4,7 +4,7 @@ package ca.uhn.fhir.rest.server.interceptor.auth;
  * #%L
  * HAPI FHIR - Core Library
  * %%
- * Copyright (C) 2014 - 2016 University Health Network
+ * Copyright (C) 2014 - 2017 University Health Network
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -369,6 +369,22 @@ public class RuleBuilder implements IAuthRuleBuilder {
 					HashSet<Class<? extends IBaseResource>> appliesToTypes = new HashSet<Class<? extends IBaseResource>>();
 					appliesToTypes.add(theType);
 					return appliesToTypes;
+				}
+
+				@Override
+				public IAuthRuleFinished onAnyType() {
+					OperationRule rule = createRule();
+					rule.appliesToAnyType();
+					myRules.add(rule);
+					return new RuleBuilderFinished();
+				}
+
+				@Override
+				public IAuthRuleFinished onAnyInstance() {
+					OperationRule rule = createRule();
+					rule.appliesToAnyInstance();
+					myRules.add(rule);
+					return new RuleBuilderFinished();
 				}
 
 			}

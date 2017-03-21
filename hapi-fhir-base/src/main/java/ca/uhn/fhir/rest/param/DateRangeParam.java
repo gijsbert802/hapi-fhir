@@ -6,7 +6,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
  * #%L
  * HAPI FHIR - Core Library
  * %%
- * Copyright (C) 2014 - 2016 University Health Network
+ * Copyright (C) 2014 - 2017 University Health Network
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -345,6 +345,7 @@ public class DateRangeParam implements IQueryParameterAnd<DateParam> {
 	public void setRangeFromDatesInclusive(String theLowerBound, String theUpperBound) {
 		myLowerBound = theLowerBound != null ? new DateParam(ParamPrefixEnum.GREATERTHAN_OR_EQUALS, theLowerBound) : null;
 		myUpperBound = theUpperBound != null ? new DateParam(ParamPrefixEnum.LESSTHAN_OR_EQUALS, theUpperBound) : null;
+		//FIXME potential null access on theLowerBound
 		if (isNotBlank(theLowerBound) && isNotBlank(theUpperBound) && theLowerBound.equals(theUpperBound)) {
 			myLowerBound.setPrefix(ParamPrefixEnum.EQUAL);
 			myUpperBound.setPrefix(ParamPrefixEnum.EQUAL);
