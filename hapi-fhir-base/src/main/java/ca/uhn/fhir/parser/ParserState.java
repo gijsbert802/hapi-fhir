@@ -1056,7 +1056,7 @@ class ParserState<T> {
 			} else if ("fhir_comments".equals(theLocalPart) && myJsonMode) {
 				push(new SwallowChildrenWholeState(getPreResourceState()));
 			} else {
-				throw new DataFormatException("Unexpected element in entry: " + theLocalPart);
+				this.logAndSwallowUnexpectedElement(theLocalPart);
 			}
 		}
 
@@ -1778,6 +1778,15 @@ class ParserState<T> {
 					push(newState);
 					return;
 				}
+				case CONTAINED_RESOURCES:
+				case CONTAINED_RESOURCE_LIST:
+				case EXTENSION_DECLARED:
+				case PRIMITIVE_XHTML:
+				case PRIMITIVE_XHTML_HL7ORG:
+				case RESOURCE:
+				case RESOURCE_BLOCK:
+				case UNDECL_EXT:
+					break;
 				}
 			}
 

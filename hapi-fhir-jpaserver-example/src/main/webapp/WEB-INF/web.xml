@@ -28,7 +28,7 @@
 		</init-param>
 		<init-param>
 			<param-name>contextConfigLocation</param-name>
-			<param-value>ca.uhn.fhir.jpa.demo.FhirTesterConfig</param-value>
+			<param-value>ca.uhn.fhir.jpa.demo.FhirTesterConfigDstu3</param-value>
 		</init-param>
 		<load-on-startup>2</load-on-startup>
 	</servlet>
