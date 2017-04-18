@@ -4,6 +4,7 @@ ADD ./target/hapi-fhir-jpaserver-example.war /var/lib/jetty/webapps/root.war
 # Add configuration files
 ADD jetty_conf /jetty_conf
 RUN mv /jetty_conf/keystore /usr/local/jetty/etc/keystore && \
+    mv /jetty_conf/truststore /usr/local/jetty/etc/truststore && \
     mv /jetty_conf/ssl.ini /var/lib/jetty/start.d/ssl.ini && \
     mv /jetty_conf/jetty-https.xml /usr/local/jetty/etc/jetty-https.xml && \
     mv /jetty_conf/jetty-ssl.xml /usr/local/jetty/etc/jetty-ssl.xml && \
