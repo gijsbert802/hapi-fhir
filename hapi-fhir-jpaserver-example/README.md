@@ -43,7 +43,10 @@ Use this command to start the container:
 Note: with this command data is persisted across container restarts, but not after removal of the container. Use a docker volume mapping on /var/lib/jetty/target to achieve this.
 
 ## Test TLS connection
-In order to test the TLS connection do the following
-Convert the pem file to a p12 file (OSX fix) `openssl pkcs12 -export -in certandkey.pem -out certandkey.p12`
-Use curl `curl --cert ./certandkey.p12:test https://localdev`
-Or use the webbrowser by importing the generated p12 file and go to `https://localdev`
+In order to test the TLS connection do the following.
+
+Convert the pem file to a p12 file (OSX fix), use any random password when asked `openssl pkcs12 -export -in clientcertandkey.pem -out clientcertandkey.p12`.
+
+Use curl `curl --cert ./clientcertandkey.p12:test https://<dev env>`.
+
+Or use the webbrowser by importing the generated p12 file and go to `https://<dev env>`
