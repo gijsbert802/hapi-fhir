@@ -50,3 +50,16 @@ Convert the pem file to a p12 file (OSX fix), use any random password when asked
 Use curl `curl --cert ./clientcertandkey.p12:test https://<dev env>`.
 
 Or use the webbrowser by importing the generated p12 file and go to `https://<dev env>`
+
+
+## Replacing the server certificate ##
+
+The cert in the keystore (jetty_conf/keystore) is expired and you have to replace it. You need to generate a new key pair and certificate directly into a keystore. Once this is done you need to export the certificate from this keystore to use as CA in the tls connection
+
+1. make a new directory in 'jetty_conf' to mnake the new keystore etc
+2. execute:
+  `keytool -keystore keystore -alias jetty -genkey -keyalg RSA`          -- this will generates a key pair and certificate directly into a keystore
+  `keytool -export -alias jetty -file jetty.der -keystore keystore`      -- this will extract the certificate as DER format
+  `openssl x509 -in jetty.der -inform DER -outform PEM -out jetty.crt`   -- this will convert the DER certificate as PEM (readable format)
+3. replace 'keystore' in jetty_conf/ with the new created one.
+4. add content of jetty.crt to tls connection as CA
