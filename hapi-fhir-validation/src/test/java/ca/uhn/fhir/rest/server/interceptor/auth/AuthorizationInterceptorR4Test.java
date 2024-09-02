@@ -134,7 +134,7 @@ public class AuthorizationInterceptorR4Test extends BaseValidationTestWithInline
 		.registerProvider(new DummyServiceRequestResourceProvider())
 		.registerProvider(new DummyConsentResourceProvider())
 		.registerProvider(new PlainProvider())
-		.registerProvider(new DummyCompositionProvier())
+		.registerProvider(new DummyCompositionProvider())
 		.setDefaultResponseEncoding(EncodingEnum.JSON)
 		.withPagingProvider(new FifoMemoryPagingProvider(10))
 		.setDefaultPrettyPrint(false);
@@ -4766,7 +4766,7 @@ public class AuthorizationInterceptorR4Test extends BaseValidationTestWithInline
 
 	}
 
-	public static class DummyCompositionProvier implements IResourceProvider {
+	public static class DummyCompositionProvider implements IResourceProvider {
 
 		@Override
 		public Class<? extends IBaseResource> getResourceType() {
