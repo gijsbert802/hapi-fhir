@@ -1873,6 +1873,29 @@ public class AuthorizationInterceptorJpaR4Test extends BaseResourceProviderR4Tes
 		assertEquals(newBirthDate.getValueAsString(), savedPatient.getBirthDateElement().getValueAsString());
 	}
 
+
+	@Test
+	public void testDocumentOperation_withExplicitAuthorization() {
+		IIdType patientId = createPatient();
+		IIdType compositionId = createResource("Composition", withSubject(patientId));
+
+		AuthorizationInterceptor interceptor = new AuthorizationInterceptor(PolicyEnum.DENY) {
+			@Override
+			public List<IAuthRule> buildRuleList(RequestDetails theRequestDetails) {
+				return new RuleBuilder()
+					.allow().read().instance(patientId).andThen()
+					.allow().operation().named("$document").onInstance(compositionId).andRequireExplicitResponseAuthorization().andThen()
+					.allow().read().instance(compositionId).andThen()
+					.denyAll()
+					.build();
+			}
+		};
+		myServer.getRestfulServer().registerInterceptor(interceptor);
+
+		Bundle bundle = myClient.operation().onInstanceVersion(compositionId).named("$document").withNoParameters(Parameters.class).returnResourceType(Bundle.class).execute();
+		assertThat(bundle.getEntry()).hasSize(2);
+	}
+
 	private Patient createPatient(String theFirstName, String theLastName) {
 		Patient patient = new Patient();
 		patient.addName().addGiven(theFirstName).setFamily(theLastName);
