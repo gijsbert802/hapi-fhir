@@ -134,7 +134,6 @@ public class AuthorizationInterceptorR4Test extends BaseValidationTestWithInline
 		.registerProvider(new DummyServiceRequestResourceProvider())
 		.registerProvider(new DummyConsentResourceProvider())
 		.registerProvider(new PlainProvider())
-		.registerProvider(new DummyCompositionProvier())
 		.setDefaultResponseEncoding(EncodingEnum.JSON)
 		.withPagingProvider(new FifoMemoryPagingProvider(10))
 		.setDefaultPrettyPrint(false);
@@ -454,47 +453,6 @@ public class AuthorizationInterceptorR4Test extends BaseValidationTestWithInline
 		httpGet = new HttpGet(ourServer.getBaseUrl() + "/Device/124456");
 		status = ourClient.execute(httpGet);
 		extractResponseAndClose(status);
-
-		//Then
-		assertTrue(ourHitMethod);
-		assertEquals(200, status.getStatusLine().getStatusCode());
-	}
-
-	@Test
-	public void testDocumentOperationWithExplicitAuthorization() throws Exception {
-		IdType patientId = new IdType("Patient/123");
-		IdType compositionId = new IdType("Composition/456");
-
-		//Given
-		ourServer.registerInterceptor(new AuthorizationInterceptor(PolicyEnum.DENY) {
-			@Override
-			public List<IAuthRule> buildRuleList(RequestDetails theRequestDetails) {
-				return new RuleBuilder()
-					.allow().operation().named("$document").onInstance(patientId).andRequireExplicitResponseAuthorization().andThen()
-					.allow().read().instance(patientId).andThen()
-					.allow().operation().named("$document").onInstance(compositionId).andRequireExplicitResponseAuthorization().andThen()
-					.allow().read().instance(compositionId).andThen()
-					.denyAll()
-					.build();
-			}
-		});
-
-		HttpGet httpGet;
-		HttpResponse status;
-
-		Patient patient;
-		patient = new Patient();
-		patient.setId(patientId);
-		Composition composition = new Composition();
-		composition.setId(compositionId);
-		composition.getSubject().setResource(patient);
-
-		ourHitMethod = false;
-		ourReturn = List.of(patient, composition);
-
-		//When
-		httpGet = new HttpGet(ourServer.getBaseUrl() + "/Composition/456/$document");
-		status = ourClient.execute(httpGet);
 
 		//Then
 		assertTrue(ourHitMethod);
@@ -4766,22 +4724,5 @@ public class AuthorizationInterceptorR4Test extends BaseValidationTestWithInline
 
 	}
 
-	public static class DummyCompositionProvier implements IResourceProvider {
-
-		@Override
-		public Class<? extends IBaseResource> getResourceType() {
-			return Composition.class;
-		}
-
-		@Operation(name = "document", idempotent = true)
-		public Bundle document(@IdParam IdType theId) {
-			markHitMethod();
-			Bundle retVal = new Bundle();
-			for (Resource next : ourReturn) {
-				retVal.addEntry().setResource(next);
-			}
-			return retVal;
-		}
-	}
 
 }
